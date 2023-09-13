@@ -40,18 +40,39 @@ export type Twist<_D extends Dictionary, _M extends MoveMap> = object
  */
 export type ArrayIndex = 'dot' | 'bracket'
 
-/**
- *
- */
-export interface FoldOption {
+interface CommonOption {
   /**
    * @default 'bracet'
    */
   arrayIndex?: 'dot' | 'bracket'
 }
 
-export const defaultFoldOption = {
-  arrayIndex: 'bracket'
+/**
+ *
+ */
+export interface FoldOption extends CommonOption {
+  /**
+   *
+   */
+  keyPrefix?: string
+}
+
+export const defaultCommonOption = {
+  arrayIndex: 'bracket' as ArrayIndex
 } satisfies FoldOption
 
-export type FixedFoldOption = Readonly<Required<FoldOption>>
+export type FixedFoldOption = Readonly<FoldOption & typeof defaultCommonOption>
+
+/**
+ *
+ */
+export interface UnfoldOption extends CommonOption {}
+
+export type FixedUnfoldOption = Readonly<UnfoldOption & typeof defaultCommonOption>
+
+/**
+ *
+ */
+export interface TwistOption extends CommonOption {}
+
+export type FixedTwistOption = Readonly<TwistOption & typeof defaultCommonOption>

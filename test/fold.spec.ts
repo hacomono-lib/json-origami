@@ -94,4 +94,51 @@ describe('fold', () => {
       '1.f.h.1': 8
     })
   })
+
+  it('nested object with key prefix', () => {
+    const target = {
+      a: 1,
+      b: {
+        c: 2,
+        d: [3, 4]
+      }
+    }
+
+    expect(fold(target, { keyPrefix: 'root' })).toEqual({
+      'root.a': 1,
+      'root.b.c': 2,
+      'root.b.d[0]': 3,
+      'root.b.d[1]': 4
+    })
+  })
+
+  it('nested object with root array with key prefix', () => {
+    const target = [
+      {
+        a: 1,
+        b: {
+          c: 2,
+          d: [3, 4]
+        }
+      },
+      {
+        e: 5,
+        f: {
+          g: 6,
+          h: [7, 8]
+        }
+      }
+    ] as const
+
+    expect(fold(target, { keyPrefix: 'root' })).toEqual({
+      'root[0].a': 1,
+      'root[0].b.c': 2,
+      'root[0].b.d[0]': 3,
+      'root[0].b.d[1]': 4,
+      'root[1].e': 5,
+      'root[1].f.g': 6,
+      'root[1].f.h[0]': 7,
+      'root[1].f.h[1]': 8
+    })
+  })
 })
