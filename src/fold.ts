@@ -1,5 +1,5 @@
 import {
-  defaultFoldOption,
+  defaultCommonOption,
   type Dictionary,
   type FoldOption,
   type Folded,
@@ -34,7 +34,10 @@ import {
  */
 export function fold<D extends Dictionary>(obj: D, option?: FoldOption): Folded<D> {
   return Object.fromEntries(
-    flatEntries('', obj, { ...defaultFoldOption, ...option } as FixedFoldOption)
+    flatEntries(option?.keyPrefix ?? '', obj, {
+      ...defaultCommonOption,
+      ...option
+    } as FixedFoldOption)
   ) as Folded<D>
 }
 

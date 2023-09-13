@@ -1,5 +1,5 @@
 import { fold, unfold } from '.'
-import type { Dictionary, MoveMap, Twist, FoldOption } from './type'
+import type { Dictionary, MoveMap, Twist, TwistOption } from './type'
 
 /**
  *
@@ -9,7 +9,7 @@ import type { Dictionary, MoveMap, Twist, FoldOption } from './type'
 export function twist<D extends Dictionary, M extends MoveMap>(
   obj: D,
   moveMap: M,
-  option?: FoldOption
+  option?: TwistOption
 ): Twist<D, M> {
   const folded = fold(obj, option)
 

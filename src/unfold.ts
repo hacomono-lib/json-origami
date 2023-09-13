@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
-  defaultFoldOption,
+  defaultCommonOption,
   type ArrayIndex,
-  type FixedFoldOption,
-  type FoldOption,
+  type FixedUnfoldOption,
+  type UnfoldOption,
   type Folded,
   type Unfolded
 } from './type'
@@ -32,11 +32,11 @@ import {
  * // }
  * ```
  */
-export function unfold<KV extends Folded<any>>(kv: KV, option?: FoldOption): Unfolded<KV> {
+export function unfold<KV extends Folded<any>>(kv: KV, option?: UnfoldOption): Unfolded<KV> {
   const fixedOpion = {
-    ...defaultFoldOption,
+    ...defaultCommonOption,
     ...option
-  } as FixedFoldOption
+  } as FixedUnfoldOption
   validateKeys(kv, fixedOpion)
 
   return unfoldInternal(Object.entries(kv), fixedOpion) as Unfolded<KV>
@@ -47,7 +47,7 @@ const validateIndexMap = {
   bracket: (k) => /\[\d+\]/.test(k)
 } satisfies Record<ArrayIndex, (key: string) => boolean>
 
-function validateKeys(kv: Folded<any>, opt: FixedFoldOption) {
+function validateKeys(kv: Folded<any>, opt: FixedUnfoldOption) {
   for (const key in kv) {
     if (/\d+/.test(key)) {
       validateNumberKey(key, opt)
@@ -59,7 +59,7 @@ function validateKeys(kv: Folded<any>, opt: FixedFoldOption) {
   }
 }
 
-function validateNumberKey(key: string, { arrayIndex }: FixedFoldOption) {
+function validateNumberKey(key: string, { arrayIndex }: FixedUnfoldOption) {
   if (!validateIndexMap[arrayIndex](key)) {
     throw new Error(`Invalid key ${key}`)
   }
@@ -70,7 +70,7 @@ const extractHeadIndexMap = {
   bracket: (k) => (k.match(/^\[(\d+)\]/) ?? [])[1]
 } satisfies Record<ArrayIndex, (key: string) => string | undefined>
 
-function extractHeadKey(key: string, { arrayIndex }: FixedFoldOption): string | number {
+function extractHeadKey(key: string, { arrayIndex }: FixedUnfoldOption): string | number {
   const indexHead = extractHeadIndexMap[arrayIndex](key)
 
   if (indexHead !== undefined) {
@@ -83,7 +83,7 @@ function extractHeadKey(key: string, { arrayIndex }: FixedFoldOption): string | 
   return match
 }
 
-function omitHeadKey(key: string, opt: FixedFoldOption): string {
+function omitHeadKey(key: string, opt: FixedUnfoldOption): string {
   const headKey = (() => {
     const k = extractHeadKey(key, opt)
     if (typeof k === 'number') {
@@ -95,7 +95,7 @@ function omitHeadKey(key: string, opt: FixedFoldOption): string {
   return key.replace(headKey === undefined ? '' : new RegExp(`^${headKey}\\.?`), '')
 }
 
-function unfoldInternal(entries: Array<[string, unknown]>, opt: FixedFoldOption): unknown {
+function unfoldInternal(entries: Array<[string, unknown]>, opt: FixedUnfoldOption): unknown {
   if (entries.length <= 0) {
     return {}
   }
