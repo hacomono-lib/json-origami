@@ -86,7 +86,7 @@ console.log(result)
 ### arrayIndex
 
 **Type**: `'dot' | 'bracket'`
-**Default**: 'bracket'
+**Default**: `'bracket'`
 
 Determines the formatting of array indexes when keys are compressed. Choose between dot notation (.0) or bracket notation ([0]).
 
@@ -106,10 +106,19 @@ conole.log(result)
 /// { a: 1, 'b.c': 2, 'b.d.0': 3, 'b.d.1.e': 4 }
 ```
 
+### keyPrefix
+
+Options for 'fold'
+
+**Type**: `string`
+**Default**: `''` (empty string)
+
+Adds a specified prefix to the keys in the output.
+
 ## License
 
 [MIT](./LICENSE)
 
 ## Contributing
 
-see [CONTRIBUTING.md}(./CONTRIBUTING.md)
+see [CONTRIBUTING.md](./CONTRIBUTING.md)
