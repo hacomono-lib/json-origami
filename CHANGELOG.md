@@ -1,5 +1,11 @@
 # json-origami
 
+## 0.2.2
+
+### Patch Changes
+
+- [#9](https://github.com/hacomono-lib/json-origami/pull/9) [`f6d7f33`](https://github.com/hacomono-lib/json-origami/commit/f6d7f33ce991fcf502b949df0319031fc035c950) Thanks [@mew-ton](https://github.com/mew-ton)! - chore: change target to es2015
+
 ## 0.2.1
 
 ### Patch Changes
