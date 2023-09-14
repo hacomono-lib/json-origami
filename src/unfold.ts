@@ -37,31 +37,16 @@ export function unfold<KV extends Folded<any>>(kv: KV, option?: UnfoldOption): U
     ...defaultCommonOption,
     ...option
   } as FixedUnfoldOption
-  validateKeys(kv, fixedOpion)
+  validateKeys(kv)
 
   return unfoldInternal(Object.entries(kv), fixedOpion) as Unfolded<KV>
 }
 
-const validateIndexMap = {
-  dot: (k) => /\.\d+/.test(k) || /^\d+/.test(k),
-  bracket: (k) => /\[\d+\]/.test(k)
-} satisfies Record<ArrayIndex, (key: string) => boolean>
-
-function validateKeys(kv: Folded<any>, opt: FixedUnfoldOption) {
+function validateKeys(kv: Folded<any>) {
   for (const key in kv) {
-    if (/\d+/.test(key)) {
-      validateNumberKey(key, opt)
-    }
-
     if (key.startsWith('.') || key.endsWith('.')) {
       throw new Error(`Invalid key ${key}`)
     }
-  }
-}
-
-function validateNumberKey(key: string, { arrayIndex }: FixedUnfoldOption) {
-  if (!validateIndexMap[arrayIndex](key)) {
-    throw new Error(`Invalid key ${key}`)
   }
 }
 
