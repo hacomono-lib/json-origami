@@ -74,7 +74,7 @@ function omitHeadKey(key: string, opt: FixedUnfoldOption): string {
     if (typeof k === 'number') {
       return opt.arrayIndex === 'dot' ? `${k}` : `\\[${k}\\]`
     }
-    return k
+    return k.replace(/\$/g, '\\$')
   })()
 
   return key.replace(headKey === undefined ? '' : new RegExp(`^${headKey}\\.?`), '')
@@ -113,7 +113,6 @@ function unfoldInternal(entries: Array<[string, unknown]>, opt: FixedUnfoldOptio
   }
 
   const keys = Array.from(new Set(entries.map(([key]) => extractHeadKey(key, opt) as string)))
-
   return keys.reduce((acc, key) => {
     const filteredEntries = entries.filter(([k]) => extractHeadKey(k, opt) === key)
     const unfolded = unfoldInternal(

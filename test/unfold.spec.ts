@@ -96,4 +96,24 @@ describe('unfold', () => {
       }
     ])
   })
+
+  it('include special characters', () => {
+    const kv = {
+      'theme.$color_primary': '#25adc9',
+      'theme.$color_secondary': '#333333',
+      'theme.$color_black': '#191919',
+      'feature.@mention': 'true'
+    }
+
+    expect(unfold(kv)).toEqual({
+      feature: {
+        '@mention': 'true'
+      },
+      theme: {
+        $color_primary: '#25adc9',
+        $color_secondary: '#333333',
+        $color_black: '#191919'
+      }
+    })
+  })
 })
