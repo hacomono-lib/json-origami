@@ -1,5 +1,11 @@
 # json-origami
 
+## 0.2.3
+
+### Patch Changes
+
+- [#11](https://github.com/hacomono-lib/json-origami/pull/11) [`93b598d`](https://github.com/hacomono-lib/json-origami/commit/93b598dcdff9ec9889f23f1448446c161b690e1d) Thanks [@mew-ton](https://github.com/mew-ton)! - fix: remove index validation
+
 ## 0.2.2
 
 ### Patch Changes
