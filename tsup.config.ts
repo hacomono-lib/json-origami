@@ -3,6 +3,7 @@ import config from './package.json'
 
 export default defineConfig({
   name: config.name,
+  target: ['es2015'],
   entry: ['src/index.ts'],
   format: ['cjs', 'esm'],
   dts: true,
