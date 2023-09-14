@@ -1,5 +1,11 @@
 # json-origami
 
+## 0.2.1
+
+### Patch Changes
+
+- [#7](https://github.com/hacomono-lib/json-origami/pull/7) [`7610240`](https://github.com/hacomono-lib/json-origami/commit/7610240533db11b36c13f65d9e00c9b21ac7b940) Thanks [@mew-ton](https://github.com/mew-ton)! - chore: src 配下も publish 対象にする
+
 ## 0.2.0
 
 ### Minor Changes
