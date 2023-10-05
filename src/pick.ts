@@ -33,13 +33,17 @@ import type { Dictionary, DeepKeyOf, PickOption, Omit, Folded } from './type'
 export function pick<D extends Dictionary, K extends DeepKeyOf<D>>(
   obj: D,
   keys: K[],
-  opt: PickOption = { arrayIndex: 'bracket' }
+  opt?: PickOption
 ): Omit<D, K> {
   const folded = fold(obj)
 
-  const fixed = Object.fromEntries(
-    Object.entries(folded).filter(([originKey]) => keys.some((k) => includesKey(originKey, k, opt)))
+  const targetKeys = new Set(
+    Object.keys(folded).filter((k) => keys.some((key) => includesKey(key, k, opt)))
+  )
+
+  const fixedKeyMap = Object.fromEntries(
+    Object.entries(folded).filter(([k]) => targetKeys.has(k))
   ) as Folded<Dictionary>
 
-  return unfold(fixed, opt) as Dictionary
+  return unfold(fixedKeyMap, opt) as Dictionary
 }

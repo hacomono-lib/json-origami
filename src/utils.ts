@@ -1,4 +1,4 @@
-import type { CommonOption } from './type'
+import { defaultCommonOption, type CommonOption } from './type'
 
 /**
  * Check if the key (origin) to be inspected contains the key.
@@ -14,7 +14,11 @@ import type { CommonOption } from './type'
  * @param key
  * @param option
  */
-export function includesKey(origin: string, key: string, { arrayIndex }: CommonOption): boolean {
+export function includesKey(
+  origin: string,
+  key: string,
+  { arrayIndex }: CommonOption = defaultCommonOption
+): boolean {
   const split = (key: string): string[] => {
     const fixedKey = arrayIndex === 'bracket' ? key.replace(/\[(\w+)\]/g, '.$1') : key
     return fixedKey.split('.')
