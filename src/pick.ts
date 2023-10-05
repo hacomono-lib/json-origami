@@ -34,11 +34,23 @@ export function pick<D extends Dictionary, K extends DeepKeyOf<D>>(
   obj: D,
   keys: K[],
   opt?: PickOption
+): Omit<D, K>
+
+export function pick<D extends Dictionary, K extends DeepKeyOf<D>>(
+  obj: D,
+  keys: Array<K | RegExp>,
+  opt?: PickOption
+): Omit<D, K>
+
+export function pick<D extends Dictionary, K extends DeepKeyOf<D>>(
+  obj: D,
+  keys: Array<K | RegExp>,
+  opt?: PickOption
 ): Omit<D, K> {
   const folded = fold(obj)
 
   const targetKeys = new Set(
-    Object.keys(folded).filter((k) => keys.some((key) => includesKey(key, k, opt)))
+    Object.keys(folded).filter((k) => keys.some((key) => includesKey(k, key, opt)))
   )
 
   const fixedKeyMap = Object.fromEntries(
