@@ -1,5 +1,11 @@
 # json-origami
 
+## 0.3.0
+
+### Minor Changes
+
+- [#31](https://github.com/hacomono-lib/json-origami/pull/31) [`e5916c1`](https://github.com/hacomono-lib/json-origami/commit/e5916c1c5c9188dfa981223f2d2dce92616355ec) Thanks [@mew-ton](https://github.com/mew-ton)! - feat: #30 add function "pick", "omit"
+
 ## 0.2.4
 
 ### Patch Changes

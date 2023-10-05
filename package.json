@@ -1,6 +1,6 @@
 {
   "name": "json-origami",
-  "version": "0.2.4",
+  "version": "0.3.0",
   "description": "Transform nested objects into a flattened key-value structure and vice-versa.",
   "keywords": [
     "key-value",
