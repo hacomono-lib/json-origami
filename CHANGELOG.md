@@ -1,5 +1,11 @@
 # json-origami
 
+## 0.4.0
+
+### Minor Changes
+
+- [#34](https://github.com/hacomono-lib/json-origami/pull/34) [`2bd9b74`](https://github.com/hacomono-lib/json-origami/commit/2bd9b7473cccbc9093ed17d77691d285716dde4f) Thanks [@mew-ton](https://github.com/mew-ton)! - feat: #33 pick, omit に RegExp を指定可能に変更
+
 ## 0.3.0
 
 ### Minor Changes
