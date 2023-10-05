@@ -1,9 +1,9 @@
 /* eslint-disable max-lines-per-function */
 import { describe, it, expect } from 'vitest'
-import { fold } from '../src'
+import { fold } from '../src/fold'
 
 describe('fold', () => {
-  it('nested object', () => {
+  it('should handle nested object', () => {
     const target = {
       a: 1,
       b: {
@@ -19,7 +19,7 @@ describe('fold', () => {
     })
   })
 
-  it('nested object with dot array index', () => {
+  it('should handle nested object with dot array index', () => {
     const target = {
       a: 1,
       b: {
@@ -35,7 +35,7 @@ describe('fold', () => {
     })
   })
 
-  it('nested object with root array', () => {
+  it('should handle nested object with root array', () => {
     const target = [
       {
         a: 1,
@@ -65,7 +65,7 @@ describe('fold', () => {
     })
   })
 
-  it('nested object with root array with dot array index', () => {
+  it('should handle nested object with root array with dot array index', () => {
     const target = [
       {
         a: 1,
@@ -95,7 +95,7 @@ describe('fold', () => {
     })
   })
 
-  it('nested object with key prefix', () => {
+  it('should handle ested object with key prefix', () => {
     const target = {
       a: 1,
       b: {
@@ -112,7 +112,7 @@ describe('fold', () => {
     })
   })
 
-  it('nested object with root array with key prefix', () => {
+  it('should handle nested object with root array with key prefix', () => {
     const target = [
       {
         a: 1,

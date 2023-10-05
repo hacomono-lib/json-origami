@@ -1,12 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-  defaultCommonOption,
-  type ArrayIndex,
-  type FixedUnfoldOption,
-  type UnfoldOption,
-  type Folded,
-  type Unfolded
-} from './type'
+import { defaultUnfoldOption } from './type'
+import type { ArrayIndex, FixedUnfoldOption, UnfoldOption, Folded, Unfolded } from './type'
 
 /**
  * Unfold a one-level object into a nested object.
@@ -34,7 +28,7 @@ import {
  */
 export function unfold<KV extends Folded<any>>(kv: KV, option?: UnfoldOption): Unfolded<KV> {
   const fixedOpion = {
-    ...defaultCommonOption,
+    ...defaultUnfoldOption,
     ...option
   } as FixedUnfoldOption
   validateKeys(kv)
@@ -96,7 +90,7 @@ function unfoldInternal(entries: Array<[string, unknown]>, opt: FixedUnfoldOptio
       .map(([key]) => extractHeadKey(key, opt) as number)
       .reduce((acc, index) => Math.max(acc, index), 0)
 
-    return new Array(maxIndex + 1).fill(undefined).map((_, index) => {
+    const array = new Array(maxIndex + 1).fill(undefined).map((_, index) => {
       const filteredEntries = entries.filter(([key]) => extractHeadKey(key, opt) === index)
 
       if (filteredEntries.length <= 0) {
@@ -110,6 +104,12 @@ function unfoldInternal(entries: Array<[string, unknown]>, opt: FixedUnfoldOptio
 
       return unfolded
     })
+
+    if (opt.pruneArray) {
+      return array.filter((v) => v !== undefined)
+    }
+
+    return array
   }
 
   const keys = Array.from(new Set(entries.map(([key]) => extractHeadKey(key, opt) as string)))

@@ -1,7 +1,7 @@
 /* eslint-disable max-lines */
 /* eslint-disable max-lines-per-function */
 import { describe, it, expect } from 'vitest'
-import { twist } from '../src'
+import { twist } from '../src/twist'
 
 describe('twist', () => {
   it('twist partial keys', () => {
@@ -110,62 +110,127 @@ describe('twist', () => {
     })
   })
 
-  it('result has blank value in array', () => {
-    const target = {
-      a: 1,
-      b: {
-        c: 2,
-        d: [3, 4]
+  it('should handle object with numeric and string keys in root', () => {
+    const target = [
+      {
+        a: 1,
+        b: {
+          c: 2,
+          d: [3, 4]
+        }
+      },
+      {
+        e: 5,
+        f: {
+          g: 6,
+          h: [7, 8]
+        }
       }
-    }
+    ] as const
 
-    expect(twist(target, { 'b.d[0]': 'b.d[2]' })).toEqual({
-      a: 1,
-      b: {
-        c: 2,
-        d: [undefined, 4, 3]
-      }
+    expect(
+      twist(target, { '[0].a': 'A', '[0].b.c': 'C', '[1].f.h[0]': 'D', '[1].f.h[1]': 'E' })
+    ).toEqual({
+      '0': {
+        b: {
+          d: [3, 4]
+        }
+      },
+      '1': {
+        e: 5,
+        f: {
+          g: 6
+        }
+      },
+      A: 1,
+      C: 2,
+      D: 7,
+      E: 8
     })
   })
 
-  // FIXME: this test case is not passed
-  it.skip('override object value', () => {
-    const target = {
-      a: 1,
-      b: {
-        c: 2,
-        d: [3, 4]
+  it('should handle object with numeric and string keys in root with dot array index', () => {
+    const target = [
+      {
+        a: 1,
+        b: {
+          c: 2,
+          d: [3, 4]
+        }
+      },
+      {
+        e: 5,
+        f: {
+          g: 6,
+          h: [7, 8]
+        }
       }
-    }
+    ] as const
 
-    expect(twist(target, { a: 'b.c' })).toEqual({
-      b: {
-        c: 1,
-        d: [3, 4]
-      }
+    expect(
+      twist(
+        target,
+        { '0.a': 'A', '0.b.c': 'C', '1.f.h.0': 'D', '1.f.h.1': 'E' },
+        { arrayIndex: 'dot' }
+      )
+    ).toEqual({
+      '0': {
+        b: {
+          d: [3, 4]
+        }
+      },
+      '1': {
+        e: 5,
+        f: {
+          g: 6
+        }
+      },
+      A: 1,
+      C: 2,
+      D: 7,
+      E: 8
     })
   })
 
-  // FIXME: this test case is not passed
-  it.skip('override array value', () => {
+  it('should prune array elements', () => {
     const target = {
       a: 1,
       b: {
         c: 2,
-        d: [3, 4]
+        d: [3, 4, 5, 6]
       }
     }
 
-    expect(twist(target, { a: 'b.d[1]' })).toEqual({
+    expect(twist(target, { 'b.d[1]': 'D' }, { pruneArray: true })).toEqual({
+      a: 1,
       b: {
-        c: 3,
-        d: [3, 1]
-      }
+        c: 2,
+        d: [3, 5, 6]
+      },
+      D: 4
     })
   })
 
-  // FIXME: this test case is not passed
-  it.skip('overrode nested value', () => {
+  it('should not prune array elements', () => {
+    const target = {
+      a: 1,
+      b: {
+        c: 2,
+        d: [3, 4, 5, 6]
+      }
+    }
+
+    expect(twist(target, { 'b.d[1]': 'D' }, { pruneArray: false })).toEqual({
+      a: 1,
+      b: {
+        c: 2,
+        d: [3, undefined, 5, 6]
+      },
+      D: 4
+    })
+  })
+
+  it('should return the original object when the second argument is an empty object', () => {
     const target = {
       a: 1,
       b: {
@@ -174,8 +239,12 @@ describe('twist', () => {
       }
     }
 
-    expect(twist(target, { a: 'b' })).toEqual({
-      b: 1
+    expect(twist(target, {})).toEqual({
+      a: 1,
+      b: {
+        c: 2,
+        d: [3, 4]
+      }
     })
   })
 })

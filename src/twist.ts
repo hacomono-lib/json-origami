@@ -1,4 +1,5 @@
-import { fold, unfold } from '.'
+import { fold } from './fold'
+import { unfold } from './unfold'
 import type { Dictionary, MoveMap, Twist, TwistOption } from './type'
 
 /**
@@ -6,7 +7,7 @@ import type { Dictionary, MoveMap, Twist, TwistOption } from './type'
  * @param obj
  * @param moveMap
  */
-export function twist<D extends Dictionary, M extends MoveMap>(
+export function twist<D extends Dictionary, M extends MoveMap<D>>(
   obj: D,
   moveMap: M,
   option?: TwistOption
