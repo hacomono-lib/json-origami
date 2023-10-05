@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /* eslint-disable max-lines-per-function */
 import { describe, it, expect } from 'vitest'
 import { omit } from '../src/omit'
@@ -117,6 +118,43 @@ describe('omit', () => {
     const result = omit(obj, ['a', 'ba'])
     expect(result).toEqual({
       cba: 3
+    })
+  })
+
+  it('should handle RegExp keys', () => {
+    const obj = {
+      a: {
+        b: {
+          cde: 1
+        },
+        bc: {
+          de: 2
+        },
+        bcd: {
+          e: 3
+        }
+      },
+      ab: {
+        c: {
+          de: 4
+        },
+        cd: {
+          e: 5
+        }
+      },
+      abc: {
+        d: {
+          e: 6
+        }
+      }
+    }
+    const result = omit(obj, [/^a\.b/, /\.e$/])
+    expect(result).toEqual({
+      ab: {
+        c: {
+          de: 4
+        }
+      }
     })
   })
 })

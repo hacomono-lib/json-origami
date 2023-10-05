@@ -11,21 +11,23 @@ import { defaultCommonOption, type CommonOption } from './type'
  * includesKey("foo.bar.baz", "f", { arrayIndex: "bracket" }) // => false
  * ```
  * @param origin
- * @param key
+ * @param match
  * @param option
  */
 export function includesKey(
   origin: string,
-  key: string,
+  match: string | RegExp,
   { arrayIndex }: CommonOption = defaultCommonOption
 ): boolean {
+  if (match instanceof RegExp) return match.test(origin)
+
   const split = (key: string): string[] => {
     const fixedKey = arrayIndex === 'bracket' ? key.replace(/\[(\w+)\]/g, '.$1') : key
     return fixedKey.split('.')
   }
 
   const originKeys = split(origin)
-  const keys = split(key)
+  const keys = split(match)
 
   if (keys.length > originKeys.length) return false
 

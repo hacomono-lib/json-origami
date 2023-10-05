@@ -33,11 +33,29 @@ export function omit<D extends Dictionary, K extends DeepKeyOf<D>>(
   obj: D,
   keys: K[],
   opt?: OmitOption
-): Omit<D, K> {
+): Omit<D, K>
+
+/**
+ *
+ * @param obj
+ * @param keys
+ * @param opt
+ */
+export function omit<D extends Dictionary, K extends DeepKeyOf<D>>(
+  obj: D,
+  keys: Array<K | RegExp>,
+  opt?: OmitOption
+): Dictionary
+
+export function omit<D extends Dictionary, K extends DeepKeyOf<D>>(
+  obj: D,
+  keys: Array<K | RegExp>,
+  opt?: OmitOption
+): Dictionary {
   const folded = fold(obj)
 
   const targetKeys = new Set(
-    Object.keys(folded).filter((k) => !keys.some((key) => includesKey(key, k, opt)))
+    Object.keys(folded).filter((k) => !keys.some((key) => includesKey(k, key, opt)))
   )
 
   const fixedKeyMap = Object.fromEntries(
