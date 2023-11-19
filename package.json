@@ -16,7 +16,7 @@
   },
   "author": "mew-ton <mxl_usmarc@slmail.mewton.jp>",
   "license": "MIT",
-  "packageManager": "yarn@4.0.1",
+  "packageManager": "yarn@4.0.2",
   "type": "module",
   "files": [
     "dist",
@@ -70,6 +70,6 @@
   },
   "volta": {
     "node": "20.9.0",
-    "yarn": "4.0.1"
+    "yarn": "4.0.2"
   }
 }
