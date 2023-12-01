@@ -56,7 +56,7 @@
     "eslint-plugin-import": "^2.29.0",
     "prettier": "^3.1.0",
     "tsup": "^7.2.0",
-    "typescript": "^5.2.2",
+    "typescript": "^5.3.2",
     "vitest": "^0.34.6",
     "yarn-run-all": "latest"
   },
@@ -69,7 +69,7 @@
     }
   },
   "volta": {
-    "node": "20.9.0",
+    "node": "20.10.0",
     "yarn": "4.0.2"
   }
 }
