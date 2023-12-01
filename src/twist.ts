@@ -1,6 +1,7 @@
 import { fold } from './fold'
 import { unfold } from './unfold'
 import type { Dictionary, MoveMap, Twist, TwistOption } from './type'
+import { includesKey } from './utils'
 
 /**
  *
@@ -16,7 +17,7 @@ export function twist<D extends Dictionary, M extends MoveMap<D>>(
 
   const twisted = Object.fromEntries(
     Object.entries(folded).map(([key, value]) => {
-      const found = Object.keys(moveMap).find((k) => key.startsWith(k))
+      const found = Object.keys(moveMap).find((k) => includesKey(key, k, option))
 
       if (found) {
         const newKey = key.replace(found, moveMap[found]!)

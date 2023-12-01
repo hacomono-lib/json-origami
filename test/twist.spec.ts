@@ -247,4 +247,40 @@ describe('twist', () => {
       }
     })
   })
+
+  // map データのキーが前方一致する組み合わせがある場合. e.g. foo.bar, foo.bar1
+  it('should be twisted correctly when the prefix is the same string.', () => {
+    const target = {
+      foo: {
+        bar: 0,
+        bar1: 1,
+        bar2: 2,
+        barbar: 3,
+      },
+      foo1: {
+        bar: 4,
+        bar1: 5,
+        bar2: 6
+      }
+    }
+
+    const map = {
+      'foo.bar': 'baz',
+      'foo.bar1': 'qux',
+      'foo.bar2': 'quux',
+      'foo.barbar': 'quux1'
+    }
+
+    expect(twist(target, map)).toEqual({
+      foo1: {
+        bar: 4,
+        bar1: 5,
+        bar2: 6
+      },
+      baz: 0,
+      qux: 1,
+      quux: 2,
+      quux1: 3
+    })
+  })
 })
