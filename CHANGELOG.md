@@ -1,5 +1,11 @@
 # json-origami
 
+## 0.4.1
+
+### Patch Changes
+
+- [#76](https://github.com/hacomono-lib/json-origami/pull/76) [`aff83a1`](https://github.com/hacomono-lib/json-origami/commit/aff83a1c31b9af9c5c548e44c7601d8c8ca0c021) Thanks [@mew-ton](https://github.com/mew-ton)! - fix: #75 twist 関数で文字列の前方一致していたところを、キーの前方一致判定に変更
+
 ## 0.4.0
 
 ### Minor Changes
