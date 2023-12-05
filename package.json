@@ -11,7 +11,7 @@
     "typescrip"
   ],
   "repository": {
-    "url": "https://github.com/hacomono-lib/json-origami",
+    "url": "git+https://github.com/hacomono-lib/json-origami.git",
     "type": "git"
   },
   "author": "mew-ton <mxl_usmarc@slmail.mewton.jp>",
