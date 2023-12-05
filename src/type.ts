@@ -1,7 +1,7 @@
 /**
  *
  */
-export type Primitive = string | number | boolean
+export type Primitive = string | number | boolean | null | undefined
 
 type MaybeReadonly<T> = T | (T extends Array<infer U> ? readonly U[] : Readonly<T>)
 
@@ -12,11 +12,18 @@ export type Dictionary =
   | MaybeReadonly<Record<string, unknown>>
   | MaybeReadonly<Array<Primitive | Record<string, unknown>>>
 
-/**
- * TODO: 深い階層のキーに対応する
- */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export type DeepKeyOf<_D extends Dictionary> = string
+export type DeepKeyOf<D extends Dictionary, A extends ArrayIndex = 'bracket'> = FixArrayIndex<
+  DeepKeyOfInternal<D>,
+  A
+>
+
+type DeepKeyOfInternal<D extends Dictionary> = {
+  [K in keyof D]: D[K] extends Primitive | Dictionary
+    ? `${Exclude<K, symbol>}${D[K] extends Dictionary ? `.${DeepKeyOfInternal<D[K]>}` : ''}`
+    : never
+}[keyof D]
+
+type A = Exclude<keyof [1, 2, 3], symbol>
 
 /**
  *
@@ -57,6 +64,14 @@ export type Pick<D extends Dictionary, _K extends DeepKeyOf<D>> = Dictionary
  *
  */
 export type ArrayIndex = 'dot' | 'bracket'
+
+type FixBracket<T extends string> = T extends `${infer L}[${infer R}]` ? `${L}.${R}` : T
+
+type FixDot<T extends string> = T extends `${infer L}.${infer R}` ? `${L}[${R}]` : T
+
+type FixArrayIndex<T extends string, A extends ArrayIndex> = A extends 'dot'
+  ? FixDot<T>
+  : FixBracket<T>
 
 export interface CommonOption {
   /**
