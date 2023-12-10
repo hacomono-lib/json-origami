@@ -1155,7 +1155,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vitest/ui@npm:^0.34.6":
+"@vitest/ui@npm:^0.34.7":
   version: 0.34.7
   resolution: "@vitest/ui@npm:0.34.7"
   dependencies:
@@ -3554,7 +3554,7 @@ __metadata:
     "@changesets/cli": "npm:^2.27.1"
     "@typescript-eslint/eslint-plugin": "npm:^6.13.1"
     "@typescript-eslint/parser": "npm:^6.13.1"
-    "@vitest/ui": "npm:^0.34.6"
+    "@vitest/ui": "npm:^0.34.7"
     eslint: "npm:^8.55.0"
     eslint-config-prettier: "npm:^9.1.0"
     eslint-plugin-import: "npm:^2.29.0"
