@@ -36,7 +36,7 @@ export function createRandomObject({ leafs }: RandomObjectOption = {}): JsonObje
     while ((root || dice(0.6)) && leafCount < maxLeafs) {
       const key = createRandomWord()
 
-      if (!key || obj[key]) continue
+      if (!key || key in obj) continue
 
       const value = createValue()
       obj[key] = value
