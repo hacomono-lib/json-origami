@@ -6,5 +6,6 @@
     "github>hacomono-lib/renovate-config:npm-lockfile",
     "github>hacomono-lib/renovate-config:github-actions",
     "github>hacomono-lib/renovate-config:pre-commit"
-  ]
+  ],
+  "platformAutomerge": true
 }
