@@ -1,24 +1,68 @@
-import { bench } from 'vitest'
-import { createRandomObject, randomChoices, BENCHMARK_TARGET_LIGHT_OBJECT_VALUES } from './utils'
+import { bench, describe } from 'vitest'
+import {
+  createRandomObject,
+  randomChoices,
+  BENCHMARK_TARGET_LIGHT_OBJECT_VALUES,
+  BENCHMARK_TARGET_OBJECT_VALUES
+} from './utils'
 import { fold } from '../src/fold'
 import { pick } from '../src/pick'
+import { JsonObject } from 'type-fest'
 
-const object = createRandomObject({ leafs: BENCHMARK_TARGET_LIGHT_OBJECT_VALUES })
-const keys = Object.keys(fold(object))
+const iterations = 10
 
-const keys10 = randomChoices(keys, Math.min(BENCHMARK_TARGET_LIGHT_OBJECT_VALUES, keys.length) * 0.1)
-const keys90 = randomChoices(keys, Math.min(BENCHMARK_TARGET_LIGHT_OBJECT_VALUES, keys.length) * 0.9)
+interface TestCaseOption {
+  /**
+   * pick するキーの割合
+   */
+  percentOfPickKeys: number
 
-bench(
-  `pick (complex object including ${BENCHMARK_TARGET_LIGHT_OBJECT_VALUES} values, target keys ${keys10.length})`,
-  () => {
-    pick(object, keys10)
-  }
-)
+  /**
+   * 生成するオブジェクトの値の数
+   */
+  objectValues: number
+}
 
-bench(
-  `pick (complex object including ${BENCHMARK_TARGET_LIGHT_OBJECT_VALUES} values, target keys ${keys90.length})`,
-  () => {
-    pick(object, keys90)
-  }
-)
+interface TestCase {
+  object: JsonObject
+  keys: string[]
+}
+
+function createTestCase({ percentOfPickKeys, objectValues }: TestCaseOption): TestCase {
+  const object = createRandomObject({ leafs: objectValues })
+  const allKeys = Object.keys(fold(object))
+  const keys = randomChoices(allKeys, Math.min(objectValues, allKeys.length) * percentOfPickKeys)
+  return { object, keys }
+}
+
+function runBench({ percentOfPickKeys, objectValues }: TestCaseOption) {
+  const testCases = Array.from({ length: iterations }, () =>
+    createTestCase({
+      percentOfPickKeys,
+      objectValues
+    })
+  )
+
+  let index = 0
+
+  bench(
+    `pick (complex object including ${objectValues} values, pick ${percentOfPickKeys * 100}% of keys)`,
+    () => {
+      const currentIndex = index++ % iterations
+      const { object, keys } = testCases[currentIndex]
+      pick(object, keys)
+    }
+  )
+}
+
+describe('pick with light object', () => {
+  runBench({ objectValues: BENCHMARK_TARGET_LIGHT_OBJECT_VALUES, percentOfPickKeys: 0.1 })
+  runBench({ objectValues: BENCHMARK_TARGET_LIGHT_OBJECT_VALUES, percentOfPickKeys: 0.5 })
+  runBench({ objectValues: BENCHMARK_TARGET_LIGHT_OBJECT_VALUES, percentOfPickKeys: 0.9 })
+})
+
+describe.skip('pick with heavy object', () => {
+  runBench({ objectValues: BENCHMARK_TARGET_OBJECT_VALUES, percentOfPickKeys: 0.1 })
+  runBench({ objectValues: BENCHMARK_TARGET_OBJECT_VALUES, percentOfPickKeys: 0.5 })
+  runBench({ objectValues: BENCHMARK_TARGET_OBJECT_VALUES, percentOfPickKeys: 0.9 })
+})

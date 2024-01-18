@@ -1,33 +1,72 @@
-import { bench } from 'vitest'
-import { createRandomObject, randomChoices, randomKeyName, BENCHMARK_TARGET_LIGHT_OBJECT_VALUES } from './utils'
+import { bench, describe } from 'vitest'
+import {
+  createRandomObject,
+  randomChoices,
+  randomKeyName,
+  BENCHMARK_TARGET_LIGHT_OBJECT_VALUES,
+  BENCHMARK_TARGET_OBJECT_VALUES
+} from './utils'
 import { fold } from '../src/fold'
 import { twist } from '../src/twist'
 
-const object = createRandomObject({ leafs: BENCHMARK_TARGET_LIGHT_OBJECT_VALUES })
-const keys = Object.keys(fold(object))
+const iterations = 10
 
-const keys10 = randomChoices(keys, Math.min(BENCHMARK_TARGET_LIGHT_OBJECT_VALUES, keys.length) * 0.1)
-const twistMap10 = keys10.reduce((acc, key) => {
-  acc[key] = randomKeyName()
-  return acc
-}, {})
+interface TestCaseOption {
+  /**
+   * twist するキーの割合
+   */
+  percentOfTwistKeys: number
 
-const keys90 = randomChoices(keys, Math.min(BENCHMARK_TARGET_LIGHT_OBJECT_VALUES, keys.length) * 0.9)
-const twistMap90 = keys90.reduce((acc, key) => {
-  acc[key] = randomKeyName()
-  return acc
-}, {})
+  /**
+   * 生成するオブジェクトの値の数
+   */
+  objectValues: number
+}
 
-bench(
-  `twist (complex object including ${BENCHMARK_TARGET_LIGHT_OBJECT_VALUES} values, target twist map ${keys10.length})`,
-  () => {
-    twist(object, twistMap10)
-  }
-)
+interface TestCase {
+  object: Record<string, unknown>
+  twistMap: Record<string, string>
+}
 
-bench(
-  `twist (complex object including ${BENCHMARK_TARGET_LIGHT_OBJECT_VALUES} values, target twist map ${keys90.length})`,
-  () => {
-    twist(object, twistMap90)
-  }
-)
+function createTestCase({ percentOfTwistKeys, objectValues }: TestCaseOption): TestCase {
+  const object = createRandomObject({ leafs: objectValues })
+  const allKeys = Object.keys(fold(object))
+  const keys = randomChoices(allKeys, Math.min(objectValues, allKeys.length) * percentOfTwistKeys)
+  const twistMap = keys.reduce((acc, key) => {
+    acc[key] = randomKeyName()
+    return acc
+  }, {})
+  return { object, twistMap }
+}
+
+function runBench({ percentOfTwistKeys, objectValues }: TestCaseOption) {
+  const testCases = Array.from({ length: iterations }, () =>
+    createTestCase({
+      percentOfTwistKeys,
+      objectValues
+    })
+  )
+
+  let index = 0
+
+  bench(
+    `twist (complex object including ${objectValues} values, twist ${percentOfTwistKeys * 100}% of keys)`,
+    () => {
+      const currentIndex = index++ % iterations
+      const { object, twistMap } = testCases[currentIndex]
+      twist(object, twistMap)
+    }
+  )
+}
+
+describe('twist with light object', () => {
+  runBench({ objectValues: BENCHMARK_TARGET_LIGHT_OBJECT_VALUES, percentOfTwistKeys: 0.1 })
+  runBench({ objectValues: BENCHMARK_TARGET_LIGHT_OBJECT_VALUES, percentOfTwistKeys: 0.5 })
+  runBench({ objectValues: BENCHMARK_TARGET_LIGHT_OBJECT_VALUES, percentOfTwistKeys: 0.9 })
+})
+
+describe.skip('twist with heavy object', () => {
+  runBench({ objectValues: BENCHMARK_TARGET_OBJECT_VALUES, percentOfTwistKeys: 0.1 })
+  runBench({ objectValues: BENCHMARK_TARGET_OBJECT_VALUES, percentOfTwistKeys: 0.5 })
+  runBench({ objectValues: BENCHMARK_TARGET_OBJECT_VALUES, percentOfTwistKeys: 0.9 })
+})

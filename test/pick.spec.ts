@@ -1,4 +1,5 @@
 /* eslint-disable max-lines */
+/* eslint-disable max-lines-per-function */
 import { it, expect } from 'vitest'
 import { pick } from '../src/pick'
 

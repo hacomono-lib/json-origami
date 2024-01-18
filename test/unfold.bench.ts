@@ -1,13 +1,31 @@
-import { bench } from 'vitest'
-import { createRandomObject, BENCHMARK_TARGET_LIGHT_OBJECT_VALUES } from './utils'
+import { bench, describe } from 'vitest'
+import {
+  createRandomObject,
+  BENCHMARK_TARGET_LIGHT_OBJECT_VALUES,
+  BENCHMARK_TARGET_OBJECT_VALUES
+} from './utils'
 import { unfold } from '../src/unfold'
 import { fold } from '../src/fold'
 
-const object = fold(createRandomObject({ leafs: BENCHMARK_TARGET_LIGHT_OBJECT_VALUES }))
+interface TestCaseOption {
+  /**
+   * 生成するオブジェクトの値の数
+   */
+  objectValues: number
+}
 
-bench(
-  `unfold (complex object including ${BENCHMARK_TARGET_LIGHT_OBJECT_VALUES} values)`,
-  () => {
+function runBench({ objectValues }: TestCaseOption) {
+  const object = fold(createRandomObject({ leafs: objectValues }))
+
+  bench(`unfold (complex object including ${objectValues} values)`, () => {
     unfold(object)
-  }
-)
+  })
+}
+
+describe('unfold with light object', () => {
+  runBench({ objectValues: BENCHMARK_TARGET_LIGHT_OBJECT_VALUES })
+})
+
+describe.skip('unfold with heavy object', () => {
+  runBench({ objectValues: BENCHMARK_TARGET_OBJECT_VALUES })
+})

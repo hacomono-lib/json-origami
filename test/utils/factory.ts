@@ -5,13 +5,13 @@ import { createRandomWord, dice, randomChoice } from './random'
 const DEFAULT_LEAFS = 1000
 
 interface RandomObjectOption {
-  leafs?: number
+  leafs: number
 }
 
-export function createRandomObject({ leafs }: RandomObjectOption = {}): JsonObject {
+export function createRandomObject({ leafs }: RandomObjectOption): JsonObject {
   let leafCount = 0
 
-  if (leafs % 1 !== 0) throw new Error('leafs must be an integer')
+  if (leafs % 1 !== 0) throw new Error(`leafs must be an integer (input: ${leafs})`)
 
   const maxLeafs = leafs ?? DEFAULT_LEAFS
 
