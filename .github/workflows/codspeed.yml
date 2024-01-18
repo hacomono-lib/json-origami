@@ -1,4 +1,9 @@
-name: codspeed-benchmarks
+name: Codspeed Benchmarks
+
+permissions:
+  contents: read
+  packages: read
+  pull-requests: write
 
 on:
   push:
