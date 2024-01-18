@@ -38,6 +38,7 @@
   },
   "scripts": {
     "dev": "vitest --ui",
+    "bench": "vitest bench",
     "build": "tsup",
     "test": "run-p test:*",
     "test:spec": "vitest --run --silent",
@@ -51,11 +52,13 @@
     "@typescript-eslint/eslint-plugin": "^6.19.0",
     "@typescript-eslint/parser": "^6.19.0",
     "@vitest/ui": "^1.2.0",
+    "defu": "^6.1.4",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.29.1",
     "prettier": "^3.2.2",
     "tsup": "^8.0.1",
+    "type-fest": "^4.9.0",
     "typescript": "^5.3.3",
     "vitest": "^1.2.0",
     "yarn-run-all": "latest"

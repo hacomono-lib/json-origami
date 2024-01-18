@@ -1,7 +1,7 @@
 /**
  *
  */
-export type Primitive = string | number | boolean
+export type Primitive = string | number | boolean | {} | []
 
 type MaybeReadonly<T> = T | (T extends Array<infer U> ? readonly U[] : Readonly<T>)
 

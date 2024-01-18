@@ -33,6 +33,8 @@ import {
  * ```
  */
 export function fold<D extends Dictionary>(obj: D, option?: FoldOption): Folded<D> {
+  if (Object.keys(obj).length <= 0) return {}
+
   return Object.fromEntries(
     flatEntries(option?.keyPrefix ?? '', obj, {
       ...defaultCommonOption,
@@ -52,13 +54,13 @@ function flatEntries(key: string, value: object, opt: FixedFoldOption): Array<[s
   const appendKey = (k: string | number) =>
     typeof k === 'number' ? arrayKeyMap[opt.arrayIndex](key, k) : key === '' ? k : `${key}.${k}`
 
-  if (Array.isArray(value)) {
+  if (Array.isArray(value) && value.length > 0) {
     return value.flatMap((v, i) => flatEntries(appendKey(i), v, opt))
   }
 
-  if (typeof value === 'object') {
+  if (typeof value === 'object' && Object.keys(value).length > 0) {
     return Object.entries(value as object).flatMap(([k, v]) => flatEntries(appendKey(k), v, opt))
   }
 
-  return [[key, value as Primitive]]
+  return [[key, value]]
 }
