@@ -78,8 +78,8 @@ function createProxy(value: ProxyTarget | undefined, opt: OrigamiOption): Origam
     return new Proxy(obj, {
       /**
        * Treat the following two accesses as equivalent:
-       * - proxy.a.b.c
-       * - proxy['a.b.c']
+       * - proxy.value.a.b.c
+       * - proxy.value['a.b.c']
        */
       get(target, p) {
         // avoiding root access
@@ -116,8 +116,8 @@ function createProxy(value: ProxyTarget | undefined, opt: OrigamiOption): Origam
 
       /**
        * Treat the following two accesses as equivalent:
-       * - proxy.a.b.c = 'd'
-       * - proxy['a.b.c'] = 'd'
+       * - proxy.value.a.b.c = 'd'
+       * - proxy.value['a.b.c'] = 'd'
        */
       set(target, p, newValue) {
         // avoiding root access
@@ -183,6 +183,11 @@ function createProxy(value: ProxyTarget | undefined, opt: OrigamiOption): Origam
         return Reflect.set(nextProxy, tail, newValue)
       },
 
+      /**
+       * Treat the following two accesses as equivalent:
+       * - delete proxy.value.a.b.c
+       * - delete proxy.value['a.b.c']
+       */
       deleteProperty(target, p) {
         // avoiding root access
         if (origamiMeta in target && ['value', origamiMeta].includes(p)) {
