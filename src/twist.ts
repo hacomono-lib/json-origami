@@ -1,7 +1,6 @@
-import { fold } from './fold'
-import { unfold } from './unfold'
-import type { Dictionary, MoveMap, Twist, TwistOption } from './type'
-import { includesKey } from './utils'
+import { type Dictionary, type MoveMap, type Twist, type TwistOption, defaultCommonOption } from './type'
+import { toProxy, toRaw } from './lib/origami-proxy'
+import { omit } from './omit'
 
 /**
  *
@@ -13,20 +12,24 @@ export function twist<D extends Dictionary, M extends MoveMap<D>>(
   moveMap: M,
   option?: TwistOption
 ): Twist<D, M> {
-  const folded = fold(obj, option)
+  const fixedOption = {
+    ...defaultCommonOption,
+    ...option
+  }
 
-  const twisted = Object.fromEntries(
-    Object.entries(folded).map(([key, value]) => {
-      const found = Object.keys(moveMap).find((k) => includesKey(key, k, option))
+  const fromSet = new Set(Object.keys(moveMap))
 
-      if (found) {
-        const newKey = key.replace(found, moveMap[found]!)
-        return [newKey, value]
-      }
+  const src = toProxy(obj as any, fixedOption)
+  const dst = toProxy(obj as any, { ...fixedOption, pruneEmpty: true })
 
-      return [key, value]
-    })
-  )
+  for (const [from, to] of Object.entries(moveMap)) {
+    dst.value[to] = src.value[from]
+    fromSet.delete(to)
+  }
+  
+  for (const from of fromSet) {
+    delete dst.value[from]
+  }
 
-  return unfold(twisted, option)
+  return toRaw(dst.value)
 }

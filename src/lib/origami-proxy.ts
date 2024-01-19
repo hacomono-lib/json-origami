@@ -8,7 +8,11 @@ import type { JsonArray, JsonObject } from 'type-fest'
 import type { CommonOption } from '../type'
 
 interface OrigamiOption extends CommonOption {
-  pruneArray?: boolean
+  /**
+   * When a value is deleted, if the result becomes an empty object or array, delete the object or array
+   * @default false
+   */
+  pruneEmpty?: boolean
 }
 
 /**
@@ -19,7 +23,6 @@ export const origamiMeta = Symbol()
 const rawExtractor = Symbol()
 
 interface OrigamiObject<T extends ProxyTarget = ProxyTarget> {
-  readonly raw: T
   readonly value: OrigamiProxy<T>
   readonly [origamiMeta]: OrigamiMeta
 }
@@ -42,10 +45,10 @@ export function createEmptyProxy(opt: OrigamiOption): OrigamiObject {
 }
 
 export function toProxy<T extends ProxyTarget>(target: T, opt: OrigamiOption): OrigamiObject<T> {
-  return createProxy(clone(target), opt)
+  return createProxy(clone(target), opt) as OrigamiObject<T>
 }
 
-function createProxy<T extends ProxyTarget>(value: T, opt: OrigamiOption): OrigamiObject<T> {
+function createProxy(value: ProxyTarget | undefined, opt: OrigamiOption): OrigamiObject {
   /**
    * * key: original object
    * * value: origami proxy object
@@ -55,9 +58,6 @@ function createProxy<T extends ProxyTarget>(value: T, opt: OrigamiOption): Origa
   const cache = new WeakMap<ProxyTarget, OrigamiProxy>()
 
   const root = {
-    get raw() {
-      return value
-    },
     value,
     get [origamiMeta]() {
       return {
@@ -66,12 +66,12 @@ function createProxy<T extends ProxyTarget>(value: T, opt: OrigamiOption): Origa
     }
   }
 
-  return createProxyInternal(root, opt) as any
+  return createProxyInternal(root as ProxyTarget, opt) as any
 
   /**
    *
    */
-  function createProxyInternal<T extends ProxyTarget>(obj: T, opt: OrigamiOption): OrigamiProxy<T> {
+  function createProxyInternal(obj: ProxyTarget, opt: OrigamiOption): OrigamiProxy {
     return new Proxy(obj, {
       /**
        * Treat the following two accesses as equivalent:
@@ -80,13 +80,13 @@ function createProxy<T extends ProxyTarget>(value: T, opt: OrigamiOption): Origa
        */
       get(target, p) {
         // avoiding root access
-        if (origamiMeta in target && ['raw', origamiMeta].includes(p)) {
+        if (origamiMeta in target && origamiMeta === p) {
           return Reflect.get(target, p)
         }
 
         // rawExtractor is a special key for accessing raw
         if (p === rawExtractor) {
-          return { raw: target }
+          return { raw: finalizeRoot(target) }
         }
 
         if (typeof p !== 'string') {
@@ -118,7 +118,7 @@ function createProxy<T extends ProxyTarget>(value: T, opt: OrigamiOption): Origa
        */
       set(target, p, newValue) {
         // avoiding root access
-        if (origamiMeta in target && p !== 'value') {
+        if (origamiMeta in target && ['value', origamiMeta].includes(p)) {
           return false
         }
 
@@ -133,32 +133,104 @@ function createProxy<T extends ProxyTarget>(value: T, opt: OrigamiOption): Origa
           return Reflect.set(target, head, newValue)
         }
 
-        let nextRaw: unknown = Reflect.get(target, head)
-        if (nextRaw === undefined) {
-          nextRaw = typeof nextHead === 'string' ? {} : Array(nextHead! + 1)
-          Reflect.set(target, head, nextRaw)
+        let nextValue: unknown = Reflect.get(target, head)
+        if (nextValue === undefined) {
+          nextValue = typeof nextHead === 'string' ? {} : []
+          Reflect.set(target, head, nextValue)
         }
 
-        if (Array.isArray(nextRaw) && typeof nextHead === 'string') {
-          const newNextRaw = nextRaw.reduce((acc, cur, i) => ({ ...acc, [i]: cur }), {})
-          nextRaw = newNextRaw
-          Reflect.set(target, head, newNextRaw)
+        // transform array to object
+        if (Array.isArray(nextValue) && typeof nextHead === 'string') {
+          const newNextValue = transformToObjectIfNeeded(nextValue)
+          if (nextValue !== newNextValue) {
+            nextValue = newNextValue
+            Reflect.set(target, head, newNextValue)
+          }
         }
 
-        if (!isProxyTarget(nextRaw)) {
+        // transform object to array
+        if (
+          typeof nextValue === 'object' &&
+          nextValue !== null &&
+          !Array.isArray(nextValue) &&
+          typeof nextHead === 'number'
+        ) {
+          const newNextValue = transformToArrayIfNeeded(nextValue)
+          if (nextValue !== newNextValue) {
+            nextValue = newNextValue
+            Reflect.set(target, head, newNextValue)
+          }
+        }
+
+        if (!isProxyTarget(nextValue)) {
           return Reflect.set(target, tail, newValue)
         }
 
-        if (!cache.has(nextRaw)) {
-          const p = createProxyInternal(nextRaw, opt)
-          cache.set(nextRaw, p)
+        if (!cache.has(nextValue)) {
+          const p = createProxyInternal(nextValue, opt)
+          cache.set(nextValue, p)
         }
 
-        const nextProxy = cache.get(nextRaw)!
+        const nextProxy = cache.get(nextValue)!
 
         return Reflect.set(nextProxy, tail, newValue)
+      },
+
+      deleteProperty(target, p) {
+        // avoiding root access
+        if (origamiMeta in target && ['value', origamiMeta].includes(p)) {
+          return false
+        }
+
+        function wrap(callback: () => boolean) {
+          const result = callback()
+          if (!result || !opt.pruneEmpty) {
+            return result
+          }
+
+          const { head } = splitKey(p as string, opt)
+          const nextValue = Reflect.get(target, head)
+
+          if (!isProxyTarget(nextValue)) {
+            return true
+          }
+
+          if (Array.isArray(nextValue)) {
+            if (nextValue.every((v) => v === undefined)) {
+              return Reflect.deleteProperty(target, head)
+            }
+          }
+
+          if (typeof nextValue === 'object' && nextValue !== null) {
+            if (Object.keys(nextValue).length === 0) {
+              return Reflect.deleteProperty(target, head)
+            }
+          }
+
+          return true
+        }
+
+        const { head, tail } = splitKey(p as string, opt)
+
+        if (!tail) {
+          return wrap(() => Reflect.deleteProperty(target, head))
+        }
+
+        const nextValue: unknown = Reflect.get(target, head)
+
+        if (!isProxyTarget(nextValue)) {
+          return wrap(() => Reflect.deleteProperty(target, tail))
+        }
+
+        if (!cache.has(nextValue)) {
+          const p = createProxyInternal(nextValue, opt)
+          cache.set(nextValue, p)
+        }
+
+        const nextProxy = cache.get(nextValue)!
+        return wrap(() => Reflect.deleteProperty(nextProxy, tail))
       }
-    }) as OrigamiProxy<T>
+    }) as OrigamiProxy
   }
 }
 
@@ -166,6 +238,39 @@ interface SplitKeyResult {
   head: string | number
   nextHead?: string | number
   tail?: string
+}
+
+function finalizeRoot(target: object): object {
+  const pipe = [
+    transformToArrayIfNeeded,
+    transformToObjectIfNeeded,
+  ]
+  return pipe.reduce((acc, fn) => fn(acc), target)
+}
+
+function transformToArrayIfNeeded(target: object): object {
+  const keys = Object.keys(target)
+  if (keys.length > 0 && keys.every((key) => `${Number.parseInt(key)}` === key)) {
+    const newArray = []
+    for (const [k, v] of Object.entries(target)) {
+      newArray[Number.parseInt(k)] = v
+    }
+    return newArray
+  }
+
+  return target
+}
+
+function transformToObjectIfNeeded(target: object): object {
+  if (Array.isArray(target) && !Object.keys(target).every((key) => `${Number.parseInt(key)}` === key)) {
+    const newObject = {} as Record<string | number, unknown>
+    for (const [k, v] of Object.entries(target)) {
+      newObject[k] = v
+    }
+    return newObject
+  }
+
+  return target
 }
 
 /**

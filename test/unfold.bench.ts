@@ -26,6 +26,6 @@ describe('unfold with light object', () => {
   runBench({ objectValues: BENCHMARK_TARGET_LIGHT_OBJECT_VALUES })
 })
 
-describe.skip('unfold with heavy object', () => {
+describe('unfold with heavy object', () => {
   runBench({ objectValues: BENCHMARK_TARGET_OBJECT_VALUES })
 })

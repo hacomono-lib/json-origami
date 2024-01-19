@@ -61,7 +61,7 @@ describe('pick with light object', () => {
   runBench({ objectValues: BENCHMARK_TARGET_LIGHT_OBJECT_VALUES, percentOfPickKeys: 0.9 })
 })
 
-describe.skip('pick with heavy object', () => {
+describe('pick with heavy object', () => {
   runBench({ objectValues: BENCHMARK_TARGET_OBJECT_VALUES, percentOfPickKeys: 0.1 })
   runBench({ objectValues: BENCHMARK_TARGET_OBJECT_VALUES, percentOfPickKeys: 0.5 })
   runBench({ objectValues: BENCHMARK_TARGET_OBJECT_VALUES, percentOfPickKeys: 0.9 })

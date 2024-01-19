@@ -61,7 +61,7 @@ describe('omit with light object', () => {
   runBench({ objectValues: BENCHMARK_TARGET_LIGHT_OBJECT_VALUES, percentOfOmitKeys: 0.9 })
 })
 
-describe.skip('omit with heavy object', () => {
+describe('omit with heavy object', () => {
   runBench({ objectValues: BENCHMARK_TARGET_OBJECT_VALUES, percentOfOmitKeys: 0.1 })
   runBench({ objectValues: BENCHMARK_TARGET_OBJECT_VALUES, percentOfOmitKeys: 0.5 })
   runBench({ objectValues: BENCHMARK_TARGET_OBJECT_VALUES, percentOfOmitKeys: 0.9 })

@@ -1,7 +1,5 @@
-import { fold } from './fold'
-import { unfold } from './unfold'
-import { includesKey } from './utils'
-import type { Dictionary, DeepKeyOf, PickOption, Omit, Folded } from './type'
+import { type Dictionary, type DeepKeyOf, type PickOption, defaultCommonOption } from './type'
+import { createEmptyProxy, toProxy, toRaw } from './lib/origami-proxy'
 
 /**
  * Returns an object with the specified keys picked from the object.
@@ -47,15 +45,17 @@ export function pick<D extends Dictionary, K extends DeepKeyOf<D>>(
   keys: Array<K | RegExp>,
   opt?: PickOption
 ): Omit<D, K> {
-  const folded = fold(obj)
+  const fixedOption = {
+    ...defaultCommonOption,
+    ...opt
+  }
 
-  const targetKeys = new Set(
-    Object.keys(folded).filter((k) => keys.some((key) => includesKey(k, key, opt)))
-  )
+  const proxy = toProxy(obj as any, fixedOption)
+  const newValue = createEmptyProxy(fixedOption)
 
-  const fixedKeyMap = Object.fromEntries(
-    Object.entries(folded).filter(([k]) => targetKeys.has(k))
-  ) as Folded<Dictionary>
+  for (const key of keys) {
+    newValue.value[key] = proxy.value[key]
+  }
 
-  return unfold(fixedKeyMap, opt) as Dictionary
+  return toRaw(newValue.value) as any
 }
