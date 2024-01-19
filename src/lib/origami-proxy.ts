@@ -13,6 +13,12 @@ interface OrigamiOption extends CommonOption {
    * @default false
    */
   pruneEmpty?: boolean
+
+  /**
+   * Instead of making it impossible to write, it is faster without deep-cloning
+   * @default false
+   */
+  immutable?: boolean
 }
 
 /**
@@ -45,7 +51,7 @@ export function createEmptyProxy(opt: OrigamiOption): OrigamiObject {
 }
 
 export function toProxy<T extends ProxyTarget>(target: T, opt: OrigamiOption): OrigamiObject<T> {
-  return createProxy(clone(target), opt) as OrigamiObject<T>
+  return createProxy(opt.immutable ? target : clone(target), opt) as OrigamiObject<T>
 }
 
 function createProxy(value: ProxyTarget | undefined, opt: OrigamiOption): OrigamiObject {
@@ -68,9 +74,6 @@ function createProxy(value: ProxyTarget | undefined, opt: OrigamiOption): Origam
 
   return createProxyInternal(root as ProxyTarget, opt) as any
 
-  /**
-   *
-   */
   function createProxyInternal(obj: ProxyTarget, opt: OrigamiOption): OrigamiProxy {
     return new Proxy(obj, {
       /**
@@ -119,6 +122,10 @@ function createProxy(value: ProxyTarget | undefined, opt: OrigamiOption): Origam
       set(target, p, newValue) {
         // avoiding root access
         if (origamiMeta in target && ['value', origamiMeta].includes(p)) {
+          return false
+        }
+
+        if (opt.immutable) {
           return false
         }
 
@@ -179,6 +186,10 @@ function createProxy(value: ProxyTarget | undefined, opt: OrigamiOption): Origam
       deleteProperty(target, p) {
         // avoiding root access
         if (origamiMeta in target && ['value', origamiMeta].includes(p)) {
+          return false
+        }
+
+        if (opt.immutable) {
           return false
         }
 

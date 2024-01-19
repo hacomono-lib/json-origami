@@ -1,6 +1,5 @@
 import { type Dictionary, type MoveMap, type Twist, type TwistOption, defaultCommonOption } from './type'
 import { toProxy, toRaw } from './lib/origami-proxy'
-import { omit } from './omit'
 
 /**
  *
@@ -19,14 +18,14 @@ export function twist<D extends Dictionary, M extends MoveMap<D>>(
 
   const fromSet = new Set(Object.keys(moveMap))
 
-  const src = toProxy(obj as any, fixedOption)
+  const src = toProxy(obj as any, { ...fixedOption, immutable: true })
   const dst = toProxy(obj as any, { ...fixedOption, pruneEmpty: true })
 
   for (const [from, to] of Object.entries(moveMap)) {
     dst.value[to] = src.value[from]
     fromSet.delete(to)
   }
-  
+
   for (const from of fromSet) {
     delete dst.value[from]
   }
