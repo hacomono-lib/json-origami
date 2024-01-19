@@ -3718,6 +3718,7 @@ __metadata:
     eslint: "npm:^8.56.0"
     eslint-config-prettier: "npm:^9.1.0"
     eslint-plugin-import: "npm:^2.29.1"
+    just-clone: "npm:^6.2.0"
     prettier: "npm:^3.2.2"
     tsup: "npm:^8.0.1"
     type-fest: "npm:^4.9.0"
@@ -3780,6 +3781,13 @@ __metadata:
     graceful-fs:
       optional: true
   checksum: 17796f0ab1be8479827d3683433f97ebe0a1c6932c3360fa40348eac36904d69269aab26f8b16da311882d94b42e9208e8b28e490bf926364f3ac9bff134c226
+  languageName: node
+  linkType: hard
+
+"just-clone@npm:^6.2.0":
+  version: 6.2.0
+  resolution: "just-clone@npm:6.2.0"
+  checksum: 36f9c208eb4850fe705c33b67beb2027016202fec50bd3c03097adb28f204deabc05dd753752007e753ffe11dc88dc5f8ba6b30ad60db0039cae210314b689f7
   languageName: node
   linkType: hard
 
