@@ -33,8 +33,8 @@ interface OrigamiObject<T extends ProxyTarget = ProxyTarget> {
   readonly [origamiMeta]: OrigamiMeta
 }
 
-interface OrigamiMeta {
-  cache: WeakMap<ProxyTarget, OrigamiObject>
+export interface OrigamiMeta {
+  cache: WeakMap<ProxyTarget, OrigamiProxy>
 }
 
 type ProxyTarget = JsonObject | JsonArray
@@ -63,16 +63,14 @@ function createProxy(value: ProxyTarget | undefined, opt: OrigamiOption): Origam
    */
   const cache = new WeakMap<ProxyTarget, OrigamiProxy>()
 
-  const root = {
-    value,
+  return {
+    value: createProxyInternal(value, opt),
     get [origamiMeta]() {
       return {
         cache
       }
     }
   }
-
-  return createProxyInternal(root as ProxyTarget, opt) as any
 
   function createProxyInternal(obj: ProxyTarget, opt: OrigamiOption): OrigamiProxy {
     return new Proxy(obj, {
@@ -82,11 +80,6 @@ function createProxy(value: ProxyTarget | undefined, opt: OrigamiOption): Origam
        * - proxy.value['a.b.c']
        */
       get(target, p) {
-        // avoiding root access
-        if (origamiMeta in target && origamiMeta === p) {
-          return Reflect.get(target, p)
-        }
-
         // rawExtractor is a special key for accessing raw
         if (p === rawExtractor) {
           return { raw: finalizeRoot(target) }
@@ -120,11 +113,6 @@ function createProxy(value: ProxyTarget | undefined, opt: OrigamiOption): Origam
        * - proxy.value['a.b.c'] = 'd'
        */
       set(target, p, newValue) {
-        // avoiding root access
-        if (origamiMeta in target && ['value', origamiMeta].includes(p)) {
-          return false
-        }
-
         if (opt.immutable) {
           return false
         }
@@ -189,11 +177,6 @@ function createProxy(value: ProxyTarget | undefined, opt: OrigamiOption): Origam
        * - delete proxy.value['a.b.c']
        */
       deleteProperty(target, p) {
-        // avoiding root access
-        if (origamiMeta in target && ['value', origamiMeta].includes(p)) {
-          return false
-        }
-
         if (opt.immutable) {
           return false
         }
