@@ -10,9 +10,9 @@ it('twist partial keys', () => {
     },
   }
 
-  expect(twist(target, { a: 'A', b: 'B', c: 'C', d: 'D' })).toEqual({
-    A: 1,
-    B: {
+  expect(twist(target, { a: 'w', b: 'x', c: 'y', d: 'z' })).toEqual({
+    w: 1,
+    x: {
       c: 2,
       d: [3, 4],
     },
@@ -28,10 +28,10 @@ it('twist nested keys', () => {
     },
   }
 
-  expect(twist(target, { 'b.c': 'C', 'b.d': 'D' })).toEqual({
+  expect(twist(target, { 'b.c': 'x', 'b.d': 'y' })).toEqual({
     a: 1,
-    C: 2,
-    D: [3, 4],
+    x: 2,
+    y: [3, 4],
   })
 })
 
@@ -125,7 +125,7 @@ it('should handle object with numeric and string keys in root', () => {
     },
   ] as const
 
-  expect(twist(target, { '[0].a': 'A', '[0].b.c': 'C', '[1].f.h[0]': 'D', '[1].f.h[1]': 'E' })).toEqual({
+  expect(twist(target, { '[0].a': 'w', '[0].b.c': 'x', '[1].f.h[0]': 'y', '[1].f.h[1]': 'z' })).toEqual({
     '0': {
       b: {
         d: [3, 4],
@@ -137,10 +137,10 @@ it('should handle object with numeric and string keys in root', () => {
         g: 6,
       },
     },
-    A: 1,
-    C: 2,
-    D: 7,
-    E: 8,
+    w: 1,
+    x: 2,
+    y: 7,
+    z: 8,
   })
 })
 
@@ -162,7 +162,7 @@ it('should handle object with numeric and string keys in root with dot array ind
     },
   ] as const
 
-  expect(twist(target, { '0.a': 'A', '0.b.c': 'C', '1.f.h.0': 'D', '1.f.h.1': 'E' }, { arrayIndex: 'dot' })).toEqual({
+  expect(twist(target, { '0.a': 'w', '0.b.c': 'x', '1.f.h.0': 'y', '1.f.h.1': 'z' }, { arrayIndex: 'dot' })).toEqual({
     '0': {
       b: {
         d: [3, 4],
@@ -174,10 +174,10 @@ it('should handle object with numeric and string keys in root with dot array ind
         g: 6,
       },
     },
-    A: 1,
-    C: 2,
-    D: 7,
-    E: 8,
+    w: 1,
+    x: 2,
+    y: 7,
+    z: 8,
   })
 })
 
@@ -190,13 +190,13 @@ it('should prune array elements', () => {
     },
   }
 
-  expect(twist(target, { 'b.d[1]': 'D' }, { pruneArray: true })).toEqual({
+  expect(twist(target, { 'b.d[1]': 'x' }, { pruneArray: true })).toEqual({
     a: 1,
     b: {
       c: 2,
       d: [3, 5, 6],
     },
-    D: 4,
+    x: 4,
   })
 })
 
@@ -209,13 +209,13 @@ it('should not prune array elements', () => {
     },
   }
 
-  expect(twist(target, { 'b.d[1]': 'D' }, { pruneArray: false })).toEqual({
+  expect(twist(target, { 'b.d[1]': 'x' }, { pruneArray: false })).toEqual({
     a: 1,
     b: {
       c: 2,
       d: [3, undefined, 5, 6],
     },
-    D: 4,
+    x: 4,
   })
 })
 
