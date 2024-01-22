@@ -1,21 +1,20 @@
-/* eslint-disable max-lines */
-import { it, expect } from 'vitest'
-import { unfold } from '../src/unfold'
+import { expect, it } from 'vitest'
+import { unfold } from '../src'
 
 it('should handle nested object', () => {
   const kv = {
     a: 1,
     'b.c': 2,
     'b.d[0]': 3,
-    'b.d[1]': 4
+    'b.d[1]': 4,
   }
 
   expect(unfold(kv)).toEqual({
     a: 1,
     b: {
       c: 2,
-      d: [3, 4]
-    }
+      d: [3, 4],
+    },
   })
 })
 
@@ -24,15 +23,15 @@ it('should handle nested object with dot array indices', () => {
     a: 1,
     'b.c': 2,
     'b.d.0': 3,
-    'b.d.1': 4
+    'b.d.1': 4,
   }
 
   expect(unfold(kv, { arrayIndex: 'dot' })).toEqual({
     a: 1,
     b: {
       c: 2,
-      d: [3, 4]
-    }
+      d: [3, 4],
+    },
   })
 })
 
@@ -45,7 +44,7 @@ it('should handle nested object with root array', () => {
     '[1].e': 5,
     '[1].f.g': 6,
     '[1].f.h[0]': 7,
-    '[1].f.h[1]': 8
+    '[1].f.h[1]': 8,
   }
 
   expect(unfold(kv)).toEqual([
@@ -53,16 +52,16 @@ it('should handle nested object with root array', () => {
       a: 1,
       b: {
         c: 2,
-        d: [3, 4]
-      }
+        d: [3, 4],
+      },
     },
     {
       e: 5,
       f: {
         g: 6,
-        h: [7, 8]
-      }
-    }
+        h: [7, 8],
+      },
+    },
   ])
 })
 
@@ -75,7 +74,7 @@ it('should handle nested object with root array with dot array indices', () => {
     '1.e': 5,
     '1.f.g': 6,
     '1.f.h.0': 7,
-    '1.f.h.1': 8
+    '1.f.h.1': 8,
   }
 
   expect(unfold(kv, { arrayIndex: 'dot' })).toEqual([
@@ -83,16 +82,16 @@ it('should handle nested object with root array with dot array indices', () => {
       a: 1,
       b: {
         c: 2,
-        d: [3, 4]
-      }
+        d: [3, 4],
+      },
     },
     {
       e: 5,
       f: {
         g: 6,
-        h: [7, 8]
-      }
-    }
+        h: [7, 8],
+      },
+    },
   ])
 })
 
@@ -106,7 +105,7 @@ it('should handle non-continuous array indices', () => {
     'b[3].e': 6,
     'b[3].f': 7,
     'b[5].g': 8,
-    'b[5].h': 9
+    'b[5].h': 9,
   }
 
   expect(unfold(kv, { pruneArray: true })).toEqual({
@@ -114,17 +113,17 @@ it('should handle non-continuous array indices', () => {
     b: [
       {
         c: 4,
-        d: 5
+        d: 5,
       },
       {
         e: 6,
-        f: 7
+        f: 7,
       },
       {
         g: 8,
-        h: 9
-      }
-    ]
+        h: 9,
+      },
+    ],
   })
 })
 
@@ -138,7 +137,7 @@ it('should handle non-continuous array indices with undefined values', () => {
     'b[3].e': 6,
     'b[3].f': 7,
     'b[5].g': 8,
-    'b[5].h': 9
+    'b[5].h': 9,
   }
 
   expect(unfold(kv, { pruneArray: false })).toEqual({
@@ -147,19 +146,19 @@ it('should handle non-continuous array indices with undefined values', () => {
       undefined,
       {
         c: 4,
-        d: 5
+        d: 5,
       },
       undefined,
       {
         e: 6,
-        f: 7
+        f: 7,
       },
       undefined,
       {
         g: 8,
-        h: 9
-      }
-    ]
+        h: 9,
+      },
+    ],
   })
 })
 
@@ -168,18 +167,21 @@ it('should handle include special characters', () => {
     'theme.$color_primary': '#25adc9',
     'theme.$color_secondary': '#333333',
     'theme.$color_black': '#191919',
-    'feature.@mention': 'true'
+    'feature.@mention': 'true',
   }
 
   expect(unfold(kv)).toEqual({
     feature: {
-      '@mention': 'true'
+      '@mention': 'true',
     },
     theme: {
+      // biome-ignore lint/style/useNamingConvention: <explanation>
       $color_primary: '#25adc9',
+      // biome-ignore lint/style/useNamingConvention: <explanation>
       $color_secondary: '#333333',
-      $color_black: '#191919'
-    }
+      // biome-ignore lint/style/useNamingConvention: <explanation>
+      $color_black: '#191919',
+    },
   })
 })
 
@@ -192,8 +194,8 @@ it('should handle include empty object or empty array', () => {
   expect(unfold(kv)).toEqual({
     a: {
       b: {},
-      c: []
-    }
+      c: [],
+    },
   })
 })
 
@@ -209,12 +211,12 @@ it.skip('should handle include array key and object key in the same hierarchy.',
   expect(unfold(kv1)).toEqual({
     a: {
       x: 1,
-      0: 2
+      0: 2,
     },
     b: {
       0: 3,
-      y: 4
-    }
+      y: 4,
+    },
   })
 })
 
@@ -236,10 +238,8 @@ it.skip('should handle include array key and object key in root', () => {
 it.skip('should throw error when empty key exists', () => {
   const kv = {
     '': 1,
-    'a': 2,
+    a: 2,
   }
-  console.log(unfold(kv))
 
   expect(() => unfold(kv)).toThrow()
 })
-

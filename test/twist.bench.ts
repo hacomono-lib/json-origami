@@ -1,13 +1,12 @@
 import { bench, describe } from 'vitest'
+import { fold, twist } from '../src'
 import {
+  BENCHMARK_TARGET_LIGHT_OBJECT_VALUES,
+  BENCHMARK_TARGET_OBJECT_VALUES,
   createRandomObject,
   randomChoices,
   randomKeyName,
-  BENCHMARK_TARGET_LIGHT_OBJECT_VALUES,
-  BENCHMARK_TARGET_OBJECT_VALUES
 } from './utils'
-import { fold } from '../src/fold'
-import { twist } from '../src/twist'
 
 const iterations = 10
 
@@ -43,20 +42,17 @@ function runBench({ percentOfTwistKeys, objectValues }: TestCaseOption) {
   const testCases = Array.from({ length: iterations }, () =>
     createTestCase({
       percentOfTwistKeys,
-      objectValues
-    })
+      objectValues,
+    }),
   )
 
   let index = 0
 
-  bench(
-    `twist (complex object including ${objectValues} values, twist ${percentOfTwistKeys * 100}% of keys)`,
-    () => {
-      const currentIndex = index++ % iterations
-      const { object, twistMap } = testCases[currentIndex]
-      twist(object, twistMap)
-    }
-  )
+  bench(`twist (complex object including ${objectValues} values, twist ${percentOfTwistKeys * 100}% of keys)`, () => {
+    const currentIndex = index++ % iterations
+    const { object, twistMap } = testCases[currentIndex]
+    twist(object, twistMap)
+  })
 }
 
 describe('twist with light object', () => {

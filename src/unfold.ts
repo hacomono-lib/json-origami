@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { defaultUnfoldOption } from './type'
-import type { ArrayIndex, FixedUnfoldOption, UnfoldOption, Folded, Unfolded } from './type'
+import type { ArrayIndex, FixedUnfoldOption, Folded, UnfoldOption, Unfolded } from './type'
 
 /**
  * Unfold a one-level object into a nested object.
@@ -26,16 +25,18 @@ import type { ArrayIndex, FixedUnfoldOption, UnfoldOption, Folded, Unfolded } fr
  * // }
  * ```
  */
-export function unfold<KV extends Folded<any>>(kv: KV, option?: UnfoldOption): Unfolded<KV> {
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+export function unfold<Kv extends Folded<any>>(kv: Kv, option?: UnfoldOption): Unfolded<Kv> {
   const fixedOpion = {
     ...defaultUnfoldOption,
-    ...option
+    ...option,
   } as FixedUnfoldOption
   validateKeys(kv)
 
-  return unfoldInternal(Object.entries(kv), fixedOpion) as Unfolded<KV>
+  return unfoldInternal(Object.entries(kv), fixedOpion) as Unfolded<Kv>
 }
 
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 function validateKeys(kv: Folded<any>) {
   for (const key in kv) {
     if (key.startsWith('.') || key.endsWith('.')) {
@@ -46,7 +47,7 @@ function validateKeys(kv: Folded<any>) {
 
 const extractHeadIndexMap = {
   dot: (k) => (k.match(/^(\d+)/) ?? [])[1],
-  bracket: (k) => (k.match(/^\[(\d+)\]/) ?? [])[1]
+  bracket: (k) => (k.match(/^\[(\d+)\]/) ?? [])[1],
 } satisfies Record<ArrayIndex, (key: string) => string | undefined>
 
 function extractHeadKey(key: string, { arrayIndex }: FixedUnfoldOption): string | number {
@@ -56,7 +57,6 @@ function extractHeadKey(key: string, { arrayIndex }: FixedUnfoldOption): string 
     return Number.parseInt(indexHead)
   }
 
-  // eslint-disable-next-line no-useless-escape
   const [, match] = key.match(/^([^\.\[]+)/) ?? [null, key]
 
   return match
@@ -74,14 +74,16 @@ function omitHeadKey(key: string, opt: FixedUnfoldOption): string {
   return key.replace(headKey === undefined ? '' : new RegExp(`^${headKey}\\.?`), '')
 }
 
-function unfoldInternal(entries: Array<[string, unknown]>, opt: FixedUnfoldOption): unknown {
+function unfoldInternal(entries: [string, unknown][], opt: FixedUnfoldOption): unknown {
   if (entries.length <= 0) {
     return {}
   }
 
+  // biome-ignore lint/style/noNonNullAssertion: <explanation>
   const firstKey = extractHeadKey(entries[0]![0], opt)
 
   if (firstKey === '') {
+    // biome-ignore lint/style/noNonNullAssertion: <explanation>
     return entries[entries.length - 1]![1]
   }
 
@@ -99,7 +101,7 @@ function unfoldInternal(entries: Array<[string, unknown]>, opt: FixedUnfoldOptio
 
       const unfolded = unfoldInternal(
         filteredEntries.map(([key, value]) => [omitHeadKey(key, opt), value]),
-        opt
+        opt,
       )
 
       return unfolded
@@ -117,12 +119,13 @@ function unfoldInternal(entries: Array<[string, unknown]>, opt: FixedUnfoldOptio
     const filteredEntries = entries.filter(([k]) => extractHeadKey(k, opt) === key)
     const unfolded = unfoldInternal(
       filteredEntries.map(([k, value]) => [omitHeadKey(k, opt), value]),
-      opt
+      opt,
     )
 
     return {
+      // biome-ignore lint/performance/noAccumulatingSpread: <explanation>
       ...acc,
-      [key]: unfolded
+      [key]: unfolded,
     }
   }, {})
 }

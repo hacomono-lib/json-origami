@@ -1,5 +1,5 @@
 ---
-name: Lint Code Base (eslint)
+name: Lint Code Base
 run-name: "Lint code base (eslint) on \"${{ github.event.pull_request.title }}\" by ${{ github.actor }}"
 
 permissions:

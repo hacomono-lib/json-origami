@@ -43,8 +43,8 @@
     "test": "run-p test:*",
     "test:spec": "vitest --run --silent",
     "test:type": "tsc --noEmit -p tsconfig.json",
-    "format": "biome format --write ./src ./docs",
-    "lint": "biome check --apply ./src ./docs"
+    "format": "biome format --write ./src ./test",
+    "lint": "biome check --apply ./src ./test"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.4.1",

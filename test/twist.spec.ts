@@ -1,22 +1,21 @@
-/* eslint-disable max-lines */
-import { it, expect } from 'vitest'
-import { twist } from '../src/twist'
+import { expect, it } from 'vitest'
+import { twist } from '../src'
 
 it('twist partial keys', () => {
   const target = {
     a: 1,
     b: {
       c: 2,
-      d: [3, 4]
-    }
+      d: [3, 4],
+    },
   }
 
   expect(twist(target, { a: 'A', b: 'B', c: 'C', d: 'D' })).toEqual({
     A: 1,
     B: {
       c: 2,
-      d: [3, 4]
-    }
+      d: [3, 4],
+    },
   })
 })
 
@@ -25,14 +24,14 @@ it('twist nested keys', () => {
     a: 1,
     b: {
       c: 2,
-      d: [3, 4]
-    }
+      d: [3, 4],
+    },
   }
 
   expect(twist(target, { 'b.c': 'C', 'b.d': 'D' })).toEqual({
     a: 1,
     C: 2,
-    D: [3, 4]
+    D: [3, 4],
   })
 })
 
@@ -41,16 +40,16 @@ it('merge existed key', () => {
     a: 1,
     b: {
       c: 2,
-      d: [3, 4]
-    }
+      d: [3, 4],
+    },
   }
 
   expect(twist(target, { a: 'b.a' })).toEqual({
     b: {
       a: 1,
       c: 2,
-      d: [3, 4]
-    }
+      d: [3, 4],
+    },
   })
 })
 
@@ -59,16 +58,16 @@ it('swap object keys', () => {
     a: 1,
     b: {
       c: 2,
-      d: [3, 4]
-    }
+      d: [3, 4],
+    },
   }
 
   expect(twist(target, { a: 'b', b: 'a' })).toEqual({
     a: {
       c: 2,
-      d: [3, 4]
+      d: [3, 4],
     },
-    b: 1
+    b: 1,
   })
 })
 
@@ -77,16 +76,16 @@ it('swap array index', () => {
     a: 1,
     b: {
       c: 2,
-      d: [3, 4]
-    }
+      d: [3, 4],
+    },
   }
 
   expect(twist(target, { 'b.d[0]': 'b.d[1]', 'b.d[1]': 'b.d[0]' })).toEqual({
     a: 1,
     b: {
       c: 2,
-      d: [4, 3]
-    }
+      d: [4, 3],
+    },
   })
 })
 
@@ -95,16 +94,16 @@ it('swap array index with dot array index', () => {
     a: 1,
     b: {
       c: 2,
-      d: [3, 4]
-    }
+      d: [3, 4],
+    },
   }
 
   expect(twist(target, { 'b.d.0': 'b.d.1', 'b.d.1': 'b.d.0' }, { arrayIndex: 'dot' })).toEqual({
     a: 1,
     b: {
       c: 2,
-      d: [4, 3]
-    }
+      d: [4, 3],
+    },
   })
 })
 
@@ -114,36 +113,34 @@ it('should handle object with numeric and string keys in root', () => {
       a: 1,
       b: {
         c: 2,
-        d: [3, 4]
-      }
+        d: [3, 4],
+      },
     },
     {
       e: 5,
       f: {
         g: 6,
-        h: [7, 8]
-      }
-    }
+        h: [7, 8],
+      },
+    },
   ] as const
 
-  expect(
-    twist(target, { '[0].a': 'A', '[0].b.c': 'C', '[1].f.h[0]': 'D', '[1].f.h[1]': 'E' })
-  ).toEqual({
+  expect(twist(target, { '[0].a': 'A', '[0].b.c': 'C', '[1].f.h[0]': 'D', '[1].f.h[1]': 'E' })).toEqual({
     '0': {
       b: {
-        d: [3, 4]
-      }
+        d: [3, 4],
+      },
     },
     '1': {
       e: 5,
       f: {
-        g: 6
-      }
+        g: 6,
+      },
     },
     A: 1,
     C: 2,
     D: 7,
-    E: 8
+    E: 8,
   })
 })
 
@@ -153,40 +150,34 @@ it('should handle object with numeric and string keys in root with dot array ind
       a: 1,
       b: {
         c: 2,
-        d: [3, 4]
-      }
+        d: [3, 4],
+      },
     },
     {
       e: 5,
       f: {
         g: 6,
-        h: [7, 8]
-      }
-    }
+        h: [7, 8],
+      },
+    },
   ] as const
 
-  expect(
-    twist(
-      target,
-      { '0.a': 'A', '0.b.c': 'C', '1.f.h.0': 'D', '1.f.h.1': 'E' },
-      { arrayIndex: 'dot' }
-    )
-  ).toEqual({
+  expect(twist(target, { '0.a': 'A', '0.b.c': 'C', '1.f.h.0': 'D', '1.f.h.1': 'E' }, { arrayIndex: 'dot' })).toEqual({
     '0': {
       b: {
-        d: [3, 4]
-      }
+        d: [3, 4],
+      },
     },
     '1': {
       e: 5,
       f: {
-        g: 6
-      }
+        g: 6,
+      },
     },
     A: 1,
     C: 2,
     D: 7,
-    E: 8
+    E: 8,
   })
 })
 
@@ -195,17 +186,17 @@ it('should prune array elements', () => {
     a: 1,
     b: {
       c: 2,
-      d: [3, 4, 5, 6]
-    }
+      d: [3, 4, 5, 6],
+    },
   }
 
   expect(twist(target, { 'b.d[1]': 'D' }, { pruneArray: true })).toEqual({
     a: 1,
     b: {
       c: 2,
-      d: [3, 5, 6]
+      d: [3, 5, 6],
     },
-    D: 4
+    D: 4,
   })
 })
 
@@ -214,17 +205,17 @@ it('should not prune array elements', () => {
     a: 1,
     b: {
       c: 2,
-      d: [3, 4, 5, 6]
-    }
+      d: [3, 4, 5, 6],
+    },
   }
 
   expect(twist(target, { 'b.d[1]': 'D' }, { pruneArray: false })).toEqual({
     a: 1,
     b: {
       c: 2,
-      d: [3, undefined, 5, 6]
+      d: [3, undefined, 5, 6],
     },
-    D: 4
+    D: 4,
   })
 })
 
@@ -233,16 +224,16 @@ it('should return the original object when the second argument is an empty objec
     a: 1,
     b: {
       c: 2,
-      d: [3, 4]
-    }
+      d: [3, 4],
+    },
   }
 
   expect(twist(target, {})).toEqual({
     a: 1,
     b: {
       c: 2,
-      d: [3, 4]
-    }
+      d: [3, 4],
+    },
   })
 })
 
@@ -253,31 +244,31 @@ it('should be twisted correctly when the prefix is the same string.', () => {
       bar: 0,
       bar1: 1,
       bar2: 2,
-      barbar: 3
+      barbar: 3,
     },
     foo1: {
       bar: 4,
       bar1: 5,
-      bar2: 6
-    }
+      bar2: 6,
+    },
   }
 
   const map = {
     'foo.bar': 'baz',
     'foo.bar1': 'qux',
     'foo.bar2': 'quux',
-    'foo.barbar': 'quux1'
+    'foo.barbar': 'quux1',
   }
 
   expect(twist(target, map)).toEqual({
     foo1: {
       bar: 4,
       bar1: 5,
-      bar2: 6
+      bar2: 6,
     },
     baz: 0,
     qux: 1,
     quux: 2,
-    quux1: 3
+    quux1: 3,
   })
 })
