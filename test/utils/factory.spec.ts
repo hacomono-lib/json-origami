@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { fold } from '../../src'
+import { fold } from '~/fold'
 import { createRandomObject } from './factory'
 
 describe('createRandomObject', () => {

@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest'
-import { omit } from '../src'
+import { omit } from '~/omit'
 
 it('should omit specified keys from the object', () => {
   const obj = {

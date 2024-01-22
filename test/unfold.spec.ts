@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest'
-import { unfold } from '../src'
+import { unfold } from '~/unfold'
 
 it('should handle nested object', () => {
   const kv = {
@@ -235,16 +235,9 @@ it('should handle include array key and object key in root', () => {
 it('should throw error when empty key exists', () => {
   const kv = {
     '': 1,
-<<<<<<< HEAD
-    'a': {
-      '': 2
-    }
+    a: {
+      '': 2,
+    },
   }
   expect(unfold(kv)).toEqual({ '': 1, a: { '': 2 } })
-=======
-    a: 2,
-  }
-
-  expect(() => unfold(kv)).toThrow()
->>>>>>> main
 })

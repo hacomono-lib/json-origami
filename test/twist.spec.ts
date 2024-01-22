@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest'
-import { twist } from '../src'
+import { twist } from '~/twist'
 
 it('twist partial keys', () => {
   const target = {

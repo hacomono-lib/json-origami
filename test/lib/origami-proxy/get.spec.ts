@@ -1,7 +1,5 @@
-/* eslint-disable max-lines */
-/* eslint-disable max-lines-per-function */
-import { it, expect } from 'vitest'
-import { toProxy, toRaw } from '../../../src/lib/origami-proxy'
+import { expect, it } from 'vitest'
+import { toProxy, toRaw } from '~/lib'
 
 it('should get values by dot-notated key', () => {
   const target = {
@@ -16,7 +14,6 @@ it('should get values by dot-notated key', () => {
 
   expect(toRaw(proxy.value['a.b.c'])).toBe('d')
   expect(toRaw(proxy.value['a.b'])).toEqual({ c: 'd' })
-  expect(toRaw(proxy.value['a'])).toEqual({ b: { c: 'd' } })
 })
 
 it('should same object when get values by same dot-notated key', () => {

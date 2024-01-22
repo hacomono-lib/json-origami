@@ -1,5 +1,6 @@
 import { bench, describe } from 'vitest'
-import { fold, unfold } from '../src'
+import { fold } from '~/fold'
+import { unfold } from '~/unfold'
 import { BENCHMARK_TARGET_LIGHT_OBJECT_VALUES, BENCHMARK_TARGET_OBJECT_VALUES, createRandomObject } from './utils'
 
 interface TestCaseOption {

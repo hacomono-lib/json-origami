@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { createEmptyProxy, toRaw } from './lib/origami-proxy'
+import { createEmptyProxy, toRaw } from './lib'
 import { defaultUnfoldOption } from './type'
 import type { FixedUnfoldOption, Folded, UnfoldOption, Unfolded } from './type'
 
@@ -27,7 +26,9 @@ import type { FixedUnfoldOption, Folded, UnfoldOption, Unfolded } from './type'
  * // }
  * ```
  */
-export function unfold<KV extends Folded<any>>(kv: KV, option?: UnfoldOption): Unfolded<KV> {
+
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+export function unfold<Kv extends Folded<any>>(kv: Kv, option?: UnfoldOption): Unfolded<Kv> {
   const fixedOption = {
     ...defaultUnfoldOption,
     ...option,
@@ -37,5 +38,6 @@ export function unfold<KV extends Folded<any>>(kv: KV, option?: UnfoldOption): U
     newValue.value[key] = value
   }
 
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   return toRaw(newValue.value) as any
 }

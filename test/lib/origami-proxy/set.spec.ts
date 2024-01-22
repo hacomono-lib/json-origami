@@ -1,7 +1,5 @@
-/* eslint-disable max-lines */
-/* eslint-disable max-lines-per-function */
-import { it, expect } from 'vitest'
-import { createEmptyProxy, toProxy, toRaw } from '../../../src/lib/origami-proxy'
+import { expect, it } from 'vitest'
+import { createEmptyProxy, toProxy, toRaw } from '~/lib'
 
 it('should set primivite value by dot-notated key', () => {
   const target = {
@@ -29,7 +27,7 @@ it('should set object value by dot-notated key', () => {
     },
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   const proxy = toProxy(target, { arrayIndex: 'bracket' }) as any
   proxy.value['a.b'] = { e: 'f' }
 
@@ -106,14 +104,14 @@ it('should set object value to un-existed key by dot-notated key', () => {
   proxy.value['e.f.g'] = 'h'
 
   expect(proxy.value['e.f.g']).toBe('h')
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   expect((target as any).e?.f?.g).toBeUndefined()
 
   proxy.value['i.j'] = { k: 'l' }
 
   expect(toRaw(proxy.value['i.j'])).toEqual({ k: 'l' })
   expect(toRaw(proxy.value['i.j.k'])).toBe('l')
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   expect((target as any).i?.j).toBeUndefined()
 
   expect(toRaw(proxy.value)).toEqual({

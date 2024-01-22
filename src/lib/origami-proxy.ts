@@ -1,8 +1,3 @@
-/* eslint-disable max-lines */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable max-statements */
-/* eslint-disable prefer-const */
-/* eslint-disable max-lines-per-function */
 import clone from 'just-clone'
 import type { JsonArray, JsonObject } from 'type-fest'
 import type { CommonOption } from '../type'
@@ -39,6 +34,7 @@ export interface OrigamiMeta {
 
 type ProxyTarget = JsonObject | JsonArray
 
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 type OrigamiProxy<T extends ProxyTarget = ProxyTarget> = T & Record<string, any> & { [rawExtractor]: { raw: T } }
 
 function isProxyTarget(target: unknown): target is ProxyTarget {
@@ -53,7 +49,7 @@ export function toProxy<T extends ProxyTarget>(target: T, opt: OrigamiOption): O
   return createProxy(opt.immutable ? target : clone(target), opt) as OrigamiObject<T>
 }
 
-function createProxy(value: ProxyTarget | undefined, opt: OrigamiOption): OrigamiObject {
+function createProxy(value: ProxyTarget, opt: OrigamiOption): OrigamiObject {
   /**
    * * key: original object
    * * value: origami proxy object
@@ -78,6 +74,8 @@ function createProxy(value: ProxyTarget | undefined, opt: OrigamiOption): Origam
        * - proxy.value.a.b.c
        * - proxy.value['a.b.c']
        */
+
+      // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: <explanation>
       get(target, p) {
         // rawExtractor is a special key for accessing raw
         if (p === rawExtractor) {
@@ -101,6 +99,7 @@ function createProxy(value: ProxyTarget | undefined, opt: OrigamiOption): Origam
           cache.set(nextRaw, p)
         }
 
+        // biome-ignore lint/style/noNonNullAssertion: <explanation>
         const nextProxy = cache.get(nextRaw)!
 
         return tail ? Reflect.get(nextProxy, tail) : cache.get(nextRaw)
@@ -111,6 +110,8 @@ function createProxy(value: ProxyTarget | undefined, opt: OrigamiOption): Origam
        * - proxy.value.a.b.c = 'd'
        * - proxy.value['a.b.c'] = 'd'
        */
+
+      // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: <explanation>
       set(target, p, newValue) {
         if (opt.immutable) {
           return false
@@ -165,6 +166,7 @@ function createProxy(value: ProxyTarget | undefined, opt: OrigamiOption): Origam
           cache.set(nextValue, p)
         }
 
+        // biome-ignore lint/style/noNonNullAssertion: <explanation>
         const nextProxy = cache.get(nextValue)!
 
         return Reflect.set(nextProxy, tail, newValue)
@@ -180,9 +182,10 @@ function createProxy(value: ProxyTarget | undefined, opt: OrigamiOption): Origam
           return false
         }
 
+        // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: <explanation>
         function wrap(callback: () => boolean) {
           const result = callback()
-          if (!result || !opt.pruneEmpty) {
+          if (!(result && opt.pruneEmpty)) {
             return result
           }
 
@@ -225,6 +228,7 @@ function createProxy(value: ProxyTarget | undefined, opt: OrigamiOption): Origam
           cache.set(nextValue, p)
         }
 
+        // biome-ignore lint/style/noNonNullAssertion: <explanation>
         const nextProxy = cache.get(nextValue)!
         return wrap(() => Reflect.deleteProperty(nextProxy, tail))
       },
@@ -282,6 +286,7 @@ function transformToObjectIfNeeded(target: object): object {
  * `[0][1].b.c` -> `{ head: '[0][1]', tail: 'b.c' }`
  */
 function splitKey(key: string, { arrayIndex }: OrigamiOption): SplitKeyResult {
+  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: <explanation>
   function pickHead(target: string): string | number {
     if (arrayIndex === 'bracket' && target.startsWith('[')) {
       const head = (target.match(/^\[(\d+)\]/) ?? [null, null])[1]

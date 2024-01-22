@@ -1,4 +1,4 @@
-import { createEmptyProxy, toProxy, toRaw } from './lib/origami-proxy'
+import { createEmptyProxy, toProxy, toRaw } from './lib'
 import { type DeepKeyOf, type Dictionary, type PickOption, defaultCommonOption } from './type'
 
 /**
@@ -46,6 +46,7 @@ export function pick<D extends Dictionary, K extends DeepKeyOf<D>>(
     ...opt,
   }
 
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   const proxy = toProxy(obj as any, fixedOption)
   const newValue = createEmptyProxy(fixedOption)
 
@@ -53,5 +54,6 @@ export function pick<D extends Dictionary, K extends DeepKeyOf<D>>(
     newValue.value[key] = proxy.value[key]
   }
 
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   return toRaw(newValue.value) as any
 }

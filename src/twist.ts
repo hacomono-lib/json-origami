@@ -1,4 +1,4 @@
-import { toProxy, toRaw } from './lib/origami-proxy'
+import { toProxy, toRaw } from './lib'
 import { type Dictionary, type MoveMap, type Twist, type TwistOption, defaultCommonOption } from './type'
 
 /**
@@ -18,7 +18,9 @@ export function twist<D extends Dictionary, M extends MoveMap<D>>(
 
   const fromSet = new Set(Object.keys(moveMap))
 
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   const src = toProxy(obj as any, { ...fixedOption, immutable: true })
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   const dst = toProxy(obj as any, { ...fixedOption, pruneEmpty: true })
 
   for (const [from, to] of Object.entries(moveMap)) {

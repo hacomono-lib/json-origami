@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest'
-import { pick } from '../src'
+import { pick } from '~/pick'
 
 it('should pick specified keys from the object', () => {
   const obj = {

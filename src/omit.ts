@@ -1,4 +1,4 @@
-import { toProxy, toRaw } from './lib/origami-proxy'
+import { toProxy, toRaw } from './lib'
 import { type DeepKeyOf, type Dictionary, type Omit, type OmitOption, defaultCommonOption } from './type'
 
 /**
@@ -51,11 +51,13 @@ export function omit<D extends Dictionary, K extends DeepKeyOf<D>>(
     ...opt,
   }
 
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   const proxy = toProxy(obj as any, { ...fixedOption, pruneEmpty: true })
 
   for (const key of keys) {
     delete proxy.value[key]
   }
 
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   return toRaw(proxy.value) as any
 }

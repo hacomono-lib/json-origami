@@ -1,6 +1,7 @@
 import type { JsonObject } from 'type-fest'
 import { bench, describe } from 'vitest'
-import { fold, omit } from '../src'
+import { fold } from '~/fold'
+import { omit } from '~/omit'
 import {
   BENCHMARK_TARGET_LIGHT_OBJECT_VALUES,
   BENCHMARK_TARGET_OBJECT_VALUES,
