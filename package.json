@@ -19,19 +19,17 @@
   "packageManager": "yarn@4.0.2",
   "type": "module",
   "files": [
-    "dist",
-    "src"
+    "dist"
   ],
   "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
+  "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
+      "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
-    },
-    "./src/*": "./src/*"
+    }
   },
   "publishConfig": {
     "access": "public"
@@ -39,7 +37,7 @@
   "scripts": {
     "dev": "vitest --ui",
     "bench": "vitest bench",
-    "build": "tsup",
+    "build": "unbuild",
     "test": "run-p test:*",
     "test:spec": "vitest --run --silent",
     "test:type": "tsc --noEmit -p tsconfig.json",
@@ -52,7 +50,7 @@
     "@changesets/cli": "^2.27.1",
     "@vitest/ui": "^1.2.1",
     "defu": "^6.1.4",
-    "tsup": "^8.0.1",
+    "unbuild": "^2.0.0",
     "type-fest": "^4.9.0",
     "typescript": "^5.3.3",
     "vitest": "^1.2.1",
