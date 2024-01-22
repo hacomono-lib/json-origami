@@ -1,13 +1,12 @@
 import type { JsonObject } from 'type-fest'
 import { bench, describe } from 'vitest'
+import { fold, omit } from '../src'
 import {
+  BENCHMARK_TARGET_LIGHT_OBJECT_VALUES,
+  BENCHMARK_TARGET_OBJECT_VALUES,
   createRandomObject,
   randomChoices,
-  BENCHMARK_TARGET_LIGHT_OBJECT_VALUES,
-  BENCHMARK_TARGET_OBJECT_VALUES
 } from './utils'
-import { fold } from '../src/fold'
-import { omit } from '../src/omit'
 
 const iterations = 10
 
@@ -39,20 +38,17 @@ function runBench({ percentOfOmitKeys, objectValues }: TestCaseOption) {
   const testCases = Array.from({ length: iterations }, () =>
     createTestCase({
       percentOfOmitKeys,
-      objectValues
-    })
+      objectValues,
+    }),
   )
 
   let index = 0
 
-  bench(
-    `omit (complex object including ${objectValues} values, omit ${percentOfOmitKeys * 100}% of keys)`,
-    () => {
-      const currentIndex = index++ % iterations
-      const { object, keys } = testCases[currentIndex]
-      omit(object, keys)
-    }
-  )
+  bench(`omit (complex object including ${objectValues} values, omit ${percentOfOmitKeys * 100}% of keys)`, () => {
+    const currentIndex = index++ % iterations
+    const { object, keys } = testCases[currentIndex]
+    omit(object, keys)
+  })
 }
 
 describe('omit with light object', () => {

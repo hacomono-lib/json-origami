@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 import type { JsonArray, JsonObject, JsonValue, Writable } from 'type-fest'
 import { createRandomWord, dice, randomChoice } from './random'
 
@@ -11,7 +10,9 @@ interface RandomObjectOption {
 export function createRandomObject({ leafs }: RandomObjectOption): JsonObject {
   let leafCount = 0
 
-  if (leafs % 1 !== 0) throw new Error(`leafs must be an integer (input: ${leafs})`)
+  if (leafs % 1 !== 0) {
+    throw new Error(`leafs must be an integer (input: ${leafs})`)
+  }
 
   const maxLeafs = leafs ?? DEFAULT_LEAFS
 
@@ -36,7 +37,9 @@ export function createRandomObject({ leafs }: RandomObjectOption): JsonObject {
     while ((root || dice(0.6)) && leafCount < maxLeafs) {
       const key = createRandomWord()
 
-      if (!key || key in obj) continue
+      if (!key || key in obj) {
+        continue
+      }
 
       const value = createValue()
       obj[key] = value
@@ -72,17 +75,19 @@ export function createRandomObject({ leafs }: RandomObjectOption): JsonObject {
       string: createStringLeaf,
       boolean: createBooleanLeaf,
       object: createObject,
-      array: createArray
+      array: createArray,
     } satisfies Record<ValueType, () => JsonValue>
 
-    return map[randomChoice([
-      'number',
-      'string',
-      'boolean',
-      'object',
-      // FIXME: array だと twist できないエッジケースがあるため、一時的に無効化する
-      // 'array'
-    ])]()
+    return map[
+      randomChoice([
+        'number',
+        'string',
+        'boolean',
+        'object',
+        // FIXME: array だと twist できないエッジケースがあるため、一時的に無効化する
+        // 'array'
+      ])
+    ]()
   }
 
   return createObject({ root: true })
