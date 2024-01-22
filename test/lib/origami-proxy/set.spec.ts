@@ -7,9 +7,9 @@ it('should set primivite value by dot-notated key', () => {
   const target = {
     a: {
       b: {
-        c: 'd'
-      }
-    }
+        c: 'd',
+      },
+    },
   }
 
   const proxy = toProxy(target, { arrayIndex: 'bracket' })
@@ -24,9 +24,9 @@ it('should set object value by dot-notated key', () => {
   const target = {
     a: {
       b: {
-        c: 'd'
-      }
-    }
+        c: 'd',
+      },
+    },
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -44,9 +44,9 @@ it('should set array value by dot-notated key', () => {
   const target = {
     a: {
       b: {
-        c: ['d', 'e']
-      }
-    }
+        c: ['d', 'e'],
+      },
+    },
   }
 
   const proxy = toProxy(target, { arrayIndex: 'dot' })
@@ -70,9 +70,9 @@ it('should set array value by dot-notated key with bracket', () => {
   const target = {
     a: {
       b: {
-        c: ['d', 'e']
-      }
-    }
+        c: ['d', 'e'],
+      },
+    },
   }
 
   const proxy = toProxy(target, { arrayIndex: 'bracket' })
@@ -96,9 +96,9 @@ it('should set object value to un-existed key by dot-notated key', () => {
   const target = {
     a: {
       b: {
-        c: 'd'
-      }
-    }
+        c: 'd',
+      },
+    },
   }
 
   const proxy = toProxy(target, { arrayIndex: 'bracket' })
@@ -119,7 +119,7 @@ it('should set object value to un-existed key by dot-notated key', () => {
   expect(toRaw(proxy.value)).toEqual({
     a: { b: { c: 'd' } },
     e: { f: { g: 'h' } },
-    i: { j: { k: 'l' } }
+    i: { j: { k: 'l' } },
   })
 })
 
@@ -127,9 +127,9 @@ it('should set value to un-existed array key by dot-notated key', () => {
   const target = {
     a: {
       b: {
-        c: 'd'
-      }
-    }
+        c: 'd',
+      },
+    },
   }
 
   const proxy = toProxy(target, { arrayIndex: 'dot' })
@@ -145,22 +145,22 @@ it('should set value to un-existed array key by dot-notated key', () => {
     undefined,
     undefined,
     undefined,
-    [undefined, undefined, undefined, undefined, 'k']
+    [undefined, undefined, undefined, undefined, 'k'],
   ])
   expect(toRaw(proxy.value['i.j.3.4'])).toBe('k')
 
   expect(toRaw(proxy.value)).toEqual({
     a: {
       b: {
-        c: 'd'
-      }
+        c: 'd',
+      },
     },
     e: {
-      f: [['g', 'h']]
+      f: [['g', 'h']],
     },
     i: {
-      j: [undefined, undefined, undefined, [undefined, undefined, undefined, undefined, 'k']]
-    }
+      j: [undefined, undefined, undefined, [undefined, undefined, undefined, undefined, 'k']],
+    },
   })
 })
 
@@ -168,9 +168,9 @@ it('should set value to un-existed array key by dot-notated key with bracket', (
   const target = {
     a: {
       b: {
-        c: 'd'
-      }
-    }
+        c: 'd',
+      },
+    },
   }
 
   const proxy = toProxy(target, { arrayIndex: 'bracket' })
@@ -186,7 +186,7 @@ it('should set value to un-existed array key by dot-notated key with bracket', (
     undefined,
     undefined,
     undefined,
-    [undefined, undefined, undefined, undefined, 'k']
+    [undefined, undefined, undefined, undefined, 'k'],
   ])
   expect(toRaw(proxy.value['i.j[3][4]'])).toBe('k')
 })
@@ -195,9 +195,9 @@ it('should set string-key value to array', () => {
   const target = {
     a: {
       b: {
-        c: ['d', 'e']
-      }
-    }
+        c: ['d', 'e'],
+      },
+    },
   }
 
   const proxy = toProxy(target, { arrayIndex: 'dot' })
@@ -209,20 +209,22 @@ it('should set string-key value to array', () => {
 })
 
 it('should set string-key value to root array', () => {
-  const target = [{
-    a: {
-      b: {
-        c: ['d', 'e']
-      }
-    }
-  },
-  {
-    f: {
-      g: {
-        h: ['i', 'j']
-      }
-    }
-  }]
+  const target = [
+    {
+      a: {
+        b: {
+          c: ['d', 'e'],
+        },
+      },
+    },
+    {
+      f: {
+        g: {
+          h: ['i', 'j'],
+        },
+      },
+    },
+  ]
 
   const proxy = toProxy(target, { arrayIndex: 'dot' })
 
@@ -232,20 +234,20 @@ it('should set string-key value to root array', () => {
     0: {
       a: {
         b: {
-          c: ['d', 'e']
-        }
-      }
+          c: ['d', 'e'],
+        },
+      },
     },
     1: {
       f: {
         g: {
-          h: ['i', 'j']
-        }
-      }
+          h: ['i', 'j'],
+        },
+      },
     },
     x: {
-      y: 'z'
-    }
+      y: 'z',
+    },
   })
 })
 
@@ -254,10 +256,10 @@ it('should set number-key value to object', () => {
     a: {
       b: {
         c: {
-          d: 'e'
-        }
-      }
-    }
+          d: 'e',
+        },
+      },
+    },
   }
 
   const proxy = toProxy(target, { arrayIndex: 'dot' })

@@ -11,9 +11,9 @@ it('should freed memory when the proxy object is finished being used', () => {
     const target = {
       a: {
         b: {
-          c: 'd'
-        }
-      }
+          c: 'd',
+        },
+      },
     }
 
     let proxy = toProxy(target, { arrayIndex: 'bracket' })

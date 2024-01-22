@@ -1,11 +1,11 @@
 import {
-  defaultCommonOption,
+  type ArrayIndex,
   type Dictionary,
+  type FixedFoldOption,
   type FoldOption,
   type Folded,
   type Primitive,
-  type FixedFoldOption,
-  type ArrayIndex
+  defaultCommonOption,
 } from './type'
 
 /**
@@ -33,23 +33,27 @@ import {
  * ```
  */
 export function fold<D extends Dictionary>(obj: D, option?: FoldOption): Folded<D> {
-  if (Object.keys(obj).length <= 0) return {}
+  if (Object.keys(obj).length <= 0) {
+    return {}
+  }
 
   return Object.fromEntries(
     flatEntries(option?.keyPrefix ?? '', obj, {
       ...defaultCommonOption,
-      ...option
-    } as FixedFoldOption)
+      ...option,
+    } as FixedFoldOption),
   ) as Folded<D>
 }
 
 const arrayKeyMap = {
   dot: (prefix: string, index: number) => (prefix === '' ? `${index}` : `${prefix}.${index}`),
-  bracket: (prefix: string, index: number) => `${prefix}[${index}]`
+  bracket: (prefix: string, index: number) => `${prefix}[${index}]`,
 } satisfies Record<ArrayIndex, (prefix: string, index: number) => string>
 
-function flatEntries(key: string, value: object, opt: FixedFoldOption): Array<[string, Primitive]> {
-  if (value === undefined || value === null) return []
+function flatEntries(key: string, value: object, opt: FixedFoldOption): [string, Primitive][] {
+  if (value === undefined || value === null) {
+    return []
+  }
 
   const appendKey = (k: string | number) =>
     typeof k === 'number' ? arrayKeyMap[opt.arrayIndex](key, k) : key === '' ? k : `${key}.${k}`

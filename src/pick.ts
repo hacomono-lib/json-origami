@@ -1,5 +1,5 @@
-import { type Dictionary, type DeepKeyOf, type PickOption, defaultCommonOption } from './type'
 import { createEmptyProxy, toProxy, toRaw } from './lib/origami-proxy'
+import { type DeepKeyOf, type Dictionary, type PickOption, defaultCommonOption } from './type'
 
 /**
  * Returns an object with the specified keys picked from the object.
@@ -28,26 +28,22 @@ import { createEmptyProxy, toProxy, toRaw } from './lib/origami-proxy'
  * @param keys
  * @param opt
  */
+export function pick<D extends Dictionary, K extends DeepKeyOf<D>>(obj: D, keys: K[], opt?: PickOption): Omit<D, K>
+
 export function pick<D extends Dictionary, K extends DeepKeyOf<D>>(
   obj: D,
-  keys: K[],
-  opt?: PickOption
+  keys: Array<K | RegExp>,
+  opt?: PickOption,
 ): Omit<D, K>
 
 export function pick<D extends Dictionary, K extends DeepKeyOf<D>>(
   obj: D,
   keys: Array<K | RegExp>,
-  opt?: PickOption
-): Omit<D, K>
-
-export function pick<D extends Dictionary, K extends DeepKeyOf<D>>(
-  obj: D,
-  keys: Array<K | RegExp>,
-  opt?: PickOption
+  opt?: PickOption,
 ): Omit<D, K> {
   const fixedOption = {
     ...defaultCommonOption,
-    ...opt
+    ...opt,
   }
 
   const proxy = toProxy(obj as any, fixedOption)

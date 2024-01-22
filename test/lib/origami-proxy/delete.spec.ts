@@ -7,9 +7,9 @@ it('should delete value by dot-notated key', () => {
   const target = {
     a: {
       b: {
-        c: 'd'
-      }
-    }
+        c: 'd',
+      },
+    },
   }
 
   const proxy = toProxy(target, { arrayIndex: 'bracket' })
@@ -22,9 +22,9 @@ it('should delete value by dot-notated parent key', () => {
   const target = {
     a: {
       b: {
-        c: 'd'
-      }
-    }
+        c: 'd',
+      },
+    },
   }
 
   const proxy = toProxy(target, { arrayIndex: 'bracket' })
@@ -36,9 +36,9 @@ it('should delete value by dot-notated key in array', () => {
   const target = {
     a: {
       b: {
-        c: ['d', 'e']
-      }
-    }
+        c: ['d', 'e'],
+      },
+    },
   }
 
   const proxy = toProxy(target, { arrayIndex: 'dot' })
@@ -51,9 +51,9 @@ it('should delete value by dot-notated key in array with bracket', () => {
   const target = {
     a: {
       b: {
-        c: ['d', 'e']
-      }
-    }
+        c: ['d', 'e'],
+      },
+    },
   }
 
   const proxy = toProxy(target, { arrayIndex: 'bracket' })
@@ -66,9 +66,9 @@ it('should completely delete empty value when pruneEmpty is true', () => {
   const target = {
     a: {
       b: {
-        c: ['d', 'e']
-      }
-    }
+        c: ['d', 'e'],
+      },
+    },
   }
 
   const proxy = toProxy(target, { arrayIndex: 'bracket', pruneEmpty: true })

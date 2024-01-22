@@ -1,5 +1,5 @@
-import { type Dictionary, type MoveMap, type Twist, type TwistOption, defaultCommonOption } from './type'
 import { toProxy, toRaw } from './lib/origami-proxy'
+import { type Dictionary, type MoveMap, type Twist, type TwistOption, defaultCommonOption } from './type'
 
 /**
  *
@@ -9,11 +9,11 @@ import { toProxy, toRaw } from './lib/origami-proxy'
 export function twist<D extends Dictionary, M extends MoveMap<D>>(
   obj: D,
   moveMap: M,
-  option?: TwistOption
+  option?: TwistOption,
 ): Twist<D, M> {
   const fixedOption = {
     ...defaultCommonOption,
-    ...option
+    ...option,
   }
 
   const fromSet = new Set(Object.keys(moveMap))

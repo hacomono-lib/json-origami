@@ -1,10 +1,6 @@
 import { bench, describe } from 'vitest'
-import {
-  createRandomObject,
-  BENCHMARK_TARGET_OBJECT_VALUES,
-  BENCHMARK_TARGET_LIGHT_OBJECT_VALUES
-} from './utils'
-import { fold } from '../src/fold'
+import { fold } from '../src'
+import { BENCHMARK_TARGET_LIGHT_OBJECT_VALUES, BENCHMARK_TARGET_OBJECT_VALUES, createRandomObject } from './utils'
 
 const iterations = 10
 
@@ -16,9 +12,7 @@ interface TestCaseOption {
 }
 
 function runBench({ objectValues }: TestCaseOption) {
-  const objects = Array.from({ length: iterations }, () =>
-    createRandomObject({ leafs: objectValues })
-  )
+  const objects = Array.from({ length: iterations }, () => createRandomObject({ leafs: objectValues }))
   let index = 0
 
   bench(`fold (complex object including ${objectValues} values)`, () => {

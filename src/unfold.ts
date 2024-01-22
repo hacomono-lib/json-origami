@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createEmptyProxy, toRaw } from './lib/origami-proxy'
 import { defaultUnfoldOption } from './type'
-import type { FixedUnfoldOption, UnfoldOption, Folded, Unfolded } from './type'
+import type { FixedUnfoldOption, Folded, UnfoldOption, Unfolded } from './type'
 
 /**
  * Unfold a one-level object into a nested object.
@@ -30,7 +30,7 @@ import type { FixedUnfoldOption, UnfoldOption, Folded, Unfolded } from './type'
 export function unfold<KV extends Folded<any>>(kv: KV, option?: UnfoldOption): Unfolded<KV> {
   const fixedOption = {
     ...defaultUnfoldOption,
-    ...option
+    ...option,
   } as FixedUnfoldOption
   const newValue = createEmptyProxy(fixedOption)
   for (const [key, value] of Object.entries(kv)) {

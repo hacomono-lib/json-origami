@@ -39,8 +39,7 @@ export interface OrigamiMeta {
 
 type ProxyTarget = JsonObject | JsonArray
 
-type OrigamiProxy<T extends ProxyTarget = ProxyTarget> = T &
-  Record<string, any> & { [rawExtractor]: { raw: T } }
+type OrigamiProxy<T extends ProxyTarget = ProxyTarget> = T & Record<string, any> & { [rawExtractor]: { raw: T } }
 
 function isProxyTarget(target: unknown): target is ProxyTarget {
   return typeof target === 'object' && target !== null
@@ -67,9 +66,9 @@ function createProxy(value: ProxyTarget | undefined, opt: OrigamiOption): Origam
     value: createProxyInternal(value, opt),
     get [origamiMeta]() {
       return {
-        cache
+        cache,
       }
-    }
+    },
   }
 
   function createProxyInternal(obj: ProxyTarget, opt: OrigamiOption): OrigamiProxy {
@@ -228,7 +227,7 @@ function createProxy(value: ProxyTarget | undefined, opt: OrigamiOption): Origam
 
         const nextProxy = cache.get(nextValue)!
         return wrap(() => Reflect.deleteProperty(nextProxy, tail))
-      }
+      },
     }) as OrigamiProxy
   }
 }
@@ -240,10 +239,7 @@ interface SplitKeyResult {
 }
 
 function finalizeRoot(target: object): object {
-  const pipe = [
-    transformToArrayIfNeeded,
-    transformToObjectIfNeeded,
-  ]
+  const pipe = [transformToArrayIfNeeded, transformToObjectIfNeeded]
   return pipe.reduce((acc, fn) => fn(acc), target)
 }
 
@@ -314,8 +310,7 @@ function splitKey(key: string, { arrayIndex }: OrigamiOption): SplitKeyResult {
   const head = pickHead(key)
 
   const tail = (() => {
-    const headStr =
-      typeof head === 'string' ? head : arrayIndex === 'bracket' ? `[${head}]` : `${head}`
+    const headStr = typeof head === 'string' ? head : arrayIndex === 'bracket' ? `[${head}]` : `${head}`
 
     const omitHead = key.replace(headStr, '')
     if (omitHead.startsWith('.')) {

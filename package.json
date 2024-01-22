@@ -43,27 +43,22 @@
     "test": "run-p test:*",
     "test:spec": "vitest --run --silent",
     "test:type": "tsc --noEmit -p tsconfig.json",
-    "lint": "eslint --ext .ts .",
-    "format": "prettier --write . --ignore-path=.eslintignore"
+    "format": "biome format --write ./src ./test",
+    "lint": "biome check --apply ./src ./test"
   },
   "dependencies": {
     "just-clone": "^6.2.0",
     "type-fest": "^4.9.0"
   },
   "devDependencies": {
+    "@biomejs/biome": "^1.5.2",
     "@changesets/changelog-github": "^0.5.0",
     "@changesets/cli": "^2.27.1",
-    "@typescript-eslint/eslint-plugin": "^6.19.0",
-    "@typescript-eslint/parser": "^6.19.0",
-    "@vitest/ui": "^1.2.0",
+    "@vitest/ui": "^1.2.1",
     "defu": "^6.1.4",
-    "eslint": "^8.56.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-import": "^2.29.1",
-    "prettier": "^3.2.2",
     "tsup": "^8.0.1",
     "typescript": "^5.3.3",
-    "vitest": "^1.2.0",
+    "vitest": "^1.2.1",
     "yarn-run-all": "latest"
   },
   "peerDependencies": {

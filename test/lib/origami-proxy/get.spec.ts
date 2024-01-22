@@ -7,9 +7,9 @@ it('should get values by dot-notated key', () => {
   const target = {
     a: {
       b: {
-        c: 'd'
-      }
-    }
+        c: 'd',
+      },
+    },
   }
 
   const proxy = toProxy(target, { arrayIndex: 'bracket' })
@@ -25,11 +25,11 @@ it('should same object when get values by same dot-notated key', () => {
       b: {
         c: {
           d: {
-            e: 'f'
-          }
-        }
-      }
-    }
+            e: 'f',
+          },
+        },
+      },
+    },
   }
 
   const proxy = toProxy(target, { arrayIndex: 'bracket' })
@@ -44,11 +44,11 @@ it('should get values including array by dot-notated key', () => {
         c: [
           'd',
           {
-            e: 'f'
-          }
-        ]
-      }
-    }
+            e: 'f',
+          },
+        ],
+      },
+    },
   }
 
   const proxy = toProxy(target, { arrayIndex: 'dot' })
@@ -66,11 +66,11 @@ it('should get values including array by dot-notated key with bracket', () => {
         c: [
           'd',
           {
-            e: 'f'
-          }
-        ]
-      }
-    }
+            e: 'f',
+          },
+        ],
+      },
+    },
   }
 
   const proxy = toProxy(target, { arrayIndex: 'bracket' })
@@ -85,9 +85,9 @@ it('should get undefined when access any object with un-existed dot-notated key'
   const target = {
     a: {
       b: {
-        c: 'd'
-      }
-    }
+        c: 'd',
+      },
+    },
   }
 
   const proxy = toProxy(target, { arrayIndex: 'bracket' })
@@ -103,11 +103,11 @@ it('should get undefined when access any object including array with un-existed 
         c: [
           'd',
           {
-            e: 'f'
-          }
-        ]
-      }
-    }
+            e: 'f',
+          },
+        ],
+      },
+    },
   }
 
   const proxy = toProxy(target, { arrayIndex: 'dot' })
@@ -123,11 +123,11 @@ it('should get undefined when access any object including array with un-existed 
         c: [
           'd',
           {
-            e: 'f'
-          }
-        ]
-      }
-    }
+            e: 'f',
+          },
+        ],
+      },
+    },
   }
 
   const proxy = toProxy(target, { arrayIndex: 'bracket' })
@@ -139,11 +139,11 @@ it('should get undefined when access any object including array with un-existed 
 it('should get some value when root array with dot-notated key', () => {
   const target = [
     {
-      a: 'b'
+      a: 'b',
     },
     {
-      c: 'd'
-    }
+      c: 'd',
+    },
   ]
 
   const proxy = toProxy(target, { arrayIndex: 'dot' })
@@ -155,11 +155,11 @@ it('should get some value when root array with dot-notated key', () => {
 it('should get some value when root array with dot-notated key with bracket', () => {
   const target = [
     {
-      a: 'b'
+      a: 'b',
     },
     {
-      c: 'd'
-    }
+      c: 'd',
+    },
   ]
 
   const proxy = toProxy(target, { arrayIndex: 'bracket' })

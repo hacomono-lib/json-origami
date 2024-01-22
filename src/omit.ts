@@ -1,11 +1,5 @@
-import {
-  type Dictionary,
-  type DeepKeyOf,
-  type OmitOption,
-  type Omit,
-  defaultCommonOption
-} from './type'
 import { toProxy, toRaw } from './lib/origami-proxy'
+import { type DeepKeyOf, type Dictionary, type Omit, type OmitOption, defaultCommonOption } from './type'
 
 /**
  * Returns an object with the specified keys removed from the object.
@@ -33,11 +27,7 @@ import { toProxy, toRaw } from './lib/origami-proxy'
  * @param keys
  * @param opt
  */
-export function omit<D extends Dictionary, K extends DeepKeyOf<D>>(
-  obj: D,
-  keys: K[],
-  opt?: OmitOption
-): Omit<D, K>
+export function omit<D extends Dictionary, K extends DeepKeyOf<D>>(obj: D, keys: K[], opt?: OmitOption): Omit<D, K>
 
 /**
  *
@@ -48,17 +38,17 @@ export function omit<D extends Dictionary, K extends DeepKeyOf<D>>(
 export function omit<D extends Dictionary, K extends DeepKeyOf<D>>(
   obj: D,
   keys: Array<K | RegExp>,
-  opt?: OmitOption
+  opt?: OmitOption,
 ): Dictionary
 
 export function omit<D extends Dictionary, K extends DeepKeyOf<D>>(
   obj: D,
   keys: Array<K | RegExp>,
-  opt?: OmitOption
+  opt?: OmitOption,
 ): Dictionary {
   const fixedOption = {
     ...defaultCommonOption,
-    ...opt
+    ...opt,
   }
 
   const proxy = toProxy(obj as any, { ...fixedOption, pruneEmpty: true })
