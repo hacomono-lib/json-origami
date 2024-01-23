@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest'
-import { createEmptyProxy, toProxy, toRaw } from '~/lib'
+import { createEmptyModifier, toModifier, toRaw } from '~/lib'
 
 it('should update primivite value using dot notation', () => {
   const target = {
@@ -10,7 +10,7 @@ it('should update primivite value using dot notation', () => {
     },
   }
 
-  const proxy = toProxy(target, { arrayIndex: 'bracket' })
+  const proxy = toModifier(target, { arrayIndex: 'bracket' })
   proxy.set('a.b.c', 'e')
 
   expect(toRaw(proxy.get('a.b'))).toEqual({ c: 'e' })
@@ -27,7 +27,7 @@ it('should update object value using dot notations', () => {
   }
 
   // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  const proxy = toProxy(target, { arrayIndex: 'bracket' }) as any
+  const proxy = toModifier(target, { arrayIndex: 'bracket' }) as any
   proxy.set('a.b', { e: 'f' })
 
   expect(toRaw(proxy.get('a.b'))).toEqual({ e: 'f' })
@@ -45,7 +45,7 @@ it('should update array value using dot notation', () => {
     },
   }
 
-  const proxy = toProxy(target, { arrayIndex: 'dot' })
+  const proxy = toModifier(target, { arrayIndex: 'dot' })
   proxy.set('a.b.c.0', 'f')
 
   expect(toRaw(proxy.get('a.b.c'))).toEqual(['f', 'e'])
@@ -71,7 +71,7 @@ it('should update array value using bracket notation within dot notation', () =>
     },
   }
 
-  const proxy = toProxy(target, { arrayIndex: 'bracket' })
+  const proxy = toModifier(target, { arrayIndex: 'bracket' })
   proxy.set('a.b.c[0]', 'f')
 
   expect(toRaw(proxy.get('a.b.c'))).toEqual(['f', 'e'])
@@ -97,7 +97,7 @@ it('should set object value to non-existent key using dot notation', () => {
     },
   }
 
-  const proxy = toProxy(target, { arrayIndex: 'bracket' })
+  const proxy = toModifier(target, { arrayIndex: 'bracket' })
 
   proxy.set('e.f.g', 'h')
 
@@ -128,7 +128,7 @@ it('should set value to non-existent array key using dot notation', () => {
     },
   }
 
-  const proxy = toProxy(target, { arrayIndex: 'dot' })
+  const proxy = toModifier(target, { arrayIndex: 'dot' })
 
   proxy.set('e.f.0', ['g', 'h'])
 
@@ -169,7 +169,7 @@ it('should set value to non-existent array key using dot notation with bracket',
     },
   }
 
-  const proxy = toProxy(target, { arrayIndex: 'bracket' })
+  const proxy = toModifier(target, { arrayIndex: 'bracket' })
 
   proxy.set('e.f[0]', ['g', 'h'])
 
@@ -196,7 +196,7 @@ it('should set value to array using string key', () => {
     },
   }
 
-  const proxy = toProxy(target, { arrayIndex: 'dot' })
+  const proxy = toModifier(target, { arrayIndex: 'dot' })
 
   proxy.set('a.b.c.f', 'g')
 
@@ -222,7 +222,7 @@ it('should set string-key value to root array', () => {
     },
   ]
 
-  const proxy = toProxy(target, { arrayIndex: 'dot' })
+  const proxy = toModifier(target, { arrayIndex: 'dot' })
 
   proxy.set('x.y', 'z')
 
@@ -258,7 +258,7 @@ it('should set number-key value to object', () => {
     },
   }
 
-  const proxy = toProxy(target, { arrayIndex: 'dot' })
+  const proxy = toModifier(target, { arrayIndex: 'dot' })
 
   proxy.set('a.b.c.0', 'f')
 
@@ -267,7 +267,7 @@ it('should set number-key value to object', () => {
 })
 
 it('should initialize as object whe nroot key is string', () => {
-  const proxy = createEmptyProxy({ arrayIndex: 'dot' })
+  const proxy = createEmptyModifier({ arrayIndex: 'dot' })
 
   proxy.set('a.b.c', 'd')
 
@@ -275,7 +275,7 @@ it('should initialize as object whe nroot key is string', () => {
 })
 
 it('should initialize as array when root key is numeric', () => {
-  const proxy = createEmptyProxy({ arrayIndex: 'dot' })
+  const proxy = createEmptyModifier({ arrayIndex: 'dot' })
 
   proxy.set('0.1.2', 3)
 

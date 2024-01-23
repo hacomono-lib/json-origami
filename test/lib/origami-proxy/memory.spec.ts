@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { toProxy } from '~/lib'
+import { toModifier } from '~/lib'
 
 function nullable<T>(target: T): T | null {
   return target
@@ -22,7 +22,7 @@ describe.sequential('memory leak test', () => {
     })
 
     // biome-ignore lint/style/noNonNullAssertion: <explanation>
-    const targetProxy = new WeakRef(toProxy(target!, { arrayIndex: 'bracket' }))
+    const targetProxy = new WeakRef(toModifier(target!, { arrayIndex: 'bracket' }))
 
     expect(targetProxy.deref()).not.toBeUndefined()
 
@@ -49,7 +49,7 @@ describe.sequential('memory leak test', () => {
     })
 
     // biome-ignore lint/style/noNonNullAssertion: <explanation>
-    let proxy = nullable(toProxy(target!, { arrayIndex: 'bracket' }))
+    let proxy = nullable(toModifier(target!, { arrayIndex: 'bracket' }))
 
     // biome-ignore lint/style/noNonNullAssertion: <explanation>
     const targetA = new WeakRef(proxy!.get('a'))

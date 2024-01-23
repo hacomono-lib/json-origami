@@ -1,4 +1,4 @@
-import { createEmptyProxy, toRaw } from './lib'
+import { createEmptyModifier, toRaw } from './lib'
 import { defaultUnfoldOption } from './type'
 import type { Dictionary, FixedUnfoldOption, Folded, UnfoldOption, Unfolded } from './type'
 
@@ -34,7 +34,7 @@ export function unfold(kv: Record<string, string>, option?: UnfoldOption): Dicti
     ...defaultUnfoldOption,
     ...option,
   } as FixedUnfoldOption
-  const newValue = createEmptyProxy(fixedOption)
+  const newValue = createEmptyModifier(fixedOption)
   for (const [key, value] of Object.entries(kv)) {
     newValue.set(key, value)
   }

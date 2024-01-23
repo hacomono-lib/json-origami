@@ -1,4 +1,4 @@
-import { createEmptyProxy, toProxy, toRaw } from './lib'
+import { createEmptyModifier, toModifier, toRaw } from './lib'
 import { type DeepKeyOf, type Dictionary, type PickOption, defaultCommonOption } from './type'
 
 /**
@@ -42,12 +42,12 @@ export function pick(obj: Dictionary, keys: Array<string | RegExp>, opt?: PickOp
     ...opt,
   }
 
-  const proxy = toProxy(obj, fixedOption)
-  const newValue = createEmptyProxy(fixedOption)
+  const proxy = toModifier(obj, fixedOption)
+  const newValue = createEmptyModifier(fixedOption)
 
   for (const key of keys) {
     if (typeof key === 'string') {
-      newValue.set(key, proxy.get(key))
+      newValue.set(key, toRaw(proxy.get(key)))
     }
 
     if (key instanceof RegExp) {

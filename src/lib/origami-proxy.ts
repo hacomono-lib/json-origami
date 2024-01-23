@@ -17,9 +17,7 @@ interface OrigamiOption extends SplitOption {
   immutable?: boolean
 }
 
-type ProxyTarget = Dictionary
-
-export interface OrigamiProxy<T extends ProxyTarget = ProxyTarget> {
+interface ObjectModifier<T extends Dictionary = Dictionary> {
   /**
    * get value by dot-notated key
    *
@@ -36,100 +34,111 @@ export interface OrigamiProxy<T extends ProxyTarget = ProxyTarget> {
    * const proxy = toProxy(target, { arrayIndex: 'bracket' })
    * proxy.get('a.b.c') // 'd'
    * ```
-   *
-   * @param key
    */
-  get<K extends string>(key: K): Get<T, K> extends ProxyTarget ? OrigamiProxy<Get<T, K>> : Get<T, K>
+  get<K extends string>(key: K): Get<T, K> extends Dictionary ? ObjectModifier<Get<T, K>> : Get<T, K>
   get(key: string): unknown
 
+  /**
+   * set value by dot-notated key
+   *
+   * e.g.
+   * ```ts
+   * const target = {
+   *  a: {
+   *   b: {
+   *    c: 'd',
+   *  },
+   * }
+   *
+   * const proxy = toProxy(target, { arrayIndex: 'bracket' })
+   * proxy.set('a.b.c', 'e')
+   * ```
+   */
   set<K extends string>(key: K, value: Get<T, K>): boolean
   set(key: string, value: unknown): boolean
 
+  /**
+   * delete value by dot-notated key
+   *
+   * e.g.
+   * ```ts
+   * const target = {
+   *   a: {
+   *     b: {
+   *       c: 'd',
+   *     },
+   *   }
+   * }
+   *
+   * const proxy = toProxy(target, { arrayIndex: 'bracket' })
+   * proxy.delete('a.b.c') // true
+   * ```
+   */
   delete<K extends string>(key: K): boolean
   delete(key: string): boolean
 
+  /**
+   * get all keys by dot-notated key
+   *
+   * e.g.
+   * ```ts
+   * const target = {
+   *   a: {
+   *     b: {
+   *       c: 'd',
+   *     },
+   *   }
+   * }
+   *
+   * const proxy = toProxy(target, { arrayIndex: 'bracket' })
+   * const k = proxy.keys() // ['a.b.c']
+   * ```
+   */
   keys(): string[]
 
   get raw(): T
 }
 
-interface CacheSet {
-  /**
-   * Cache of proxy object by origin object
-   * - key: origin object
-   * - value: proxy object
-   */
-  proxyByOrigin: WeakMap<ProxyTarget, OrigamiProxy>
-
-  /**
-   * Cache of proxy object by dot-notated key
-   * - key: dot-notated key
-   * - value: proxy object
-   */
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  proxyByKey: Map<string | symbol, WeakRef<any>>
-}
-
-class OrigamiProxyImpl<T extends ProxyTarget> implements OrigamiProxy<T> {
+class ObjectModifierImpl<T extends Dictionary> implements ObjectModifier<T> {
   #raw: T
 
   #opt: OrigamiOption
 
-  #caches: CacheSet
+  #cache: WeakMap<Dictionary, ObjectModifier>
 
-  constructor(raw: T, opt: OrigamiOption, caches?: CacheSet) {
+  constructor(raw: T, opt: OrigamiOption, cache?: WeakMap<Dictionary, ObjectModifier>) {
     this.#raw = raw
     this.#opt = opt
-    this.#caches = caches ?? {
-      proxyByOrigin: new WeakMap(),
-      proxyByKey: new Map(),
-    }
+    this.#cache = cache ?? new WeakMap()
   }
 
   get raw() {
-    return this.#finalizeRoot(this.#raw) as T
-  }
-
-  #finalizeRoot(target: object): object {
-    const pipe = [transformToArrayIfNeeded, transformToObjectIfNeeded]
-    return pipe.reduce((acc, fn) => fn(acc), target)
+    return finalizeRoot(this.#raw) as T
   }
 
   // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   get(key: string): any {
-    if (this.#caches.proxyByKey.has(key)) {
-      const cached = this.#caches.proxyByKey.get(key)
-      if (cached !== undefined && cached.deref() !== undefined) {
-        // biome-ignore lint/style/noNonNullAssertion: <explanation>
-        return cached.deref()!
-      }
-    }
-
     if (typeof key !== 'string') {
-      return Reflect.get(this.#raw, key)
+      return this.#raw[key as keyof T]
     }
 
     const { head, tail } = splitKey(key as string, this.#opt)
     const nextRaw: unknown = this.#raw[head as keyof T]
 
-    if (!isProxyTarget(nextRaw)) {
+    if (!isModifyTarget(nextRaw)) {
       // biome-ignore lint/suspicious/noExplicitAny: <explanation>
       return tail ? (this.#raw as any)[tail] : nextRaw
     }
 
-    if (!this.#caches.proxyByOrigin.has(nextRaw)) {
+    if (!this.#cache.has(nextRaw)) {
       const p = this.#createNext(nextRaw)
-      this.#caches.proxyByOrigin.set(nextRaw, p)
+      this.#cache.set(nextRaw, p)
     }
 
     // biome-ignore lint/style/noNonNullAssertion: <explanation>
-    const nextProxy = this.#caches.proxyByOrigin.get(nextRaw)!
+    const nextProxy = this.#cache.get(nextRaw)!
 
     const result = tail ? nextProxy.get(tail) : nextProxy
-
-    if (result instanceof OrigamiProxyImpl) {
-      this.#caches.proxyByKey.set(key, new WeakRef(result))
-    }
 
     return result
   }
@@ -152,7 +161,7 @@ class OrigamiProxyImpl<T extends ProxyTarget> implements OrigamiProxy<T> {
       return true
     }
 
-    let nextValue: unknown = Reflect.get(this.#raw, head)
+    let nextValue: unknown = this.#raw[head as keyof T]
     if (nextValue === undefined) {
       nextValue = typeof nextHead === 'string' ? {} : []
       this.#raw[head as keyof T] = nextValue as T[keyof T]
@@ -161,6 +170,7 @@ class OrigamiProxyImpl<T extends ProxyTarget> implements OrigamiProxy<T> {
     // transform array to object
     if (Array.isArray(nextValue) && typeof nextHead === 'string') {
       const newNextValue = transformToObjectIfNeeded(nextValue)
+      console.log('newNextValue', newNextValue)
       if (nextValue !== newNextValue) {
         nextValue = newNextValue
         this.#raw[head as keyof T] = newNextValue as T[keyof T]
@@ -181,18 +191,18 @@ class OrigamiProxyImpl<T extends ProxyTarget> implements OrigamiProxy<T> {
       }
     }
 
-    if (!isProxyTarget(nextValue)) {
+    if (!isModifyTarget(nextValue)) {
       this.#raw[head as keyof T] = newValue as T[keyof T]
       return true
     }
 
-    if (!this.#caches.proxyByOrigin.has(nextValue)) {
+    if (!this.#cache.has(nextValue)) {
       const p = this.#createNext(nextValue)
-      this.#caches.proxyByOrigin.set(nextValue, p)
+      this.#cache.set(nextValue, p)
     }
 
     // biome-ignore lint/style/noNonNullAssertion: <explanation>
-    const nextProxy = this.#caches.proxyByOrigin.get(nextValue)!
+    const nextProxy = this.#cache.get(nextValue)!
 
     return nextProxy.set(tail, newValue)
   }
@@ -208,19 +218,19 @@ class OrigamiProxyImpl<T extends ProxyTarget> implements OrigamiProxy<T> {
       return this.#deleteWrap(key, () => delete this.#raw[head as keyof T])
     }
 
-    const nextValue: unknown = Reflect.get(this.#raw, head)
+    const nextValue: unknown = this.#raw[head as keyof T]
 
-    if (!isProxyTarget(nextValue)) {
+    if (!isModifyTarget(nextValue)) {
       return this.#deleteWrap(key, () => delete this.#raw[head as keyof T])
     }
 
-    if (!this.#caches.proxyByOrigin.has(nextValue)) {
+    if (!this.#cache.has(nextValue)) {
       const p = this.#createNext(nextValue)
-      this.#caches.proxyByOrigin.set(nextValue, p)
+      this.#cache.set(nextValue, p)
     }
 
     // biome-ignore lint/style/noNonNullAssertion: <explanation>
-    const nextProxy = this.#caches.proxyByOrigin.get(nextValue)!
+    const nextProxy = this.#cache.get(nextValue)!
     return this.#deleteWrap(key, () => nextProxy.delete(tail))
   }
 
@@ -238,7 +248,7 @@ class OrigamiProxyImpl<T extends ProxyTarget> implements OrigamiProxy<T> {
     const { head } = splitKey(key as string, this.#opt)
     const nextValue = this.#raw[head as keyof T]
 
-    if (!isProxyTarget(nextValue)) {
+    if (!isModifyTarget(nextValue)) {
       return true
     }
 
@@ -265,19 +275,23 @@ class OrigamiProxyImpl<T extends ProxyTarget> implements OrigamiProxy<T> {
 
       const requiredBracket = this.#opt.arrayIndex === 'bracket' && Array.isArray(this.#raw)
 
-      if (!isProxyTarget(nextValue)) {
+      if (!isModifyTarget(nextValue)) {
         return [requiredBracket ? `[${head}]` : head]
       }
 
-      if (!this.#caches.proxyByOrigin.has(nextValue)) {
+      if (!this.#cache.has(nextValue)) {
         const p = this.#createNext(nextValue)
-        this.#caches.proxyByOrigin.set(nextValue, p)
+        this.#cache.set(nextValue, p)
       }
 
       // biome-ignore lint/style/noNonNullAssertion: <explanation>
-      const nextProxy = this.#caches.proxyByOrigin.get(nextValue)!
+      const nextProxy = this.#cache.get(nextValue)!
 
       const nextKeys = nextProxy.keys()
+
+      if (nextKeys.length <= 0) {
+        return [requiredBracket ? `[${head}]` : head]
+      }
 
       if (requiredBracket) {
         return nextKeys.map((k) => `[${head}].${k}`)
@@ -289,25 +303,30 @@ class OrigamiProxyImpl<T extends ProxyTarget> implements OrigamiProxy<T> {
     return keys
   }
 
-  #createNext(target: ProxyTarget): OrigamiProxy {
-    return new OrigamiProxyImpl(target, this.#opt, this.#caches)
+  #createNext(target: Dictionary): ObjectModifier {
+    return new ObjectModifierImpl(target, this.#opt, this.#cache)
   }
 }
 
-function isProxyTarget(target: unknown): target is ProxyTarget {
+function isModifyTarget(target: unknown): target is Dictionary {
   return typeof target === 'object' && target !== null
 }
 
-export function createEmptyProxy(opt: OrigamiOption): OrigamiProxy {
-  return createProxy({}, opt)
+export function createEmptyModifier(opt: OrigamiOption): ObjectModifier {
+  return createModifier({}, opt)
 }
 
-export function toProxy<T extends ProxyTarget>(target: T, opt: OrigamiOption): OrigamiProxy<T> {
-  return createProxy(opt.immutable ? target : clone(target), opt) as OrigamiProxy<T>
+export function toModifier<T extends Dictionary>(target: T, opt: OrigamiOption): ObjectModifier<T> {
+  return createModifier(opt.immutable ? target : clone(target), opt) as ObjectModifier<T>
 }
 
-function createProxy(value: ProxyTarget, opt: OrigamiOption): OrigamiProxy {
-  return new OrigamiProxyImpl(value, opt)
+function createModifier(value: Dictionary, opt: OrigamiOption): ObjectModifier {
+  return new ObjectModifierImpl(value, opt)
+}
+
+function finalizeRoot(target: object): object {
+  const pipe = [transformToObjectIfNeeded, transformToArrayIfNeeded]
+  return pipe.reduce((acc, fn) => fn(acc), target)
 }
 
 function transformToArrayIfNeeded(target: object): object {
@@ -324,7 +343,7 @@ function transformToArrayIfNeeded(target: object): object {
 }
 
 function transformToObjectIfNeeded(target: object): object {
-  if (Array.isArray(target) && !Object.keys(target).every((key) => `${Number.parseInt(key)}` === key)) {
+  if (Array.isArray(target) && target.length > 0) {
     const newObject = {} as Record<string | number, unknown>
     for (const [k, v] of Object.entries(target)) {
       newObject[k] = v
@@ -335,11 +354,11 @@ function transformToObjectIfNeeded(target: object): object {
   return target
 }
 
-export function isOrigamiProxy(target: unknown): target is OrigamiProxy {
-  return target instanceof OrigamiProxyImpl
+function isModifier(target: unknown): target is ObjectModifier {
+  return target instanceof ObjectModifierImpl
 }
 
-export function toRaw<T>(target: T): T extends OrigamiProxy<infer U> ? U : T {
+export function toRaw<T>(target: T): T extends ObjectModifier<infer U> ? U : T {
   // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  return (isOrigamiProxy(target) ? target.raw : target) as any
+  return (isModifier(target) ? target.raw : target) as any
 }

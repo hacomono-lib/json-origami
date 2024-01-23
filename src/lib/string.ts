@@ -61,5 +61,11 @@ export function splitKey(key: string, { arrayIndex }: SplitOption): SplitKeyResu
     return omitHead
   })()
 
-  return { head, tail, nextHead: tail ? pickHead(tail) : undefined }
+  const isEnd = tail === '' && !key.endsWith('.')
+
+  if (isEnd) {
+    return { head }
+  }
+
+  return { head, tail, nextHead: pickHead(tail) }
 }

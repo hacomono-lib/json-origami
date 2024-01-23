@@ -1,4 +1,4 @@
-import { toProxy, toRaw } from './lib'
+import { toModifier, toRaw } from './lib'
 import { type Dictionary, type MoveMap, type Twist, type TwistOption, defaultCommonOption } from './type'
 
 /**
@@ -18,11 +18,11 @@ export function twist<D extends Dictionary, M extends MoveMap<D>>(
 
   const fromSet = new Set(Object.keys(moveMap))
 
-  const src = toProxy(obj, { ...fixedOption, immutable: true })
-  const dst = toProxy(obj, { ...fixedOption, pruneEmpty: true })
+  const src = toModifier(obj, { ...fixedOption, immutable: true })
+  const dst = toModifier(obj, { ...fixedOption, pruneEmpty: true })
 
   for (const [from, to] of Object.entries(moveMap)) {
-    dst.set(to, src.get(from))
+    dst.set(to, toRaw(src.get(from)))
     fromSet.delete(to)
   }
 
