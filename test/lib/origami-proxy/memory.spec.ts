@@ -1,46 +1,76 @@
-import { expect, it } from 'vitest'
-import { origamiMeta, toProxy, toRaw } from '~/lib'
+import { describe, expect, it } from 'vitest'
+import { toProxy } from '~/lib'
 
-it('should freed memory when the proxy object is finished being used', () => {
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  let refA: WeakRef<any> | undefined
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  let refB: WeakRef<any> | undefined
+function nullable<T>(target: T): T | null {
+  return target
+}
 
-  {
-    const target = {
+function tick() {
+  return new Promise((resolve) => {
+    setTimeout(resolve, 100)
+  })
+}
+
+describe.sequential('memory leak test', () => {
+  it('should freed memory when the proxy object is finished being used', async () => {
+    let target = nullable({
       a: {
         b: {
           c: 'd',
         },
       },
+    })
+
+    // biome-ignore lint/style/noNonNullAssertion: <explanation>
+    const targetProxy = new WeakRef(toProxy(target!, { arrayIndex: 'bracket' }))
+
+    expect(targetProxy.deref()).not.toBeUndefined()
+
+    target = null
+
+    await tick()
+
+    if (!global.gc) {
+      throw new Error('GC is not available')
     }
 
-    let proxy = toProxy(target, { arrayIndex: 'bracket' })
-    let meta = proxy[origamiMeta]
+    global.gc()
 
-    let a = toRaw(proxy.value.a)
-    refA = new WeakRef(a)
-    let b = toRaw(proxy.value['a.b'])
-    refB = new WeakRef(b)
+    expect(targetProxy.deref()).toBeUndefined()
+  })
 
-    expect(meta.cache.has(a)).toBeTruthy()
-    expect(meta.cache.has(b)).toBeTruthy()
-    expect(refA.deref()).toBe(a)
-    expect(refB.deref()).toBe(b)
+  it('should freed memory when the inside proxy object is finished being used', async () => {
+    let target = nullable({
+      a: {
+        b: {
+          c: 'd',
+        },
+      },
+    })
 
-    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-    proxy = undefined as any
-    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-    meta = undefined as any
-    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-    a = undefined as any
-    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-    b = undefined as any
-  }
+    // biome-ignore lint/style/noNonNullAssertion: <explanation>
+    let proxy = nullable(toProxy(target!, { arrayIndex: 'bracket' }))
 
-  // biome-ignore lint/style/noNonNullAssertion: <explanation>
-  expect(refA!.deref()).toBeUndefined()
-  // biome-ignore lint/style/noNonNullAssertion: <explanation>
-  expect(refB!.deref()).toBeUndefined()
+    // biome-ignore lint/style/noNonNullAssertion: <explanation>
+    const targetA = new WeakRef(proxy!.value.a)
+    // biome-ignore lint/style/noNonNullAssertion: <explanation>
+    const targetB = new WeakRef(proxy!.value['a.b'])
+
+    expect(targetA.deref()).not.toBeUndefined()
+    expect(targetB.deref()).not.toBeUndefined()
+
+    proxy = null
+    target = null
+
+    await tick()
+
+    if (!global.gc) {
+      throw new Error('GC is not available')
+    }
+
+    global.gc()
+
+    expect(targetA.deref()).toBeUndefined()
+    expect(targetB.deref()).toBeUndefined()
+  })
 })

@@ -41,23 +41,27 @@ export function omit<D extends Dictionary, K extends DeepKeyOf<D>>(
   opt?: OmitOption,
 ): Dictionary
 
-export function omit<D extends Dictionary, K extends DeepKeyOf<D>>(
-  obj: D,
-  keys: Array<K | RegExp>,
-  opt?: OmitOption,
-): Dictionary {
+export function omit(obj: Dictionary, keys: Array<string | RegExp>, opt?: OmitOption): Dictionary {
   const fixedOption = {
     ...defaultCommonOption,
     ...opt,
   }
 
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  const proxy = toProxy(obj as any, { ...fixedOption, pruneEmpty: true })
+  const proxy = toProxy(obj, { ...fixedOption, pruneEmpty: true })
 
   for (const key of keys) {
-    delete proxy.value[key]
+    if (typeof key === 'string') {
+      delete proxy.value[key]
+    }
+
+    if (key instanceof RegExp) {
+      for (const k of Object.keys(proxy.value)) {
+        if (key.test(k)) {
+          delete proxy.value[k]
+        }
+      }
+    }
   }
 
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  return toRaw(proxy.value) as any
+  return toRaw(proxy.value)
 }

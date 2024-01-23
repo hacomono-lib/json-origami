@@ -1,18 +1,12 @@
-/**
- *
- */
+import type { JsonArray, JsonObject } from 'type-fest'
 
 // biome-ignore lint/complexity/noBannedTypes: <explanation>
 export type Primitive = string | number | boolean | {} | []
 
-type MaybeReadonly<T> = T | (T extends Array<infer U> ? readonly U[] : Readonly<T>)
-
 /**
  *
  */
-export type Dictionary =
-  | MaybeReadonly<Record<string, unknown>>
-  | MaybeReadonly<Array<Primitive | Record<string, unknown>>>
+export type Dictionary = JsonObject | JsonArray
 
 /**
  * TODO: 深い階層のキーに対応する

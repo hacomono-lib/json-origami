@@ -16,26 +16,16 @@ interface OrigamiOption extends CommonOption {
   immutable?: boolean
 }
 
-/**
- * * export is for testing
- */
-export const origamiMeta = Symbol()
-
 const rawExtractor = Symbol()
 
 interface OrigamiObject<T extends ProxyTarget = ProxyTarget> {
   readonly value: OrigamiProxy<T>
-  readonly [origamiMeta]: OrigamiMeta
-}
-
-export interface OrigamiMeta {
-  cache: WeakMap<ProxyTarget, OrigamiProxy>
 }
 
 type ProxyTarget = JsonObject | JsonArray
 
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-type OrigamiProxy<T extends ProxyTarget = ProxyTarget> = T & Record<string, any> & { [rawExtractor]: { raw: T } }
+export type OrigamiProxy<T extends ProxyTarget = ProxyTarget> = T & Record<string, any> & { [rawExtractor]: { raw: T } }
 
 function isProxyTarget(target: unknown): target is ProxyTarget {
   return typeof target === 'object' && target !== null
@@ -56,15 +46,10 @@ function createProxy(value: ProxyTarget, opt: OrigamiOption): OrigamiObject {
    *
    * caution: export is for testing
    */
-  const cache = new WeakMap<ProxyTarget, OrigamiProxy>()
+  const cache = new Map<ProxyTarget, OrigamiProxy>()
 
   return {
     value: createProxyInternal(value, opt),
-    get [origamiMeta]() {
-      return {
-        cache,
-      }
-    },
   }
 
   function createProxyInternal(obj: ProxyTarget, opt: OrigamiOption): OrigamiProxy {
@@ -83,7 +68,6 @@ function createProxy(value: ProxyTarget, opt: OrigamiOption): OrigamiObject {
         }
 
         if (typeof p !== 'string') {
-          // eslint-disable-next-line prefer-rest-params
           return Reflect.get(target, p)
         }
 
@@ -118,7 +102,6 @@ function createProxy(value: ProxyTarget, opt: OrigamiOption): OrigamiObject {
         }
 
         if (typeof p !== 'string') {
-          // eslint-disable-next-line prefer-rest-params
           return Reflect.set(target, p, newValue)
         }
 

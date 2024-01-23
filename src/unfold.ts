@@ -1,6 +1,6 @@
 import { createEmptyProxy, toRaw } from './lib'
 import { defaultUnfoldOption } from './type'
-import type { FixedUnfoldOption, Folded, UnfoldOption, Unfolded } from './type'
+import type { Dictionary, FixedUnfoldOption, Folded, UnfoldOption, Unfolded } from './type'
 
 /**
  * Unfold a one-level object into a nested object.
@@ -26,9 +26,10 @@ import type { FixedUnfoldOption, Folded, UnfoldOption, Unfolded } from './type'
  * // }
  * ```
  */
-
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-export function unfold<Kv extends Folded<any>>(kv: Kv, option?: UnfoldOption): Unfolded<Kv> {
+export function unfold<Kv extends Folded<any>>(kv: Kv, option?: UnfoldOption): Unfolded<Kv>
+
+export function unfold(kv: Record<string, string>, option?: UnfoldOption): Dictionary {
   const fixedOption = {
     ...defaultUnfoldOption,
     ...option,
@@ -38,6 +39,5 @@ export function unfold<Kv extends Folded<any>>(kv: Kv, option?: UnfoldOption): U
     newValue.value[key] = value
   }
 
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  return toRaw(newValue.value) as any
+  return toRaw(newValue.value)
 }

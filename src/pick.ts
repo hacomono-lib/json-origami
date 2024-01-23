@@ -36,24 +36,28 @@ export function pick<D extends Dictionary, K extends DeepKeyOf<D>>(
   opt?: PickOption,
 ): Omit<D, K>
 
-export function pick<D extends Dictionary, K extends DeepKeyOf<D>>(
-  obj: D,
-  keys: Array<K | RegExp>,
-  opt?: PickOption,
-): Omit<D, K> {
+export function pick(obj: Dictionary, keys: Array<string | RegExp>, opt?: PickOption): Dictionary {
   const fixedOption = {
     ...defaultCommonOption,
     ...opt,
   }
 
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  const proxy = toProxy(obj as any, fixedOption)
+  const proxy = toProxy(obj, fixedOption)
   const newValue = createEmptyProxy(fixedOption)
 
   for (const key of keys) {
-    newValue.value[key] = proxy.value[key]
+    if (typeof key === 'string') {
+      newValue.value[key] = proxy.value[key]
+    }
+
+    if (key instanceof RegExp) {
+      for (const k of Object.keys(proxy.value)) {
+        if (key.test(k)) {
+          newValue.value[k] = proxy.value[k]
+        }
+      }
+    }
   }
 
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  return toRaw(newValue.value) as any
+  return toRaw(newValue.value)
 }
