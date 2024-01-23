@@ -1,12 +1,16 @@
-import type { JsonArray, JsonObject } from 'type-fest'
-
 // biome-ignore lint/complexity/noBannedTypes: <explanation>
-export type Primitive = string | number | boolean | {} | []
+export type DictionaryLeaf = string | number | boolean | {} | [] | Function | null | undefined | symbol | bigint
+
+type DictionaryValue = DictionaryLeaf | Dictionary
+
+type DictionaryObject = { [Key in string]: DictionaryValue } & { [Key in string]?: DictionaryValue | undefined }
+
+type DictionaryArray = DictionaryValue[] | readonly DictionaryValue[]
 
 /**
  *
  */
-export type Dictionary = JsonObject | JsonArray
+export type Dictionary = DictionaryObject | DictionaryArray
 
 /**
  * TODO: 深い階層のキーに対応する
@@ -16,7 +20,7 @@ export type DeepKeyOf<_D extends Dictionary> = string
 /**
  *
  */
-export type Folded<_D extends Dictionary> = Record<string, Primitive>
+export type Folded<_D extends Dictionary> = Record<string, DictionaryLeaf>
 
 /**
  *
@@ -131,3 +135,10 @@ export type FixedOmitOption = Readonly<OmitOption & typeof defaultUnfoldOption>
 export interface PickOption extends UnfoldOption {}
 
 export type FixedPickOption = Readonly<PickOption & typeof defaultUnfoldOption>
+
+/**
+ *
+ */
+export interface KeysOption extends CommonOption {}
+
+export type FixedKeysOption = Readonly<KeysOption & typeof defaultCommonOption>

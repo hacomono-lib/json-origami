@@ -1,12 +1,5 @@
-import {
-  type ArrayIndex,
-  type Dictionary,
-  type FixedFoldOption,
-  type FoldOption,
-  type Folded,
-  type Primitive,
-  defaultCommonOption,
-} from './type'
+import { toProxy, toRaw } from './lib'
+import { type Dictionary, type FixedFoldOption, type FoldOption, type Folded, defaultCommonOption } from './type'
 
 /**
  * Fold an object into a one-level object.
@@ -37,34 +30,18 @@ export function fold<D extends Dictionary>(obj: D, option?: FoldOption): Folded<
     return {}
   }
 
-  return Object.fromEntries(
-    flatEntries(option?.keyPrefix ?? '', obj, {
-      ...defaultCommonOption,
-      ...option,
-    } as FixedFoldOption),
-  ) as Folded<D>
-}
+  const fixedOption = {
+    ...defaultCommonOption,
+    ...option,
+  } as FixedFoldOption
 
-const arrayKeyMap = {
-  dot: (prefix: string, index: number) => (prefix === '' ? `${index}` : `${prefix}.${index}`),
-  bracket: (prefix: string, index: number) => `${prefix}[${index}]`,
-} satisfies Record<ArrayIndex, (prefix: string, index: number) => string>
+  const proxy = toProxy(obj, fixedOption)
 
-function flatEntries(key: string, value: object, opt: FixedFoldOption): [string, Primitive][] {
-  if (value === undefined || value === null) {
-    return []
+  const result = {} as Folded<D>
+
+  for (const key of proxy.keys()) {
+    result[key] = toRaw(proxy.get(key))
   }
 
-  const appendKey = (k: string | number) =>
-    typeof k === 'number' ? arrayKeyMap[opt.arrayIndex](key, k) : key === '' ? k : `${key}.${k}`
-
-  if (Array.isArray(value) && value.length > 0) {
-    return value.flatMap((v, i) => flatEntries(appendKey(i), v, opt))
-  }
-
-  if (typeof value === 'object' && Object.keys(value).length > 0) {
-    return Object.entries(value as object).flatMap(([k, v]) => flatEntries(appendKey(k), v, opt))
-  }
-
-  return [[key, value]]
+  return result
 }

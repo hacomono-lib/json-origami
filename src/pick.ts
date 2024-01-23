@@ -47,17 +47,17 @@ export function pick(obj: Dictionary, keys: Array<string | RegExp>, opt?: PickOp
 
   for (const key of keys) {
     if (typeof key === 'string') {
-      newValue.value[key] = proxy.value[key]
+      newValue.set(key, proxy.get(key))
     }
 
     if (key instanceof RegExp) {
-      for (const k of Object.keys(proxy.value)) {
+      for (const k of proxy.keys()) {
         if (key.test(k)) {
-          newValue.value[k] = proxy.value[k]
+          newValue.set(k, proxy.get(k))
         }
       }
     }
   }
 
-  return toRaw(newValue.value)
+  return toRaw(newValue)
 }

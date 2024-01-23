@@ -36,8 +36,8 @@ export function unfold(kv: Record<string, string>, option?: UnfoldOption): Dicti
   } as FixedUnfoldOption
   const newValue = createEmptyProxy(fixedOption)
   for (const [key, value] of Object.entries(kv)) {
-    newValue.value[key] = value
+    newValue.set(key, value)
   }
 
-  return toRaw(newValue.value)
+  return toRaw(newValue)
 }

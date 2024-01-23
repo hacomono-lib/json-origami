@@ -52,9 +52,9 @@ describe.sequential('memory leak test', () => {
     let proxy = nullable(toProxy(target!, { arrayIndex: 'bracket' }))
 
     // biome-ignore lint/style/noNonNullAssertion: <explanation>
-    const targetA = new WeakRef(proxy!.value.a)
+    const targetA = new WeakRef(proxy!.get('a'))
     // biome-ignore lint/style/noNonNullAssertion: <explanation>
-    const targetB = new WeakRef(proxy!.value['a.b'])
+    const targetB = new WeakRef(proxy!.get('a.b'))
 
     expect(targetA.deref()).not.toBeUndefined()
     expect(targetB.deref()).not.toBeUndefined()

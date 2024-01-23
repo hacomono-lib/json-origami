@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest'
 import { toProxy, toRaw } from '~/lib'
 
-it('should delete value by dot-notated key', () => {
+it('should delete value by key written in dot notation', () => {
   const target = {
     a: {
       b: {
@@ -11,13 +11,12 @@ it('should delete value by dot-notated key', () => {
   }
 
   const proxy = toProxy(target, { arrayIndex: 'bracket' })
-  // biome-ignore lint/performance/noDelete: <explanation>
-  delete proxy.value['a.b.c']
+  proxy.delete('a.b.c')
 
-  expect(toRaw(proxy.value)).toEqual({ a: { b: {} } })
+  expect(toRaw(proxy)).toEqual({ a: { b: {} } })
 })
 
-it('should delete value by dot-notated parent key', () => {
+it('should delete value by parent key written in dot notation', () => {
   const target = {
     a: {
       b: {
@@ -27,12 +26,11 @@ it('should delete value by dot-notated parent key', () => {
   }
 
   const proxy = toProxy(target, { arrayIndex: 'bracket' })
-  // biome-ignore lint/performance/noDelete: <explanation>
-  delete proxy.value['a.b']
-  expect(toRaw(proxy.value)).toEqual({ a: {} })
+  proxy.delete('a.b')
+  expect(toRaw(proxy)).toEqual({ a: {} })
 })
 
-it('should delete value by dot-notated key in array', () => {
+it('should delete value by key in array written in dot notation', () => {
   const target = {
     a: {
       b: {
@@ -42,13 +40,12 @@ it('should delete value by dot-notated key in array', () => {
   }
 
   const proxy = toProxy(target, { arrayIndex: 'dot' })
-  // biome-ignore lint/performance/noDelete: <explanation>
-  delete proxy.value['a.b.c.0']
+  proxy.delete('a.b.c.0')
 
-  expect(toRaw(proxy.value)).toEqual({ a: { b: { c: [undefined, 'e'] } } })
+  expect(toRaw(proxy)).toEqual({ a: { b: { c: [undefined, 'e'] } } })
 })
 
-it('should delete value by dot-notated key in array with bracket', () => {
+it('should delete value by key in array written in bracket notation', () => {
   const target = {
     a: {
       b: {
@@ -58,13 +55,12 @@ it('should delete value by dot-notated key in array with bracket', () => {
   }
 
   const proxy = toProxy(target, { arrayIndex: 'bracket' })
-  // biome-ignore lint/performance/noDelete: <explanation>
-  delete proxy.value['a.b.c[0]']
+  proxy.delete('a.b.c[0]')
 
-  expect(toRaw(proxy.value)).toEqual({ a: { b: { c: [undefined, 'e'] } } })
+  expect(toRaw(proxy)).toEqual({ a: { b: { c: [undefined, 'e'] } } })
 })
 
-it('should completely delete empty value when pruneEmpty is true', () => {
+it('should completely delete empty value when pruneEmpty option is true', () => {
   const target = {
     a: {
       b: {
@@ -74,12 +70,10 @@ it('should completely delete empty value when pruneEmpty is true', () => {
   }
 
   const proxy = toProxy(target, { arrayIndex: 'bracket', pruneEmpty: true })
-  // biome-ignore lint/performance/noDelete: <explanation>
-  delete proxy.value['a.b.c[0]']
+  proxy.delete('a.b.c[0]')
 
-  expect(toRaw(proxy.value)).toEqual({ a: { b: { c: [undefined, 'e'] } } })
+  expect(toRaw(proxy)).toEqual({ a: { b: { c: [undefined, 'e'] } } })
 
-  // biome-ignore lint/performance/noDelete: <explanation>
-  delete proxy.value['a.b.c[1]']
-  expect(toRaw(proxy.value)).toEqual({})
+  proxy.delete('a.b.c[1]')
+  expect(toRaw(proxy)).toEqual({})
 })

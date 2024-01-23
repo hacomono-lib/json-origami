@@ -22,13 +22,13 @@ export function twist<D extends Dictionary, M extends MoveMap<D>>(
   const dst = toProxy(obj, { ...fixedOption, pruneEmpty: true })
 
   for (const [from, to] of Object.entries(moveMap)) {
-    dst.value[to] = src.value[from]
+    dst.set(to, src.get(from))
     fromSet.delete(to)
   }
 
   for (const from of fromSet) {
-    delete dst.value[from]
+    dst.delete(from)
   }
 
-  return toRaw(dst.value)
+  return toRaw(dst)
 }

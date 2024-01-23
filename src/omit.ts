@@ -51,17 +51,17 @@ export function omit(obj: Dictionary, keys: Array<string | RegExp>, opt?: OmitOp
 
   for (const key of keys) {
     if (typeof key === 'string') {
-      delete proxy.value[key]
+      proxy.delete(key)
     }
 
     if (key instanceof RegExp) {
-      for (const k of Object.keys(proxy.value)) {
+      for (const k of proxy.keys()) {
         if (key.test(k)) {
-          delete proxy.value[k]
+          proxy.delete(k)
         }
       }
     }
   }
 
-  return toRaw(proxy.value)
+  return toRaw(proxy)
 }

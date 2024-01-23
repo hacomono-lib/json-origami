@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest'
 import { toProxy, toRaw } from '~/lib'
 
-it('should get values by dot-notated key', () => {
+it('should retrieve values using dot-notated key', () => {
   const target = {
     a: {
       b: {
@@ -12,11 +12,11 @@ it('should get values by dot-notated key', () => {
 
   const proxy = toProxy(target, { arrayIndex: 'bracket' })
 
-  expect(toRaw(proxy.value['a.b.c'])).toBe('d')
-  expect(toRaw(proxy.value['a.b'])).toEqual({ c: 'd' })
+  expect(toRaw(proxy.get('a.b.c'))).toBe('d')
+  expect(toRaw(proxy.get('a.b'))).toEqual({ c: 'd' })
 })
 
-it('should same object when get values by same dot-notated key', () => {
+it('should return same object reference when retrieving values using same dot-notated key', () => {
   const target = {
     a: {
       b: {
@@ -31,10 +31,10 @@ it('should same object when get values by same dot-notated key', () => {
 
   const proxy = toProxy(target, { arrayIndex: 'bracket' })
 
-  expect(toRaw(proxy.value['a.b'])).toBe(toRaw(proxy.value['a.b']))
+  expect(toRaw(proxy.get('a.b'))).toBe(toRaw(proxy.get('a.b')))
 })
 
-it('should get values including array by dot-notated key', () => {
+it('should retrieve values including array using dot-notated key', () => {
   const target = {
     a: {
       b: {
@@ -50,13 +50,13 @@ it('should get values including array by dot-notated key', () => {
 
   const proxy = toProxy(target, { arrayIndex: 'dot' })
 
-  expect(toRaw(proxy.value['a.b.c'])).toEqual(['d', { e: 'f' }])
-  expect(toRaw(proxy.value['a.b.c.0'])).toBe('d')
-  expect(toRaw(proxy.value['a.b.c.1'])).toEqual({ e: 'f' })
-  expect(toRaw(proxy.value['a.b.c.1.e'])).toBe('f')
+  expect(toRaw(proxy.get('a.b.c'))).toEqual(['d', { e: 'f' }])
+  expect(toRaw(proxy.get('a.b.c.0'))).toBe('d')
+  expect(toRaw(proxy.get('a.b.c.1'))).toEqual({ e: 'f' })
+  expect(toRaw(proxy.get('a.b.c.1.e'))).toBe('f')
 })
 
-it('should get values including array by dot-notated key with bracket', () => {
+it('should retrieve values including array using dot-notated key with bracket notation', () => {
   const target = {
     a: {
       b: {
@@ -72,13 +72,13 @@ it('should get values including array by dot-notated key with bracket', () => {
 
   const proxy = toProxy(target, { arrayIndex: 'bracket' })
 
-  expect(toRaw(proxy.value['a.b.c'])).toEqual(['d', { e: 'f' }])
-  expect(toRaw(proxy.value['a.b.c[0]'])).toBe('d')
-  expect(toRaw(proxy.value['a.b.c[1]'])).toEqual({ e: 'f' })
-  expect(toRaw(proxy.value['a.b.c[1].e'])).toBe('f')
+  expect(toRaw(proxy.get('a.b.c'))).toEqual(['d', { e: 'f' }])
+  expect(toRaw(proxy.get('a.b.c[0]'))).toBe('d')
+  expect(toRaw(proxy.get('a.b.c[1]'))).toEqual({ e: 'f' })
+  expect(toRaw(proxy.get('a.b.c[1].e'))).toBe('f')
 })
 
-it('should get undefined when access any object with un-existed dot-notated key', () => {
+it('should return undefined when accessing non-existent dot-notated key in object', () => {
   const target = {
     a: {
       b: {
@@ -89,11 +89,11 @@ it('should get undefined when access any object with un-existed dot-notated key'
 
   const proxy = toProxy(target, { arrayIndex: 'bracket' })
 
-  expect(proxy.value['e.f.g']).toBeUndefined()
-  expect(proxy.x).toBeUndefined()
+  expect(proxy.get('e.f.g')).toBeUndefined()
+  expect(proxy.get('x')).toBeUndefined()
 })
 
-it('should get undefined when access any object including array with un-existed dot-notated key', () => {
+it('should return undefined when accessing non-existent dot-notation key in object including array', () => {
   const target = {
     a: {
       b: {
@@ -109,11 +109,11 @@ it('should get undefined when access any object including array with un-existed 
 
   const proxy = toProxy(target, { arrayIndex: 'dot' })
 
-  expect(proxy.value['a.b.c.2']).toBeUndefined()
-  expect(proxy.value['a.b.c.1.f']).toBeUndefined()
+  expect(proxy.get('a.b.c.2')).toBeUndefined()
+  expect(proxy.get('a.b.c.1.f')).toBeUndefined()
 })
 
-it('should get undefined when access any object including array with un-existed dot-notated key with bracket', () => {
+it('should return undefined when accessing non-existent dot-notation key in object including array with bracket notation', () => {
   const target = {
     a: {
       b: {
@@ -129,11 +129,11 @@ it('should get undefined when access any object including array with un-existed 
 
   const proxy = toProxy(target, { arrayIndex: 'bracket' })
 
-  expect(proxy.value['a.b.c[2]']).toBeUndefined()
-  expect(proxy.value['a.b.c[1].f']).toBeUndefined()
+  expect(proxy.get('a.b.c[2]')).toBeUndefined()
+  expect(proxy.get('a.b.c[1].f')).toBeUndefined()
 })
 
-it('should get some value when root array with dot-notated key', () => {
+it('should retrieve values from root array using dot notation', () => {
   const target = [
     {
       a: 'b',
@@ -145,11 +145,11 @@ it('should get some value when root array with dot-notated key', () => {
 
   const proxy = toProxy(target, { arrayIndex: 'dot' })
 
-  expect(toRaw(proxy.value['0.a'])).toBe('b')
-  expect(toRaw(proxy.value['1.c'])).toBe('d')
+  expect(toRaw(proxy.get('0.a'))).toBe('b')
+  expect(toRaw(proxy.get('1.c'))).toBe('d')
 })
 
-it('should get some value when root array with dot-notated key with bracket', () => {
+it('should retrieve values from root array using bracket notation within dot notation', () => {
   const target = [
     {
       a: 'b',
@@ -161,6 +161,6 @@ it('should get some value when root array with dot-notated key with bracket', ()
 
   const proxy = toProxy(target, { arrayIndex: 'bracket' })
 
-  expect(toRaw(proxy.value['[0]a'])).toBe('b')
-  expect(toRaw(proxy.value['[1]c'])).toBe('d')
+  expect(toRaw(proxy.get('[0]a'))).toBe('b')
+  expect(toRaw(proxy.get('[1]c'))).toBe('d')
 })
