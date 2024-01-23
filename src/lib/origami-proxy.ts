@@ -170,7 +170,6 @@ class ObjectModifierImpl<T extends Dictionary> implements ObjectModifier<T> {
     // transform array to object
     if (Array.isArray(nextValue) && typeof nextHead === 'string') {
       const newNextValue = transformToObjectIfNeeded(nextValue)
-      console.log('newNextValue', newNextValue)
       if (nextValue !== newNextValue) {
         nextValue = newNextValue
         this.#raw[head as keyof T] = newNextValue as T[keyof T]
