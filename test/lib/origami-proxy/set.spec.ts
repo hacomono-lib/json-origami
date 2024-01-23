@@ -281,3 +281,77 @@ it('should initialize as array when root key is numeric', () => {
 
   expect(toRaw(proxy)).toEqual([[undefined, [undefined, undefined, 3]]])
 })
+
+it('should prune empty objects when set values', () => {
+  const target = {
+    a: {
+      b: {
+        c: 'd',
+      },
+    },
+  }
+
+  const proxy = toModifier(target, { arrayIndex: 'bracket', pruneNil: true })
+  proxy.set('a.x.y.z', {})
+
+  expect(toRaw(proxy)).toEqual({
+    a: {
+      b: {
+        c: 'd',
+      },
+    },
+  })
+})
+
+it('should prune empty arrays when set values', () => {
+  const target = {
+    a: {
+      b: {
+        c: 'd',
+      },
+    },
+  }
+
+  const proxy = toModifier(target, { arrayIndex: 'bracket', pruneNil: true })
+  proxy.set('a.x.y.z', [])
+
+  expect(toRaw(proxy)).toEqual({
+    a: {
+      b: {
+        c: 'd',
+      },
+    },
+  })
+})
+
+it('should prune undefined values when setting undefined to an array', () => {
+  const target = {
+    a: ['b', 'c', 'd'],
+  }
+
+  const proxy = toModifier(target, { arrayIndex: 'bracket', pruneNil: true })
+  proxy.set('a[0]', undefined)
+
+  expect(toRaw(proxy)).toEqual({
+    a: ['c', 'd'],
+  })
+})
+
+it('should prune undefined values in arrays when setting an retrieving values', () => {
+  const target = {
+    a: ['b', undefined, 'c', undefined, 'd'],
+  }
+
+  const proxy = toModifier(target, { arrayIndex: 'bracket', pruneNil: true })
+  proxy.set('a[10]', 'x')
+
+  expect(toRaw(proxy)).toEqual({
+    a: ['b', 'c', 'd', 'x'],
+  })
+
+  proxy.set('a[1]', 'y')
+
+  expect(toRaw(proxy)).toEqual({
+    a: ['b', 'y', 'c', 'd', 'x'],
+  })
+})

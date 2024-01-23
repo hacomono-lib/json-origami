@@ -1,1 +1,1 @@
-export * from './origami-proxy'
+export { createEmptyModifier, toModifier, toRaw } from './modifier'

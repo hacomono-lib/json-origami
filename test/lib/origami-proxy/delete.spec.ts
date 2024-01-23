@@ -60,7 +60,7 @@ it('should delete value by key in array written in bracket notation', () => {
   expect(toRaw(proxy)).toEqual({ a: { b: { c: [undefined, 'e'] } } })
 })
 
-it('should completely delete empty value when pruneEmpty option is true', () => {
+it('should completely delete empty value when pruneNil option is true', () => {
   const target = {
     a: {
       b: {
@@ -69,10 +69,10 @@ it('should completely delete empty value when pruneEmpty option is true', () => 
     },
   }
 
-  const proxy = toModifier(target, { arrayIndex: 'bracket', pruneEmpty: true })
+  const proxy = toModifier(target, { arrayIndex: 'bracket', pruneNil: true })
   proxy.delete('a.b.c[0]')
 
-  expect(toRaw(proxy)).toEqual({ a: { b: { c: [undefined, 'e'] } } })
+  expect(toRaw(proxy)).toEqual({ a: { b: { c: ['e'] } } })
 
   proxy.delete('a.b.c[1]')
   expect(toRaw(proxy)).toEqual({})

@@ -8,7 +8,7 @@ interface OrigamiOption extends SplitOption {
    * When a value is deleted, if the result becomes an empty object or array, delete the object or array
    * @default false
    */
-  pruneEmpty?: boolean
+  pruneNil?: boolean
 
   /**
    * Instead of making it impossible to write, it is faster without deep-cloning
@@ -99,17 +99,28 @@ interface ObjectModifier<T extends Dictionary = Dictionary> {
   get raw(): T
 }
 
+/**
+ * - key .. original object ref
+ * - value .. Object Modifier
+ */
+const caches = new WeakMap<Dictionary, ObjectModifier>()
+
+/**
+ * - key .. original array ref
+ * - value .. prune-empty calculate source array
+ */
+
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+const pruneSource = new WeakMap<any[], any[]>()
+
 class ObjectModifierImpl<T extends Dictionary> implements ObjectModifier<T> {
   #raw: T
 
   #opt: OrigamiOption
 
-  #cache: WeakMap<Dictionary, ObjectModifier>
-
-  constructor(raw: T, opt: OrigamiOption, cache?: WeakMap<Dictionary, ObjectModifier>) {
+  constructor(raw: T, opt: OrigamiOption) {
     this.#raw = raw
     this.#opt = opt
-    this.#cache = cache ?? new WeakMap()
   }
 
   get raw() {
@@ -130,13 +141,13 @@ class ObjectModifierImpl<T extends Dictionary> implements ObjectModifier<T> {
       return tail ? (this.#raw as any)[tail] : nextRaw
     }
 
-    if (!this.#cache.has(nextRaw)) {
+    if (!caches.has(nextRaw)) {
       const p = this.#createNext(nextRaw)
-      this.#cache.set(nextRaw, p)
+      caches.set(nextRaw, p)
     }
 
     // biome-ignore lint/style/noNonNullAssertion: <explanation>
-    const nextProxy = this.#cache.get(nextRaw)!
+    const nextProxy = caches.get(nextRaw)!
 
     const result = tail ? nextProxy.get(tail) : nextProxy
 
@@ -144,17 +155,17 @@ class ObjectModifierImpl<T extends Dictionary> implements ObjectModifier<T> {
   }
 
   // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: <explanation>
-  set(p: string, newValue: unknown): boolean {
+  set(key: string, newValue: unknown): boolean {
     if (this.#opt.immutable) {
       return false
     }
 
-    if (typeof p !== 'string') {
-      this.#raw[p as keyof T] = newValue as T[keyof T]
+    if (typeof key !== 'string') {
+      this.#raw[key as keyof T] = newValue as T[keyof T]
       return true
     }
 
-    const { head, tail, nextHead } = splitKey(p as string, this.#opt)
+    const { head, tail, nextHead } = splitKey(key as string, this.#opt)
 
     if (!tail) {
       this.#raw[head as keyof T] = newValue as T[keyof T]
@@ -167,13 +178,19 @@ class ObjectModifierImpl<T extends Dictionary> implements ObjectModifier<T> {
       this.#raw[head as keyof T] = nextValue as T[keyof T]
     }
 
-    // transform array to object
-    if (Array.isArray(nextValue) && typeof nextHead === 'string') {
-      const newNextValue = transformToObjectIfNeeded(nextValue)
-      if (nextValue !== newNextValue) {
-        nextValue = newNextValue
-        this.#raw[head as keyof T] = newNextValue as T[keyof T]
+    if (Array.isArray(nextValue) && this.#opt.pruneNil) {
+      if (!pruneSource.has(nextValue)) {
+        pruneSource.set(nextValue, nextValue)
       }
+
+      const source = pruneSource.get(nextValue) ?? []
+      pruneSource.set(nextValue, source)
+
+      if (typeof nextHead === 'number') {
+        source[nextHead] = newValue
+      }
+
+      return this.#pruneIfNeeded(key)
     }
 
     // transform object to array
@@ -195,13 +212,13 @@ class ObjectModifierImpl<T extends Dictionary> implements ObjectModifier<T> {
       return true
     }
 
-    if (!this.#cache.has(nextValue)) {
+    if (!caches.has(nextValue)) {
       const p = this.#createNext(nextValue)
-      this.#cache.set(nextValue, p)
+      caches.set(nextValue, p)
     }
 
     // biome-ignore lint/style/noNonNullAssertion: <explanation>
-    const nextProxy = this.#cache.get(nextValue)!
+    const nextProxy = caches.get(nextValue)!
 
     return nextProxy.set(tail, newValue)
   }
@@ -214,23 +231,23 @@ class ObjectModifierImpl<T extends Dictionary> implements ObjectModifier<T> {
     const { head, tail } = splitKey(key as string, this.#opt)
 
     if (!tail) {
-      return this.#deleteWrap(key, () => delete this.#raw[head as keyof T])
+      return delete this.#raw[head as keyof T] && this.#pruneIfNeeded(key)
     }
 
     const nextValue: unknown = this.#raw[head as keyof T]
 
     if (!isModifyTarget(nextValue)) {
-      return this.#deleteWrap(key, () => delete this.#raw[head as keyof T])
+      return delete this.#raw[head as keyof T] && this.#pruneIfNeeded(key)
     }
 
-    if (!this.#cache.has(nextValue)) {
+    if (!caches.has(nextValue)) {
       const p = this.#createNext(nextValue)
-      this.#cache.set(nextValue, p)
+      caches.set(nextValue, p)
     }
 
     // biome-ignore lint/style/noNonNullAssertion: <explanation>
-    const nextProxy = this.#cache.get(nextValue)!
-    return this.#deleteWrap(key, () => nextProxy.delete(tail))
+    const nextProxy = caches.get(nextValue)!
+    return nextProxy.delete(tail) && this.#pruneIfNeeded(key)
   }
 
   /**
@@ -238,10 +255,9 @@ class ObjectModifierImpl<T extends Dictionary> implements ObjectModifier<T> {
    * - If the object after deleting the value becomes empty, delete the object
    *
    */
-  #deleteWrap(key: string, runDelete: () => boolean) {
-    const result = runDelete()
-    if (!(result && this.#opt.pruneEmpty)) {
-      return result
+  #pruneIfNeeded(key: string): boolean {
+    if (this.#opt.immutable || !this.#opt.pruneNil) {
+      return true
     }
 
     const { head } = splitKey(key as string, this.#opt)
@@ -252,8 +268,32 @@ class ObjectModifierImpl<T extends Dictionary> implements ObjectModifier<T> {
     }
 
     if (Array.isArray(nextValue)) {
+      console.log('---')
+      console.log('key', key)
+      console.log('value', nextValue)
+
       if (nextValue.every((v) => v === undefined)) {
         return delete this.#raw[head as keyof T]
+      }
+
+      if (!pruneSource.has(nextValue)) {
+        pruneSource.set(nextValue, nextValue)
+      }
+
+      // biome-ignore lint/style/noNonNullAssertion: <explanation>
+      const source = pruneSource.get(nextValue)!
+      console.log('source', source)
+
+      const pruned = source.filter((v) => v !== undefined)
+      if (pruned.length <= 0) {
+        return delete this.#raw[head as keyof T]
+      }
+
+      if (pruned.length !== nextValue.length) {
+        this.#raw[head as keyof T] = pruned as T[keyof T]
+
+        pruneSource.set(pruned, source)
+        return true
       }
     }
 
@@ -278,13 +318,13 @@ class ObjectModifierImpl<T extends Dictionary> implements ObjectModifier<T> {
         return [requiredBracket ? `[${head}]` : head]
       }
 
-      if (!this.#cache.has(nextValue)) {
+      if (!caches.has(nextValue)) {
         const p = this.#createNext(nextValue)
-        this.#cache.set(nextValue, p)
+        caches.set(nextValue, p)
       }
 
       // biome-ignore lint/style/noNonNullAssertion: <explanation>
-      const nextProxy = this.#cache.get(nextValue)!
+      const nextProxy = caches.get(nextValue)!
 
       const nextKeys = nextProxy.keys()
 
@@ -303,7 +343,7 @@ class ObjectModifierImpl<T extends Dictionary> implements ObjectModifier<T> {
   }
 
   #createNext(target: Dictionary): ObjectModifier {
-    return new ObjectModifierImpl(target, this.#opt, this.#cache)
+    return new ObjectModifierImpl(target, this.#opt)
   }
 }
 

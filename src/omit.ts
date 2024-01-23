@@ -47,7 +47,7 @@ export function omit(obj: Dictionary, keys: Array<string | RegExp>, opt?: OmitOp
     ...opt,
   }
 
-  const proxy = toModifier(obj, { ...fixedOption, pruneEmpty: true })
+  const proxy = toModifier(obj, { ...fixedOption, pruneNil: true })
 
   for (const key of keys) {
     if (typeof key === 'string') {
