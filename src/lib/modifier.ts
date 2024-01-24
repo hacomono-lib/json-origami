@@ -8,7 +8,13 @@ interface OrigamiOption extends SplitOption {
    * When a value is deleted, if the result becomes an empty object or array, delete the object or array
    * @default false
    */
-  pruneNil?: boolean
+  pruneNilInArray?: boolean
+
+  /**
+   *
+   * @default false
+   */
+  pruneEmptyLeaf?: boolean
 
   /**
    * Instead of making it impossible to write, it is faster without deep-cloning
@@ -164,7 +170,7 @@ class ObjectModifierImpl<T extends Dictionary> implements ObjectModifier<T> {
   #findAllPruneTargets(raw: Dictionary): Set<WeakRef<Dictionary>> {
     const set = new Set<WeakRef<Dictionary>>()
 
-    if (this.#opt.immutable || !this.#opt.pruneNil) {
+    if (this.#opt.immutable || !this.#opt.pruneNilInArray) {
       return set
     }
 
@@ -221,7 +227,7 @@ class ObjectModifierImpl<T extends Dictionary> implements ObjectModifier<T> {
   }
 
   finalize(): T {
-    if (this.#opt.immutable || !this.#opt.pruneNil) {
+    if (this.#opt.immutable || !this.#opt.pruneNilInArray) {
       return this.#raw
     }
 
@@ -325,11 +331,17 @@ class ObjectModifierImpl<T extends Dictionary> implements ObjectModifier<T> {
     const pipe = [transformToObjectIfNeeded, transformToArrayIfNeeded]
     const modified = pipe.reduce((acc, fn) => fn(acc), this.#raw as Dictionary)
 
+    if (this.#opt.pruneEmptyLeaf && this.#parentKey && !this.#opt.immutable && Object.keys(modified).length <= 0) {
+      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+      delete (this.#parent as any)[this.#parentKey]
+      return
+    }
+
     if (modified === this.#raw) {
       return
     }
 
-    if (Array.isArray(modified) && this.#opt.pruneNil && !this.#opt.immutable) {
+    if (Array.isArray(modified) && this.#opt.pruneNilInArray && !this.#opt.immutable) {
       this.#pruneTargets.add(new WeakRef(modified))
     }
 

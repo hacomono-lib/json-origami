@@ -287,7 +287,7 @@ it('should prune undefined values when setting undefined to an array', () => {
     a: ['b', 'c', 'd'],
   }
 
-  const modifier = toModifier(target, { arrayIndex: 'bracket', pruneNil: true })
+  const modifier = toModifier(target, { arrayIndex: 'bracket', pruneNilInArray: true })
   modifier.set('a[0]', undefined)
 
   expect(modifier.finalize()).toEqual({
@@ -300,7 +300,7 @@ it('should prune undefined values in arrays when setting an retrieving values', 
     a: ['b', undefined, 'c', undefined, 'd'],
   }
 
-  const modifier = toModifier(target, { arrayIndex: 'bracket', pruneNil: true })
+  const modifier = toModifier(target, { arrayIndex: 'bracket', pruneNilInArray: true })
   modifier.set('a[10]', 'x')
   modifier.set('a[1]', 'y')
 

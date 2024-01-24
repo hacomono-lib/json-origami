@@ -69,7 +69,7 @@ it('should completely delete empty value when pruneNil option is true', () => {
     },
   }
 
-  const modifier = toModifier(target, { arrayIndex: 'bracket', pruneNil: true })
+  const modifier = toModifier(target, { arrayIndex: 'bracket', pruneNilInArray: true })
   modifier.delete('a.b.c[0]')
   modifier.delete('a.b.c[1]')
 

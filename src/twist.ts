@@ -19,7 +19,7 @@ export function twist<D extends Dictionary, M extends MoveMap<D>>(
   const fromSet = new Set(Object.keys(moveMap))
 
   const src = toModifier(obj, { ...fixedOption, immutable: true })
-  const dst = toModifier(obj, { ...fixedOption, pruneNil: fixedOption.pruneArray })
+  const dst = toModifier(obj, { ...fixedOption, pruneNilInArray: fixedOption.pruneArray })
 
   for (const [from, to] of Object.entries(moveMap)) {
     dst.set(to, src.get(from))

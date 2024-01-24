@@ -34,7 +34,7 @@ export function unfold(kv: Record<string, string>, option?: UnfoldOption): Dicti
     ...defaultUnfoldOption,
     ...option,
   } as FixedUnfoldOption
-  const newValue = createEmptyModifier({ ...fixedOption, pruneNil: fixedOption.pruneArray })
+  const newValue = createEmptyModifier({ ...fixedOption, pruneNilInArray: fixedOption.pruneArray })
   for (const [key, value] of Object.entries(kv)) {
     newValue.set(key, value)
   }

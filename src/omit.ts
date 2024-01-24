@@ -47,7 +47,7 @@ export function omit(obj: Dictionary, keys: Array<string | RegExp>, opt?: OmitOp
     ...opt,
   }
 
-  const modifier = toModifier(obj, { ...fixedOption, pruneNil: fixedOption.pruneArray })
+  const modifier = toModifier(obj, { ...fixedOption, pruneNilInArray: fixedOption.pruneArray, pruneEmptyLeaf: true })
 
   for (const key of keys) {
     if (typeof key === 'string') {
@@ -57,7 +57,6 @@ export function omit(obj: Dictionary, keys: Array<string | RegExp>, opt?: OmitOp
     if (key instanceof RegExp) {
       for (const k of modifier.keys()) {
         if (key.test(k)) {
-          console.log('delete', k)
           modifier.delete(k)
         }
       }

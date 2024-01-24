@@ -126,7 +126,9 @@ it('should handle object with numeric and string keys in root', () => {
     },
   ] as const
 
-  expect(twist(target, { '[0].a': 'w', '[0].b.c': 'x', '[1].f.h[0]': 'y', '[1].f.h[1]': 'z' })).toEqual({
+  expect(
+    twist(target, { '[0].a': 'w', '[0].b.c': 'x', '[1].f.h[0]': 'y', '[1].f.h[1]': 'z' }, { pruneArray: true }),
+  ).toEqual({
     '0': {
       b: {
         d: [3, 4],
@@ -164,7 +166,13 @@ it('should handle object with numeric and string keys in root with dot array ind
     },
   ] as const
 
-  expect(twist(target, { '0.a': 'w', '0.b.c': 'x', '1.f.h.0': 'y', '1.f.h.1': 'z' }, { arrayIndex: 'dot' })).toEqual({
+  expect(
+    twist(
+      target,
+      { '0.a': 'w', '0.b.c': 'x', '1.f.h.0': 'y', '1.f.h.1': 'z' },
+      { arrayIndex: 'dot', pruneArray: true },
+    ),
+  ).toEqual({
     '0': {
       b: {
         d: [3, 4],
