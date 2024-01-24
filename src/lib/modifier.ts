@@ -118,6 +118,7 @@ interface ObjectModifier<T extends Dictionary = Dictionary> {
 
 interface ModifierContext {
   /**
+   * Cache the Object Modifier instance and do not generate the same object instance again
    * - key .. original object ref
    * - value .. Object Modifier
    */
@@ -127,6 +128,9 @@ interface ModifierContext {
 
   parentKey?: string | number
 
+  /**
+   * Options such as pruneArray are evaluated last. Keep a reference to the last evaluated target to prevent recursive processing
+   */
   pruneTargets: Set<WeakRef<Dictionary>>
 }
 

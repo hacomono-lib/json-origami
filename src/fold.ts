@@ -35,12 +35,12 @@ export function fold<D extends Dictionary>(obj: D, option?: FoldOption): Folded<
     ...option,
   } as FixedFoldOption
 
-  const proxy = toModifier(obj, fixedOption)
+  const modifier = toModifier(obj, { ...fixedOption, immutable: true })
 
   const result = {} as Folded<D>
 
-  for (const key of proxy.keys()) {
-    result[fixKey(fixedOption, key)] = proxy.get(key)
+  for (const key of modifier.keys()) {
+    result[fixKey(fixedOption, key)] = modifier.get(key)
   }
 
   return result

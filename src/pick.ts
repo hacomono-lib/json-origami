@@ -42,22 +42,22 @@ export function pick(obj: Dictionary, keys: Array<string | RegExp>, opt?: PickOp
     ...opt,
   }
 
-  const proxy = toModifier(obj, fixedOption)
-  const newValue = createEmptyModifier(fixedOption)
+  const src = toModifier(obj, { ...fixedOption, immutable: true })
+  const dist = createEmptyModifier(fixedOption)
 
   for (const key of keys) {
     if (typeof key === 'string') {
-      newValue.set(key, proxy.get(key))
+      dist.set(key, src.get(key))
     }
 
     if (key instanceof RegExp) {
-      for (const k of proxy.keys()) {
+      for (const k of src.keys()) {
         if (key.test(k)) {
-          newValue.set(k, proxy.get(k))
+          dist.set(k, src.get(k))
         }
       }
     }
   }
 
-  return newValue.finalize()
+  return dist.finalize()
 }
