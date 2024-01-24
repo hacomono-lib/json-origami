@@ -17,7 +17,8 @@ function runBench({ objectValues }: TestCaseOption) {
 
   bench(`fold (complex object including ${objectValues} values)`, () => {
     const object = objects[index++ % iterations]
-    fold(object)
+    // biome-ignore lint/style/noNonNullAssertion: <explanation>
+    fold(object!)
   })
 }
 

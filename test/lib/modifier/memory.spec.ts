@@ -12,7 +12,7 @@ function tick() {
 }
 
 describe.sequential('memory leak test', () => {
-  it('should freed memory when the proxy object is finished being used', async () => {
+  it('should freed memory when the modifier object is finished being used', async () => {
     let target = nullable({
       a: {
         b: {
@@ -39,7 +39,7 @@ describe.sequential('memory leak test', () => {
     expect(targetProxy.deref()).toBeUndefined()
   })
 
-  it('should freed memory when the inside proxy object is finished being used', async () => {
+  it('should freed memory when the inside modifier object is finished being used', async () => {
     let target = nullable({
       a: {
         b: {
@@ -49,17 +49,17 @@ describe.sequential('memory leak test', () => {
     })
 
     // biome-ignore lint/style/noNonNullAssertion: <explanation>
-    let proxy = nullable(toModifier(target!, { arrayIndex: 'bracket' }))
+    let modifier = nullable(toModifier(target!, { arrayIndex: 'bracket' }))
 
     // biome-ignore lint/style/noNonNullAssertion: <explanation>
-    const targetA = new WeakRef(proxy!.get('a'))
+    const targetA = new WeakRef(modifier!.get('a'))
     // biome-ignore lint/style/noNonNullAssertion: <explanation>
-    const targetB = new WeakRef(proxy!.get('a.b'))
+    const targetB = new WeakRef(modifier!.get('a.b'))
 
     expect(targetA.deref()).not.toBeUndefined()
     expect(targetB.deref()).not.toBeUndefined()
 
-    proxy = null
+    modifier = null
     target = null
 
     await tick()

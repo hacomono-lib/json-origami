@@ -1,4 +1,4 @@
-import { toModifier, toRaw } from './lib'
+import { toModifier } from './lib'
 import { type Dictionary, type MoveMap, type Twist, type TwistOption, defaultCommonOption } from './type'
 
 /**
@@ -19,10 +19,10 @@ export function twist<D extends Dictionary, M extends MoveMap<D>>(
   const fromSet = new Set(Object.keys(moveMap))
 
   const src = toModifier(obj, { ...fixedOption, immutable: true })
-  const dst = toModifier(obj, { ...fixedOption, pruneNil: true })
+  const dst = toModifier(obj, { ...fixedOption, pruneNil: fixedOption.pruneArray })
 
   for (const [from, to] of Object.entries(moveMap)) {
-    dst.set(to, toRaw(src.get(from)))
+    dst.set(to, src.get(from))
     fromSet.delete(to)
   }
 
@@ -30,5 +30,5 @@ export function twist<D extends Dictionary, M extends MoveMap<D>>(
     dst.delete(from)
   }
 
-  return toRaw(dst)
+  return dst.finalize()
 }

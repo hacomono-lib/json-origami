@@ -47,7 +47,8 @@ function runBench({ percentOfOmitKeys, objectValues }: TestCaseOption) {
 
   bench(`omit (complex object including ${objectValues} values, omit ${percentOfOmitKeys * 100}% of keys)`, () => {
     const currentIndex = index++ % iterations
-    const { object, keys } = testCases[currentIndex]
+    // biome-ignore lint/style/noNonNullAssertion: <explanation>
+    const { object, keys } = testCases[currentIndex]!
     omit(object, keys)
   })
 }

@@ -1,4 +1,4 @@
-import { createEmptyModifier, toRaw } from './lib'
+import { createEmptyModifier } from './lib'
 import { defaultUnfoldOption } from './type'
 import type { Dictionary, FixedUnfoldOption, Folded, UnfoldOption, Unfolded } from './type'
 
@@ -34,10 +34,10 @@ export function unfold(kv: Record<string, string>, option?: UnfoldOption): Dicti
     ...defaultUnfoldOption,
     ...option,
   } as FixedUnfoldOption
-  const newValue = createEmptyModifier(fixedOption)
+  const newValue = createEmptyModifier({ ...fixedOption, pruneNil: fixedOption.pruneArray })
   for (const [key, value] of Object.entries(kv)) {
     newValue.set(key, value)
   }
 
-  return toRaw(newValue)
+  return newValue.finalize()
 }

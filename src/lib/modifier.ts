@@ -35,8 +35,19 @@ interface ObjectModifier<T extends Dictionary = Dictionary> {
    * proxy.get('a.b.c') // 'd'
    * ```
    */
-  get<K extends string>(key: K): Get<T, K> extends Dictionary ? ObjectModifier<Get<T, K>> : Get<T, K>
+  get<K extends string>(key: K): Get<T, K>
   get(key: string): unknown
+
+  /**
+   * get all value
+   */
+  get(): T
+
+  /**
+   * Since get is usually passed by reference, pruning may not be done properly.
+   * Therefore, by calling finalize at the end, the result according to the option is returned.
+   */
+  finalize(): T
 
   /**
    * set value by dot-notated key
@@ -99,62 +110,140 @@ interface ObjectModifier<T extends Dictionary = Dictionary> {
   get raw(): T
 }
 
+interface ModifierContext {
+  /**
+   * - key .. original object ref
+   * - value .. Object Modifier
+   */
+  cachesModifier: WeakMap<Dictionary, ObjectModifier>
+
+  parent?: Dictionary
+
+  parentKey?: string | number
+
+  pruneTargets: Set<WeakRef<Dictionary>>
+}
+
 /**
  * - key .. original object ref
  * - value .. Object Modifier
  */
-const caches = new WeakMap<Dictionary, ObjectModifier>()
-
-/**
- * - key .. original array ref
- * - value .. prune-empty calculate source array
- */
-
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-const pruneSource = new WeakMap<any[], any[]>()
 
 class ObjectModifierImpl<T extends Dictionary> implements ObjectModifier<T> {
   #raw: T
 
   #opt: OrigamiOption
 
-  constructor(raw: T, opt: OrigamiOption) {
+  #context: ModifierContext
+
+  constructor(raw: T, opt: OrigamiOption, context?: ModifierContext) {
     this.#raw = raw
     this.#opt = opt
+    this.#context = context ?? {
+      cachesModifier: new WeakMap(),
+      pruneTargets: this.#findAllPruneTargets(raw),
+    }
+  }
+
+  get #parent() {
+    return this.#context.parent
+  }
+
+  get #parentKey() {
+    return this.#context.parentKey
+  }
+
+  get #pruneTargets() {
+    return this.#context.pruneTargets
+  }
+
+  get #cachesModifier() {
+    return this.#context.cachesModifier
+  }
+
+  #findAllPruneTargets(raw: Dictionary): Set<WeakRef<Dictionary>> {
+    const set = new Set<WeakRef<Dictionary>>()
+
+    if (this.#opt.immutable || !this.#opt.pruneNil) {
+      return set
+    }
+
+    // 再帰的にチェックし、 array の ref を set につっこむ
+    const warkFindArray = (target: unknown) => {
+      if (!isDictionary(target)) {
+        return
+      }
+
+      if (Array.isArray(target)) {
+        set.add(new WeakRef(target))
+      }
+
+      for (const value of Object.values(target)) {
+        warkFindArray(value)
+      }
+    }
+    warkFindArray(raw)
+    return set
   }
 
   get raw() {
-    return finalizeRoot(this.#raw) as T
+    return this.#raw
   }
 
   // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  get(key: string): any {
+  get(key?: string): any {
+    if (key === undefined) {
+      return this.#raw
+    }
+
     if (typeof key !== 'string') {
       return this.#raw[key as keyof T]
     }
 
     const { head, tail } = splitKey(key as string, this.#opt)
+
     const nextRaw: unknown = this.#raw[head as keyof T]
 
-    if (!isModifyTarget(nextRaw)) {
+    if (!isDictionary(nextRaw)) {
       // biome-ignore lint/suspicious/noExplicitAny: <explanation>
       return tail ? (this.#raw as any)[tail] : nextRaw
     }
 
-    if (!caches.has(nextRaw)) {
-      const p = this.#createNext(nextRaw)
-      caches.set(nextRaw, p)
+    if (!this.#cachesModifier.has(nextRaw)) {
+      const p = this.#createNext(nextRaw, head)
+      this.#cachesModifier.set(nextRaw, p)
     }
 
     // biome-ignore lint/style/noNonNullAssertion: <explanation>
-    const nextProxy = caches.get(nextRaw)!
+    const nextModifier = this.#cachesModifier.get(nextRaw)!
 
-    const result = tail ? nextProxy.get(tail) : nextProxy
-
-    return result
+    return tail ? nextModifier.get(tail) : nextModifier.raw
   }
 
-  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: <explanation>
+  finalize(): T {
+    if (this.#opt.immutable || !this.#opt.pruneNil) {
+      return this.#raw
+    }
+
+    for (const ref of this.#pruneTargets) {
+      const target = ref.deref()
+      if (!target) {
+        continue
+      }
+
+      if (Array.isArray(target)) {
+        for (let i = 0; i < target.length; i++) {
+          if (target[i] === undefined) {
+            target.splice(i, 1)
+            i--
+          }
+        }
+      }
+    }
+
+    return this.#raw
+  }
+
   set(key: string, newValue: unknown): boolean {
     if (this.#opt.immutable) {
       return false
@@ -162,6 +251,7 @@ class ObjectModifierImpl<T extends Dictionary> implements ObjectModifier<T> {
 
     if (typeof key !== 'string') {
       this.#raw[key as keyof T] = newValue as T[keyof T]
+      this.#afterModify()
       return true
     }
 
@@ -169,6 +259,7 @@ class ObjectModifierImpl<T extends Dictionary> implements ObjectModifier<T> {
 
     if (!tail) {
       this.#raw[head as keyof T] = newValue as T[keyof T]
+      this.#afterModify()
       return true
     }
 
@@ -178,49 +269,23 @@ class ObjectModifierImpl<T extends Dictionary> implements ObjectModifier<T> {
       this.#raw[head as keyof T] = nextValue as T[keyof T]
     }
 
-    if (Array.isArray(nextValue) && this.#opt.pruneNil) {
-      if (!pruneSource.has(nextValue)) {
-        pruneSource.set(nextValue, nextValue)
-      }
-
-      const source = pruneSource.get(nextValue) ?? []
-      pruneSource.set(nextValue, source)
-
-      if (typeof nextHead === 'number') {
-        source[nextHead] = newValue
-      }
-
-      return this.#pruneIfNeeded(key)
-    }
-
-    // transform object to array
-    if (
-      typeof nextValue === 'object' &&
-      nextValue !== null &&
-      !Array.isArray(nextValue) &&
-      typeof nextHead === 'number'
-    ) {
-      const newNextValue = transformToArrayIfNeeded(nextValue)
-      if (nextValue !== newNextValue) {
-        nextValue = newNextValue
-        this.#raw[head as keyof T] = newNextValue as T[keyof T]
-      }
-    }
-
-    if (!isModifyTarget(nextValue)) {
+    if (!isDictionary(nextValue)) {
       this.#raw[head as keyof T] = newValue as T[keyof T]
+      this.#afterModify()
       return true
     }
 
-    if (!caches.has(nextValue)) {
-      const p = this.#createNext(nextValue)
-      caches.set(nextValue, p)
+    if (!this.#cachesModifier.has(nextValue)) {
+      const p = this.#createNext(nextValue, head)
+      this.#cachesModifier.set(nextValue, p)
     }
 
     // biome-ignore lint/style/noNonNullAssertion: <explanation>
-    const nextProxy = caches.get(nextValue)!
+    const nextModifier = this.#cachesModifier.get(nextValue)!
 
-    return nextProxy.set(tail, newValue)
+    const result = nextModifier.set(tail, newValue)
+    this.#afterModify()
+    return result
   }
 
   delete(key: string) {
@@ -231,79 +296,50 @@ class ObjectModifierImpl<T extends Dictionary> implements ObjectModifier<T> {
     const { head, tail } = splitKey(key as string, this.#opt)
 
     if (!tail) {
-      return delete this.#raw[head as keyof T] && this.#pruneIfNeeded(key)
+      delete this.#raw[head as keyof T]
+      this.#afterModify()
+      return true
     }
 
     const nextValue: unknown = this.#raw[head as keyof T]
 
-    if (!isModifyTarget(nextValue)) {
-      return delete this.#raw[head as keyof T] && this.#pruneIfNeeded(key)
+    if (!isDictionary(nextValue)) {
+      delete this.#raw[head as keyof T]
+      this.#afterModify()
+      return true
     }
 
-    if (!caches.has(nextValue)) {
-      const p = this.#createNext(nextValue)
-      caches.set(nextValue, p)
+    if (!this.#cachesModifier.has(nextValue)) {
+      const p = this.#createNext(nextValue, head)
+      this.#cachesModifier.set(nextValue, p)
     }
 
     // biome-ignore lint/style/noNonNullAssertion: <explanation>
-    const nextProxy = caches.get(nextValue)!
-    return nextProxy.delete(tail) && this.#pruneIfNeeded(key)
+    const nextModifier = this.#cachesModifier.get(nextValue)!
+    nextModifier.delete(tail)
+    this.#afterModify()
+    return true
   }
 
-  /**
-   * After deleting the value, perform the following processing
-   * - If the object after deleting the value becomes empty, delete the object
-   *
-   */
-  #pruneIfNeeded(key: string): boolean {
-    if (this.#opt.immutable || !this.#opt.pruneNil) {
-      return true
+  #afterModify() {
+    const pipe = [transformToObjectIfNeeded, transformToArrayIfNeeded]
+    const modified = pipe.reduce((acc, fn) => fn(acc), this.#raw as Dictionary)
+
+    if (modified === this.#raw) {
+      return
     }
 
-    const { head } = splitKey(key as string, this.#opt)
-    const nextValue = this.#raw[head as keyof T]
-
-    if (!isModifyTarget(nextValue)) {
-      return true
+    if (Array.isArray(modified) && this.#opt.pruneNil && !this.#opt.immutable) {
+      this.#pruneTargets.add(new WeakRef(modified))
     }
 
-    if (Array.isArray(nextValue)) {
-      console.log('---')
-      console.log('key', key)
-      console.log('value', nextValue)
+    this.#raw = modified as T
 
-      if (nextValue.every((v) => v === undefined)) {
-        return delete this.#raw[head as keyof T]
-      }
-
-      if (!pruneSource.has(nextValue)) {
-        pruneSource.set(nextValue, nextValue)
-      }
-
-      // biome-ignore lint/style/noNonNullAssertion: <explanation>
-      const source = pruneSource.get(nextValue)!
-      console.log('source', source)
-
-      const pruned = source.filter((v) => v !== undefined)
-      if (pruned.length <= 0) {
-        return delete this.#raw[head as keyof T]
-      }
-
-      if (pruned.length !== nextValue.length) {
-        this.#raw[head as keyof T] = pruned as T[keyof T]
-
-        pruneSource.set(pruned, source)
-        return true
-      }
+    if (this.#parent && this.#parentKey) {
+      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+      ;(this.#parent as any)[this.#parentKey] = modified
     }
-
-    if (typeof nextValue === 'object' && nextValue !== null) {
-      if (Object.keys(nextValue).length === 0) {
-        return delete this.#raw[head as keyof T]
-      }
-    }
-
-    return true
+    return
   }
 
   keys(): string[] {
@@ -314,17 +350,17 @@ class ObjectModifierImpl<T extends Dictionary> implements ObjectModifier<T> {
 
       const requiredBracket = this.#opt.arrayIndex === 'bracket' && Array.isArray(this.#raw)
 
-      if (!isModifyTarget(nextValue)) {
+      if (!isDictionary(nextValue)) {
         return [requiredBracket ? `[${head}]` : head]
       }
 
-      if (!caches.has(nextValue)) {
-        const p = this.#createNext(nextValue)
-        caches.set(nextValue, p)
+      if (!this.#cachesModifier.has(nextValue)) {
+        const p = this.#createNext(nextValue, head)
+        this.#cachesModifier.set(nextValue, p)
       }
 
       // biome-ignore lint/style/noNonNullAssertion: <explanation>
-      const nextProxy = caches.get(nextValue)!
+      const nextProxy = this.#cachesModifier.get(nextValue)!
 
       const nextKeys = nextProxy.keys()
 
@@ -342,12 +378,17 @@ class ObjectModifierImpl<T extends Dictionary> implements ObjectModifier<T> {
     return keys
   }
 
-  #createNext(target: Dictionary): ObjectModifier {
-    return new ObjectModifierImpl(target, this.#opt)
+  #createNext(target: Dictionary, key: string | number): ObjectModifier {
+    return new ObjectModifierImpl(target, this.#opt, {
+      cachesModifier: this.#cachesModifier,
+      pruneTargets: this.#pruneTargets,
+      parent: this.#raw,
+      parentKey: key,
+    })
   }
 }
 
-function isModifyTarget(target: unknown): target is Dictionary {
+function isDictionary(target: unknown): target is Dictionary {
   return typeof target === 'object' && target !== null
 }
 
@@ -363,16 +404,13 @@ function createModifier(value: Dictionary, opt: OrigamiOption): ObjectModifier {
   return new ObjectModifierImpl(value, opt)
 }
 
-function finalizeRoot(target: object): object {
-  const pipe = [transformToObjectIfNeeded, transformToArrayIfNeeded]
-  return pipe.reduce((acc, fn) => fn(acc), target)
-}
+function transformToArrayIfNeeded(target: Dictionary): Dictionary {
+  const entries = Object.entries(target)
+  const isNumericKey = (key: string) => `${Number.parseInt(key)}` === key
 
-function transformToArrayIfNeeded(target: object): object {
-  const keys = Object.keys(target)
-  if (keys.length > 0 && keys.every((key) => `${Number.parseInt(key)}` === key)) {
+  if (entries.length > 0 && entries.every(([k]) => isNumericKey(k))) {
     const newArray = []
-    for (const [k, v] of Object.entries(target)) {
+    for (const [k, v] of entries) {
       newArray[Number.parseInt(k)] = v
     }
     return newArray
@@ -381,10 +419,13 @@ function transformToArrayIfNeeded(target: object): object {
   return target
 }
 
-function transformToObjectIfNeeded(target: object): object {
-  if (Array.isArray(target) && target.length > 0) {
+function transformToObjectIfNeeded(target: Dictionary): Dictionary {
+  const entries = Object.entries(target)
+  const isNotNumericKey = (key: string) => `${Number.parseInt(key)}` !== key && key !== ''
+
+  if (Array.isArray(target) && target.length > 0 && entries.some(([k]) => isNotNumericKey(k))) {
     const newObject = {} as Record<string | number, unknown>
-    for (const [k, v] of Object.entries(target)) {
+    for (const [k, v] of entries) {
       newObject[k] = v
     }
     return newObject

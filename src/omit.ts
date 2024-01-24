@@ -1,4 +1,4 @@
-import { toModifier, toRaw } from './lib'
+import { toModifier } from './lib'
 import { type DeepKeyOf, type Dictionary, type Omit, type OmitOption, defaultCommonOption } from './type'
 
 /**
@@ -47,21 +47,22 @@ export function omit(obj: Dictionary, keys: Array<string | RegExp>, opt?: OmitOp
     ...opt,
   }
 
-  const proxy = toModifier(obj, { ...fixedOption, pruneNil: true })
+  const modifier = toModifier(obj, { ...fixedOption, pruneNil: fixedOption.pruneArray })
 
   for (const key of keys) {
     if (typeof key === 'string') {
-      proxy.delete(key)
+      modifier.delete(key)
     }
 
     if (key instanceof RegExp) {
-      for (const k of proxy.keys()) {
+      for (const k of modifier.keys()) {
         if (key.test(k)) {
-          proxy.delete(k)
+          console.log('delete', k)
+          modifier.delete(k)
         }
       }
     }
   }
 
-  return toRaw(proxy)
+  return modifier.finalize()
 }

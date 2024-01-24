@@ -47,7 +47,8 @@ function runBench({ percentOfPickKeys, objectValues }: TestCaseOption) {
 
   bench(`pick (complex object including ${objectValues} values, pick ${percentOfPickKeys * 100}% of keys)`, () => {
     const currentIndex = index++ % iterations
-    const { object, keys } = testCases[currentIndex]
+    // biome-ignore lint/style/noNonNullAssertion: <explanation>
+    const { object, keys } = testCases[currentIndex]!
     pick(object, keys)
   })
 }

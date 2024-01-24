@@ -1,4 +1,4 @@
-import { createEmptyModifier, toModifier, toRaw } from './lib'
+import { createEmptyModifier, toModifier } from './lib'
 import { type DeepKeyOf, type Dictionary, type PickOption, defaultCommonOption } from './type'
 
 /**
@@ -47,7 +47,7 @@ export function pick(obj: Dictionary, keys: Array<string | RegExp>, opt?: PickOp
 
   for (const key of keys) {
     if (typeof key === 'string') {
-      newValue.set(key, toRaw(proxy.get(key)))
+      newValue.set(key, proxy.get(key))
     }
 
     if (key instanceof RegExp) {
@@ -59,5 +59,5 @@ export function pick(obj: Dictionary, keys: Array<string | RegExp>, opt?: PickOp
     }
   }
 
-  return toRaw(newValue)
+  return newValue.finalize()
 }

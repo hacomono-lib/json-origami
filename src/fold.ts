@@ -1,4 +1,4 @@
-import { toModifier, toRaw } from './lib'
+import { toModifier } from './lib'
 import { type Dictionary, type FixedFoldOption, type FoldOption, type Folded, defaultCommonOption } from './type'
 
 /**
@@ -40,7 +40,7 @@ export function fold<D extends Dictionary>(obj: D, option?: FoldOption): Folded<
   const result = {} as Folded<D>
 
   for (const key of proxy.keys()) {
-    result[fixKey(fixedOption, key)] = toRaw(proxy.get(key))
+    result[fixKey(fixedOption, key)] = proxy.get(key)
   }
 
   return result

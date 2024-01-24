@@ -32,10 +32,13 @@ function createTestCase({ percentOfTwistKeys, objectValues }: TestCaseOption): T
   const object = createRandomObject({ leafs: objectValues })
   const allKeys = Object.keys(fold(object))
   const keys = randomChoices(allKeys, Math.min(objectValues, allKeys.length) * percentOfTwistKeys)
-  const twistMap = keys.reduce((acc, key) => {
-    acc[key] = randomKeyName()
-    return acc
-  }, {})
+  const twistMap = keys.reduce(
+    (acc, key) => {
+      acc[key] = randomKeyName()
+      return acc
+    },
+    {} as Record<string, string>,
+  )
   return { object, twistMap }
 }
 
@@ -51,7 +54,8 @@ function runBench({ percentOfTwistKeys, objectValues }: TestCaseOption) {
 
   bench(`twist (complex object including ${objectValues} values, twist ${percentOfTwistKeys * 100}% of keys)`, () => {
     const currentIndex = index++ % iterations
-    const { object, twistMap } = testCases[currentIndex]
+    // biome-ignore lint/style/noNonNullAssertion: <explanation>
+    const { object, twistMap } = testCases[currentIndex]!
     twist(object, twistMap)
   })
 }
