@@ -116,6 +116,10 @@ interface ObjectModifier<T extends Dictionary = Dictionary> {
   get raw(): T
 }
 
+interface MaybeRef<T> {
+  deref(): T
+}
+
 interface ModifierContext {
   /**
    * Cache the Object Modifier instance and do not generate the same object instance again
@@ -128,10 +132,17 @@ interface ModifierContext {
 
   parentKey?: string | number
 
+  absoluteKey: string
+
   /**
    * Options such as pruneArray are evaluated last. Keep a reference to the last evaluated target to prevent recursive processing
    */
   pruneTargets: Set<WeakRef<Dictionary>>
+
+  /**
+   * Only in Immutable mode, access to the same key is cached
+   */
+  cacheKv: Map<string, MaybeRef<unknown>>
 }
 
 /**
@@ -152,7 +163,11 @@ class ObjectModifierImpl<T extends Dictionary> implements ObjectModifier<T> {
     this.#context = context ?? {
       cachesModifier: new WeakMap(),
       pruneTargets: this.#findAllPruneTargets(raw),
+      cacheKv: new Map(),
+      absoluteKey: '',
     }
+
+    this.#cacheKvIfNeeded(this.#context.absoluteKey, this.#raw)
   }
 
   get #parent() {
@@ -200,10 +215,19 @@ class ObjectModifierImpl<T extends Dictionary> implements ObjectModifier<T> {
     return this.#raw
   }
 
+  get #isRoot(): boolean {
+    return !this.#parent
+  }
+
   // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   get(key?: string): any {
     if (key === undefined) {
       return this.#raw
+    }
+
+    const cached = this.#restoreCacheKvIfNeeded(key)
+    if (cached !== undefined) {
+      return cached
     }
 
     if (typeof key !== 'string') {
@@ -367,7 +391,12 @@ class ObjectModifierImpl<T extends Dictionary> implements ObjectModifier<T> {
       const requiredBracket = this.#opt.arrayIndex === 'bracket' && Array.isArray(this.#raw)
 
       if (!isDictionary(nextValue)) {
-        return [requiredBracket ? `[${head}]` : head]
+        const resultKey = requiredBracket ? `[${head}]` : head
+        this.#cacheKvIfNeeded(
+          `${this.#context.absoluteKey}${resultKey.startsWith('[') ? '' : '.'}${resultKey}`,
+          this.#raw,
+        )
+        return [resultKey]
       }
 
       if (!this.#cachesModifier.has(nextValue)) {
@@ -395,12 +424,38 @@ class ObjectModifierImpl<T extends Dictionary> implements ObjectModifier<T> {
   }
 
   #createNext(target: Dictionary, key: string | number): ObjectModifier {
+    const requiredBracket = this.#opt.arrayIndex === 'bracket' && Array.isArray(this.#raw)
+    const fixedKey = requiredBracket ? `[${key}]` : `${key}`
+
     return new ObjectModifierImpl(target, this.#opt, {
-      cachesModifier: this.#cachesModifier,
-      pruneTargets: this.#pruneTargets,
+      ...this.#context,
       parent: this.#raw,
       parentKey: key,
+      absoluteKey: this.#context.absoluteKey
+        ? `${this.#context.absoluteKey}${fixedKey.startsWith('[') ? '' : '.'}${fixedKey}`
+        : `${fixedKey}`,
     })
+  }
+
+  #cacheKvIfNeeded(absoluteKey: string, value: unknown) {
+    if (!this.#opt.immutable) {
+      return
+    }
+
+    this.#context.cacheKv.set(
+      absoluteKey,
+      typeof value === 'object' && value !== null ? new WeakRef(value) : { deref: () => value },
+    )
+  }
+
+  #restoreCacheKvIfNeeded<T = unknown>(absoluteKey: string): T | undefined {
+    if (!(this.#opt.immutable || this.#isRoot)) {
+      return
+    }
+
+    const result = this.#context.cacheKv.get(absoluteKey)?.deref() as T | undefined
+
+    return result
   }
 }
 
