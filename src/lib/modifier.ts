@@ -385,6 +385,7 @@ class ObjectModifierImpl<T extends Dictionary> implements ObjectModifier<T> {
   keys(): string[] {
     const heads = Object.keys(this.#raw)
 
+    // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: <explanation>
     const keys = heads.flatMap((head) => {
       const nextValue = this.#raw[head as keyof T]
 
