@@ -43,20 +43,34 @@ export function pick(obj: Dictionary, keys: Array<string | RegExp>, opt?: PickOp
   }
 
   const src = toModifier(obj, { ...fixedOption, immutable: true })
-  const dist = createEmptyModifier(fixedOption)
 
-  for (const key of keys) {
-    if (typeof key === 'string') {
-      dist.set(key, src.get(key))
+  const regexpKeyss = keys.filter((key): key is RegExp => key instanceof RegExp)
+
+  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: <explanation>
+  const fixedKeys: string[] = (() => {
+    if (regexpKeyss.length <= 0) {
+      return keys as string[]
     }
 
-    if (key instanceof RegExp) {
-      for (const k of src.keys()) {
-        if (key.test(k)) {
-          dist.set(k, src.get(k))
+    const stringKeys = keys.filter((key): key is string => typeof key === 'string')
+    const keyset = new Set<string>(stringKeys)
+    const srcKeys = src.keys()
+
+    for (const key of regexpKeyss) {
+      if (key instanceof RegExp) {
+        for (const k of srcKeys) {
+          if (key.test(k)) {
+            keyset.add(k)
+          }
         }
       }
     }
+    return [...keyset]
+  })()
+
+  const dist = createEmptyModifier(fixedOption)
+  for (const key of fixedKeys) {
+    dist.set(key, src.get(key))
   }
 
   return dist.finalize()
