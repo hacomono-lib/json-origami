@@ -19,7 +19,7 @@ export function twist<D extends Dictionary, M extends MoveMap<D>>(
   const fromKeys = Object.keys(moveMap)
   const copyKeys: string[] = []
 
-  const src = toModifier(obj, { ...fixedOption, immutable: true })
+  const src = toModifier(obj, fixedOption)
   const dist = createEmptyModifier(fixedOption)
 
   const srcKeys = src.keys()

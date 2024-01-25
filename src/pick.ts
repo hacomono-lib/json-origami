@@ -42,7 +42,7 @@ export function pick(obj: Dictionary, keys: Array<string | RegExp>, opt?: PickOp
     ...opt,
   }
 
-  const src = toModifier(obj, { ...fixedOption, immutable: true })
+  const src = toModifier(obj, fixedOption)
 
   const regexpKeyss = keys.filter((key): key is RegExp => key instanceof RegExp)
 

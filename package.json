@@ -48,7 +48,6 @@
     "lint": "biome check --apply ./src ./test"
   },
   "dependencies": {
-    "just-clone": "^6.2.0",
     "type-fest": "^4.9.0"
   },
   "devDependencies": {

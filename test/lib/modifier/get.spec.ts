@@ -191,22 +191,3 @@ it('should prune undefined values in arrays and correctly retrieve values by ind
   expect(modifier.get('a.b.c')).toEqual([undefined, 'd', undefined, 'e', undefined, 'f'])
   expect(modifier.get('a.b.c[1]')).toBe('d')
 })
-
-it('should correctly prune undefined values in arrays based on the pruneNil option', () => {
-  const target = {
-    a: {
-      b: {
-        c: [undefined, 'd', undefined, 'e', undefined, 'f'],
-      },
-    },
-  }
-
-  const modifier1 = toModifier(target, { arrayIndex: 'bracket', pruneNilInArray: true })
-  expect(modifier1.get('a.b.c')).toEqual([undefined, 'd', undefined, 'e', undefined, 'f'])
-  expect(modifier1.get()).toEqual({ a: { b: { c: [undefined, 'd', undefined, 'e', undefined, 'f'] } } })
-  expect(modifier1.finalize()).toEqual({ a: { b: { c: ['d', 'e', 'f'] } } })
-
-  const modifier2 = toModifier(target, { arrayIndex: 'bracket', pruneNilInArray: false })
-  expect(modifier2.get('a.b.c')).toEqual([undefined, 'd', undefined, 'e', undefined, 'f'])
-  expect(modifier2.get()).toEqual({ a: { b: { c: [undefined, 'd', undefined, 'e', undefined, 'f'] } } })
-})

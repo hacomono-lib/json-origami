@@ -1,4 +1,3 @@
-import clone from 'just-clone'
 import type { Get } from 'type-fest'
 import type { Dictionary } from '~/type'
 import { type KeyOption, splitHead, splitTails } from './string'
@@ -197,6 +196,30 @@ class ObjectModifierImpl<T extends Dictionary> implements ObjectModifier<T> {
   }
 
   finalize(): T {
+    console.log('finalize')
+    if (this.#opt.immutable) {
+      return this.#raw
+    }
+
+    const { pruneTargets } = this.#context
+
+    for (const target of pruneTargets) {
+      const targetRef = target.deref()
+      if (!targetRef) {
+        continue
+      }
+
+      console.log('targetRef', targetRef)
+
+      if (Array.isArray(targetRef)) {
+        for (let i = targetRef.length - 1; i >= 0; i--) {
+          if (targetRef[i] !== undefined) {
+            break
+          }
+          targetRef.pop()
+        }
+      }
+    }
     return this.#raw
   }
 
@@ -369,8 +392,8 @@ export function createEmptyModifier(opt: OrigamiOption): ObjectModifier {
   return createModifier({}, opt)
 }
 
-export function toModifier<T extends Dictionary>(target: T, opt: OrigamiOption): ObjectModifier<T> {
-  return createModifier(opt.immutable ? target : clone(target), opt) as ObjectModifier<T>
+export function toModifier<T extends Dictionary>(target: T, opt: Omit<OrigamiOption, 'immutable'>): ObjectModifier<T> {
+  return createModifier(target, { ...opt, immutable: true }) as ObjectModifier<T>
 }
 
 function createModifier(value: Dictionary, opt: OrigamiOption): ObjectModifier {

@@ -48,7 +48,7 @@ export function omit(obj: Dictionary, keys: Array<string | RegExp>, opt?: OmitOp
     ...opt,
   }
 
-  const src = toModifier(obj, { ...fixedOption, immutable: true })
+  const src = toModifier(obj, fixedOption)
   const srcKeys = src.keys()
 
   const pickKeys = srcKeys.filter((srcKey) => keys.every((k) => !startsKeyWith(srcKey, k, fixedOption)))
