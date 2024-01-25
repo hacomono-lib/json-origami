@@ -161,8 +161,8 @@ it('should retrieve values from root array using bracket notation within dot not
 
   const modifier = toModifier(target, { arrayIndex: 'bracket' })
 
-  expect(modifier.get('[0]a')).toBe('b')
-  expect(modifier.get('[1]c')).toBe('d')
+  expect(modifier.get('[0].a')).toBe('b')
+  expect(modifier.get('[1].c')).toBe('d')
 })
 
 it('should retrieve empty object | array inside array', () => {

@@ -30,7 +30,6 @@ it('twist nested keys', () => {
 
   expect(twist(target, { 'b.c': 'x', 'b.d': 'y' })).toEqual({
     a: 1,
-    b: {},
     x: 2,
     y: [3, 4],
   })
@@ -138,7 +137,6 @@ it('should handle object with numeric and string keys in root', () => {
       e: 5,
       f: {
         g: 6,
-        h: [],
       },
     },
     w: 1,
@@ -182,7 +180,6 @@ it('should handle object with numeric and string keys in root with dot array ind
       e: 5,
       f: {
         g: 6,
-        h: [],
       },
     },
     w: 1,
@@ -272,7 +269,6 @@ it('should be twisted correctly when the prefix is the same string.', () => {
   }
 
   expect(twist(target, map)).toEqual({
-    foo: {},
     foo1: {
       bar: 4,
       bar1: 5,

@@ -1,20 +1,14 @@
 import clone from 'just-clone'
 import type { Get } from 'type-fest'
 import type { Dictionary } from '~/type'
-import { type SplitOption, splitHead, splitTails } from './string'
+import { type KeyOption, splitHead, splitTails } from './string'
 
-interface OrigamiOption extends SplitOption {
+interface OrigamiOption extends KeyOption {
   /**
    * When a value is deleted, if the result becomes an empty object or array, delete the object or array
    * @default false
    */
   pruneNilInArray?: boolean
-
-  /**
-   *
-   * @default false
-   */
-  pruneEmptyLeaf?: boolean
 
   /**
    * Instead of making it impossible to write, it is faster without deep-cloning
@@ -73,26 +67,6 @@ interface ObjectModifier<T extends Dictionary = Dictionary> {
    */
   set<K extends string>(key: K, value: Get<T, K>): boolean
   set(key: string, value: unknown): boolean
-
-  /**
-   * delete value by dot-notated key
-   *
-   * e.g.
-   * ```ts
-   * const target = {
-   *   a: {
-   *     b: {
-   *       c: 'd',
-   *     },
-   *   }
-   * }
-   *
-   * const proxy = toProxy(target, { arrayIndex: 'bracket' })
-   * proxy.delete('a.b.c') // true
-   * ```
-   */
-  delete<K extends string>(key: K): boolean
-  delete(key: string): boolean
 
   /**
    * get all keys by dot-notated key
@@ -170,52 +144,19 @@ class ObjectModifierImpl<T extends Dictionary> implements ObjectModifier<T> {
     this.#context = context ?? {
       cacheOriginToModifier: new WeakMap(),
       cacheKeyToModifier: new Map(),
-      pruneTargets: this.#findAllPruneTargets(raw),
+      pruneTargets: new Set(),
       absoluteKey: '',
     }
 
     this.#cacheModifier()
   }
 
-  get #parent() {
-    return this.#context.parent
-  }
-
-  get #parentKey() {
-    return this.#context.parentKey
-  }
-
-  get #pruneTargets() {
-    return this.#context.pruneTargets
-  }
-
-  get #cachesModifier() {
-    return this.#context.cacheOriginToModifier
-  }
-
-  #findAllPruneTargets(raw: Dictionary): Set<WeakRef<Dictionary>> {
-    const set = new Set<WeakRef<Dictionary>>()
-
-    if (this.#opt.immutable || !this.#opt.pruneNilInArray) {
-      return set
+  get #parentModifier(): ObjectModifier | undefined {
+    if (!this.#context.parent) {
+      return undefined
     }
 
-    // 再帰的にチェックし、 array の ref を set につっこむ
-    const warkFindArray = (target: unknown) => {
-      if (!isDictionary(target)) {
-        return
-      }
-
-      if (Array.isArray(target)) {
-        set.add(new WeakRef(target))
-      }
-
-      for (const value of Object.values(target)) {
-        warkFindArray(value)
-      }
-    }
-    warkFindArray(raw)
-    return set
+    return this.#context.cacheOriginToModifier.get(this.#context.parent)
   }
 
   get raw() {
@@ -223,7 +164,7 @@ class ObjectModifierImpl<T extends Dictionary> implements ObjectModifier<T> {
   }
 
   get #isRoot(): boolean {
-    return !this.#parent
+    return !this.#context.parent
   }
 
   // biome-ignore lint/suspicious/noExplicitAny: <explanation>
@@ -256,26 +197,6 @@ class ObjectModifierImpl<T extends Dictionary> implements ObjectModifier<T> {
   }
 
   finalize(): T {
-    if (this.#opt.immutable || !this.#opt.pruneNilInArray) {
-      return this.#raw
-    }
-
-    for (const ref of this.#pruneTargets) {
-      const target = ref.deref()
-      if (!target) {
-        continue
-      }
-
-      if (Array.isArray(target)) {
-        for (let i = 0; i < target.length; i++) {
-          if (target[i] === undefined) {
-            target.splice(i, 1)
-            i--
-          }
-        }
-      }
-    }
-
     return this.#raw
   }
 
@@ -287,7 +208,9 @@ class ObjectModifierImpl<T extends Dictionary> implements ObjectModifier<T> {
     if (this.#isRoot) {
       const shorthand = this.#findShorthand(key)
       if (shorthand) {
-        return shorthand.modifier.set(shorthand.lastKey, newValue)
+        shorthand.modifier.set(shorthand.lastKey, newValue)
+        this.#afterModify()
+        return true
       }
     }
 
@@ -317,9 +240,11 @@ class ObjectModifierImpl<T extends Dictionary> implements ObjectModifier<T> {
       return true
     }
 
-    if (!this.#cachesModifier.has(nextValue)) {
+    const { cacheOriginToModifier } = this.#context
+
+    if (!cacheOriginToModifier.has(nextValue)) {
       const p = this.#createNext(nextValue, head)
-      this.#cachesModifier.set(nextValue, p)
+      cacheOriginToModifier.set(nextValue, p)
     }
 
     const nextModifier = this.#getNextModifier(nextValue, head)
@@ -329,70 +254,27 @@ class ObjectModifierImpl<T extends Dictionary> implements ObjectModifier<T> {
     return result
   }
 
-  delete(key: string) {
-    if (this.#opt.immutable) {
-      return false
-    }
-
-    if (this.#isRoot) {
-      const shorthand = this.#findShorthand(key)
-      if (shorthand) {
-        return shorthand.modifier.delete(shorthand.lastKey)
-      }
-    }
-
-    const { head, rest } = splitHead(key as string, this.#opt)
-
-    if (!rest) {
-      delete this.#raw[head as keyof T]
-      this.#afterModify()
-      return true
-    }
-
-    const nextValue: unknown = this.#raw[head as keyof T]
-
-    if (!isDictionary(nextValue)) {
-      delete this.#raw[head as keyof T]
-      this.#afterModify()
-      return true
-    }
-
-    if (!this.#cachesModifier.has(nextValue)) {
-      const p = this.#createNext(nextValue, head)
-      this.#cachesModifier.set(nextValue, p)
-    }
-
-    // biome-ignore lint/style/noNonNullAssertion: <explanation>
-    const nextModifier = this.#cachesModifier.get(nextValue)!
-    nextModifier.delete(rest)
-    this.#afterModify()
-    return true
-  }
-
   #afterModify() {
     const pipe = [transformToObjectIfNeeded, transformToArrayIfNeeded]
     const modified = pipe.reduce((acc, fn) => fn(acc), this.#raw as Dictionary)
-
-    if (this.#opt.pruneEmptyLeaf && this.#parentKey && !this.#opt.immutable && Object.keys(modified).length <= 0) {
-      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-      delete (this.#parent as any)[this.#parentKey]
-      return
-    }
 
     if (modified === this.#raw) {
       return
     }
 
-    if (Array.isArray(modified) && this.#opt.pruneNilInArray && !this.#opt.immutable) {
-      this.#pruneTargets.add(new WeakRef(modified))
-    }
-
     this.#raw = modified as T
 
-    if (this.#parent && this.#parentKey) {
+    const { parent, parentKey, pruneTargets } = this.#context
+
+    if (parent && parentKey) {
       // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-      ;(this.#parent as any)[this.#parentKey] = modified
+      ;(parent as any)[parentKey] = modified
     }
+
+    if (Array.isArray(modified) && this.#opt.pruneNilInArray) {
+      pruneTargets.add(new WeakRef(modified))
+    }
+
     return
   }
 
@@ -428,15 +310,17 @@ class ObjectModifierImpl<T extends Dictionary> implements ObjectModifier<T> {
   }
 
   #getNextModifier<D extends Dictionary>(nextRaw: D, keyOfNextRaw: string | number): ObjectModifier<D> {
-    if (this.#cachesModifier.has(nextRaw)) {
+    const { cacheOriginToModifier } = this.#context
+    if (cacheOriginToModifier.has(nextRaw)) {
       // biome-ignore lint/style/noNonNullAssertion: <explanation>
-      return this.#cachesModifier.get(nextRaw)! as ObjectModifier<D>
+      return cacheOriginToModifier.get(nextRaw)! as ObjectModifier<D>
     }
 
     return this.#createNext(nextRaw, keyOfNextRaw)
   }
 
   #createNext<D extends Dictionary>(target: D, key: string | number): ObjectModifier<D> {
+    const { absoluteKey } = this.#context
     const requiredBracket = this.#opt.arrayIndex === 'bracket' && Array.isArray(this.#raw)
     const fixedKey = requiredBracket ? `[${key}]` : `${key}`
 
@@ -444,20 +328,18 @@ class ObjectModifierImpl<T extends Dictionary> implements ObjectModifier<T> {
       ...this.#context,
       parent: this.#raw,
       parentKey: key,
-      absoluteKey: this.#context.absoluteKey
-        ? `${this.#context.absoluteKey}${fixedKey.startsWith('[') ? '' : '.'}${fixedKey}`
-        : `${fixedKey}`,
+      absoluteKey: absoluteKey ? `${absoluteKey}${fixedKey.startsWith('[') ? '' : '.'}${fixedKey}` : `${fixedKey}`,
     })
   }
 
   #cacheModifier() {
-    const { absoluteKey } = this.#context
-    if (this.#cachesModifier.has(this.#raw) && this.#cachesModifier.get(this.#raw)?.raw === this.#raw) {
+    const { absoluteKey, cacheOriginToModifier, cacheKeyToModifier } = this.#context
+    if (cacheOriginToModifier.has(this.#raw) && cacheOriginToModifier.get(this.#raw)?.raw === this.#raw) {
       return
     }
 
-    this.#context.cacheOriginToModifier.set(this.#raw, this)
-    this.#context.cacheKeyToModifier.set(absoluteKey, new WeakRef(this))
+    cacheOriginToModifier.set(this.#raw, this)
+    cacheKeyToModifier.set(absoluteKey, new WeakRef(this))
   }
 
   #findShorthand(absoluteKey: string): { modifier: ObjectModifier; lastKey: string } | undefined {
@@ -465,8 +347,9 @@ class ObjectModifierImpl<T extends Dictionary> implements ObjectModifier<T> {
       return
     }
     const result = splitTails(absoluteKey, this.#opt)
+    const { cacheKeyToModifier } = this.#context
     for (const { tail, remainder } of result) {
-      const shorthand = this.#context.cacheKeyToModifier.get(remainder)?.deref()
+      const shorthand = cacheKeyToModifier.get(remainder)?.deref()
       if (shorthand) {
         return {
           modifier: shorthand,

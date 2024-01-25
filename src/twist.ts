@@ -1,4 +1,4 @@
-import { toModifier } from './lib'
+import { createEmptyModifier, startsKeyWith, toModifier } from './lib'
 import { type Dictionary, type MoveMap, type Twist, type TwistOption, defaultCommonOption } from './type'
 
 /**
@@ -16,18 +16,27 @@ export function twist<D extends Dictionary, M extends MoveMap<D>>(
     ...option,
   }
 
-  const fromSet = new Set(Object.keys(moveMap))
+  const fromKeys = Object.keys(moveMap)
+  const copyKeys: string[] = []
 
   const src = toModifier(obj, { ...fixedOption, immutable: true })
-  const dist = toModifier(obj, { ...fixedOption, pruneNilInArray: fixedOption.pruneArray })
+  const dist = createEmptyModifier(fixedOption)
+
+  const srcKeys = src.keys()
+
+  for (const srcKey of srcKeys) {
+    const needCopy = fromKeys.every((fromKey) => !startsKeyWith(srcKey, fromKey, fixedOption))
+    if (needCopy) {
+      copyKeys.push(srcKey)
+    }
+  }
 
   for (const [from, to] of Object.entries(moveMap)) {
     dist.set(to, src.get(from))
-    fromSet.delete(to)
   }
 
-  for (const from of fromSet) {
-    dist.delete(from)
+  for (const key of copyKeys) {
+    dist.set(key, src.get(key))
   }
 
   return dist.finalize()

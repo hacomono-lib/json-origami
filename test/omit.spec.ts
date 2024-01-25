@@ -62,7 +62,7 @@ it('should handle arrays correctly (dot mode)', () => {
       },
     },
   }
-  const result = omit(obj, ['b.d.1'])
+  const result = omit(obj, ['b.d.1'], { arrayIndex: 'dot' })
   expect(result).toEqual({
     a: 1,
     b: {

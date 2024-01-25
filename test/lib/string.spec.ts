@@ -39,30 +39,30 @@ describe('splitTails', () => {
   it('should correctly split keys in bracket mode', () => {
     expect(splitTails('a[0].b.c', { arrayIndex: 'bracket' })).toEqual([
       { tail: 'c', remainder: 'a[0].b' },
-      { tail: 'b', remainder: 'a[0]' },
-      { tail: 0, remainder: 'a' },
+      { tail: 'b.c', remainder: 'a[0]' },
+      { tail: '[0].b.c', remainder: 'a' },
     ])
   })
 
   it('should correctly split keys in dot mode', () => {
     expect(splitTails('a.0.b.c', { arrayIndex: 'dot' })).toEqual([
       { tail: 'c', remainder: 'a.0.b' },
-      { tail: 'b', remainder: 'a.0' },
-      { tail: 0, remainder: 'a' },
+      { tail: 'b.c', remainder: 'a.0' },
+      { tail: '0.b.c', remainder: 'a' },
     ])
   })
 
   it('should correctly handle empty string keys in dot mode', () => {
     expect(splitTails('a..b.c.', { arrayIndex: 'dot' })).toEqual([
       { tail: '', remainder: 'a..b.c' },
-      { tail: 'c', remainder: 'a..b' },
-      { tail: 'b', remainder: 'a.' },
-      { tail: '', remainder: 'a' },
+      { tail: 'c.', remainder: 'a..b' },
+      { tail: 'b.c.', remainder: 'a.' },
+      { tail: '.b.c.', remainder: 'a' },
     ])
     expect(splitTails('.b.c.', { arrayIndex: 'dot' })).toEqual([
       { tail: '', remainder: '.b.c' },
-      { tail: 'c', remainder: '.b' },
-      { tail: 'b', remainder: '' },
+      { tail: 'c.', remainder: '.b' },
+      { tail: 'b.c.', remainder: '' },
     ])
     expect(splitTails('c.', { arrayIndex: 'dot' })).toEqual([{ tail: '', remainder: 'c' }])
   })
@@ -71,8 +71,8 @@ describe('splitTails', () => {
     const result = splitTails('[0][1].b.c', { arrayIndex: 'bracket' })
     expect(result).toEqual([
       { tail: 'c', remainder: '[0][1].b' },
-      { tail: 'b', remainder: '[0][1]' },
-      { tail: 1, remainder: '[0]' },
+      { tail: 'b.c', remainder: '[0][1]' },
+      { tail: '[1].b.c', remainder: '[0]' },
     ])
   })
 
@@ -80,8 +80,8 @@ describe('splitTails', () => {
     const result = splitTails('0.1.b.c', { arrayIndex: 'dot' })
     expect(result).toEqual([
       { tail: 'c', remainder: '0.1.b' },
-      { tail: 'b', remainder: '0.1' },
-      { tail: 1, remainder: '0' },
+      { tail: 'b.c', remainder: '0.1' },
+      { tail: '1.b.c', remainder: '0' },
     ])
   })
 })

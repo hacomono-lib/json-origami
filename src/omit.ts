@@ -1,4 +1,5 @@
-import { toModifier } from './lib'
+import { createEmptyModifier, toModifier } from './lib'
+import { startsKeyWith } from './lib'
 import { type DeepKeyOf, type Dictionary, type Omit, type OmitOption, defaultCommonOption } from './type'
 
 /**
@@ -47,21 +48,14 @@ export function omit(obj: Dictionary, keys: Array<string | RegExp>, opt?: OmitOp
     ...opt,
   }
 
-  const modifier = toModifier(obj, { ...fixedOption, pruneNilInArray: fixedOption.pruneArray, pruneEmptyLeaf: true })
+  const src = toModifier(obj, { ...fixedOption, immutable: true })
+  const srcKeys = src.keys()
 
-  for (const key of keys) {
-    if (typeof key === 'string') {
-      modifier.delete(key)
-    }
+  const pickKeys = srcKeys.filter((srcKey) => keys.every((k) => !startsKeyWith(srcKey, k, fixedOption)))
+  const dist = createEmptyModifier(fixedOption)
 
-    if (key instanceof RegExp) {
-      for (const k of modifier.keys()) {
-        if (key.test(k)) {
-          modifier.delete(k)
-        }
-      }
-    }
+  for (const key of pickKeys) {
+    dist.set(key, src.get(key))
   }
-
-  return modifier.finalize()
+  return dist.finalize()
 }
