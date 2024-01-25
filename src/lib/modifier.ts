@@ -196,27 +196,24 @@ class ObjectModifierImpl<T extends Dictionary> implements ObjectModifier<T> {
   }
 
   finalize(): T {
-    console.log('finalize')
     if (this.#opt.immutable) {
       return this.#raw
     }
 
     const { pruneTargets } = this.#context
 
-    for (const target of pruneTargets) {
-      const targetRef = target.deref()
-      if (!targetRef) {
+    for (const targetRef of pruneTargets) {
+      const target = targetRef.deref()
+      if (!target) {
         continue
       }
 
-      console.log('targetRef', targetRef)
-
-      if (Array.isArray(targetRef)) {
-        for (let i = targetRef.length - 1; i >= 0; i--) {
-          if (targetRef[i] !== undefined) {
-            break
+      if (Array.isArray(target)) {
+        for (let i = 0; i < target.length; i++) {
+          if (target[i] === undefined) {
+            target.splice(i, 1)
+            i--
           }
-          targetRef.pop()
         }
       }
     }
@@ -261,13 +258,6 @@ class ObjectModifierImpl<T extends Dictionary> implements ObjectModifier<T> {
       this.#raw[head as keyof T] = newValue as T[keyof T]
       this.#afterModify()
       return true
-    }
-
-    const { cacheOriginToModifier } = this.#context
-
-    if (!cacheOriginToModifier.has(nextValue)) {
-      const p = this.#createNext(nextValue, head)
-      cacheOriginToModifier.set(nextValue, p)
     }
 
     const nextModifier = this.#getNextModifier(nextValue, head)
@@ -363,6 +353,10 @@ class ObjectModifierImpl<T extends Dictionary> implements ObjectModifier<T> {
 
     cacheOriginToModifier.set(this.#raw, this)
     cacheKeyToModifier.set(absoluteKey, new WeakRef(this))
+
+    if (!this.#opt.immutable && this.#opt.pruneNilInArray && Array.isArray(this.#raw)) {
+      this.#context.pruneTargets.add(new WeakRef(this.#raw))
+    }
   }
 
   #findShorthand(absoluteKey: string): { modifier: ObjectModifier; lastKey: string } | undefined {

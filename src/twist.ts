@@ -17,12 +17,12 @@ export function twist<D extends Dictionary, M extends MoveMap<D>>(
   }
 
   const fromKeys = Object.keys(moveMap)
-  const copyKeys: string[] = []
 
   const src = toModifier(obj, fixedOption)
-  const dist = createEmptyModifier(fixedOption)
+  const dist = createEmptyModifier({ ...fixedOption, pruneNilInArray: option?.pruneArray })
 
   const srcKeys = src.keys()
+  const copyKeys: string[] = []
 
   for (const srcKey of srcKeys) {
     const needCopy = fromKeys.every((fromKey) => !startsKeyWith(srcKey, fromKey, fixedOption))

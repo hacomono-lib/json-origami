@@ -35,7 +35,7 @@ export function fold<D extends Dictionary>(obj: D, option?: FoldOption): Folded<
     ...option,
   } as FixedFoldOption
 
-  const modifier = toModifier(obj, { ...fixedOption, immutable: true })
+  const modifier = toModifier(obj, fixedOption)
 
   const result = {} as Folded<D>
 
