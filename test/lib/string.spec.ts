@@ -17,7 +17,7 @@ describe('splitHead', () => {
   it('should correctly handle empty string keys in dot mode', () => {
     expect(splitHead('a..b.c.', { arrayIndex: 'dot' })).toEqual({ head: 'a', nextHead: '', rest: '.b.c.' })
     expect(splitHead('.b.c.', { arrayIndex: 'dot' })).toEqual({ head: '', nextHead: 'b', rest: 'b.c.' })
-    expect(splitHead('c.', { arrayIndex: 'dot' })).toEqual({ head: 'c', nextHead: '', rest: '' })
+    expect(splitHead('c.', { arrayIndex: 'dot' })).toEqual({ head: 'c' })
   })
 
   it('should handle keys with multiple array indices in bracket mode', () => {
