@@ -116,10 +116,6 @@ interface ObjectModifier<T extends Dictionary = Dictionary> {
   get raw(): T
 }
 
-interface MaybeRef<T> {
-  deref(): T
-}
-
 interface ModifierContext {
   /**
    * A WeakMap that caches Object Modifier instances to avoid generating the same object instance again.
