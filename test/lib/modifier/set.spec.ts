@@ -22,7 +22,7 @@ it('should not set any value when modifier created by "toModifier"', () => {
   })
 })
 
-it('should initialize as object whe nroot key is string', () => {
+it('should initialize as object when root key is string', () => {
   const modifier = createEmptyModifier({ arrayIndex: 'dot' })
 
   modifier.set('a.b.c', 'd')

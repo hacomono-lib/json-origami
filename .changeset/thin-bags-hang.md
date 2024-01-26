@@ -2,4 +2,4 @@
 "json-origami": minor
 ---
 
-fix: #106 performance implevement
+fix: performance improvement (#106)
