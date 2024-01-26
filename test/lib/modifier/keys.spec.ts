@@ -91,8 +91,7 @@ it('should not retrieve keys from empty object', () => {
 })
 
 it('should not retrieve keys from empty array', () => {
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  const target: any[] = []
+  const target: unknown[] = []
 
   const modifier = toModifier(target, { arrayIndex: 'dot' })
   expect(modifier.keys()).toEqual([])

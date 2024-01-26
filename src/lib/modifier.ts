@@ -1,5 +1,5 @@
 import type { Get } from 'type-fest'
-import type { Dictionary } from '~/type'
+import type { Dictionary, DictionaryLeaf } from '~/type'
 import { type KeyOption, splitHead, splitTails } from './string'
 
 interface OrigamiOption extends KeyOption {
@@ -30,8 +30,8 @@ interface ObjectModifier<T extends Dictionary = Dictionary> {
    *   }
    * }
    *
-   * const proxy = toProxy(target, { arrayIndex: 'bracket' })
-   * proxy.get('a.b.c') // 'd'
+   * const modifier = toModifier(target, { arrayIndex: 'bracket' })
+   * modifier.get('a.b.c') // 'd'
    * ```
    */
   get<K extends string>(key: K): Get<T, K>
@@ -60,8 +60,8 @@ interface ObjectModifier<T extends Dictionary = Dictionary> {
    *  },
    * }
    *
-   * const proxy = toProxy(target, { arrayIndex: 'bracket' })
-   * proxy.set('a.b.c', 'e')
+   * const modifier = toModifier(target, { arrayIndex: 'bracket' })
+   * modifier.set('a.b.c', 'e')
    * ```
    */
   set<K extends string>(key: K, value: Get<T, K>): boolean
@@ -80,11 +80,31 @@ interface ObjectModifier<T extends Dictionary = Dictionary> {
    *   }
    * }
    *
-   * const proxy = toProxy(target, { arrayIndex: 'bracket' })
-   * const k = proxy.keys() // ['a.b.c']
+   * const modifier = toModifier(target, { arrayIndex: 'bracket' })
+   * const k = modifier.keys() // ['a.b.c']
    * ```
    */
   keys(): string[]
+
+  /**
+   * get all entries by dot-notated key
+   *
+   * e.g.
+   * ```ts
+   * const target = {
+   *   a: {
+   *     b: {
+   *       c: 'd',
+   *     }
+   *   }
+   * }
+   *
+   * const modifier = toModifier(target, { arrayIndex: 'bracket' })
+   * const e = modifier.entries() // [['a.b.c', 'd']]
+   * ```
+   *
+   */
+  entries(): [string, DictionaryLeaf][]
 
   get raw(): T
 }
@@ -292,34 +312,38 @@ class ObjectModifierImpl<T extends Dictionary> implements ObjectModifier<T> {
   }
 
   keys(): string[] {
+    return this.entries().map(([k]) => k)
+  }
+
+  entries(): [string, DictionaryLeaf][] {
     const heads = Object.keys(this.#raw)
 
-    const keys = heads.flatMap((head) => {
+    const entries = heads.flatMap((head): [string, DictionaryLeaf][] => {
       const nextValue = this.#raw[head as keyof T]
 
       const requiredBracket = this.#opt.arrayIndex === 'bracket' && Array.isArray(this.#raw)
 
       if (!isDictionary(nextValue)) {
         const resultKey = requiredBracket ? `[${head}]` : head
-        return [resultKey]
+        return [[resultKey, nextValue]]
       }
 
       const nextModifier = this.#getNextModifier(nextValue, head)
 
-      const nextKeys = nextModifier.keys()
+      const nextEntries = nextModifier.entries()
 
-      if (nextKeys.length <= 0) {
-        return [requiredBracket ? `[${head}]` : head]
+      if (nextEntries.length <= 0) {
+        return [[requiredBracket ? `[${head}]` : head, nextValue]]
       }
 
       if (requiredBracket) {
-        return nextKeys.map((k) => `[${head}].${k}`)
+        return nextEntries.map(([k, v]) => [`[${head}].${k}`, v])
       }
 
-      return nextKeys.map((k) => (k.startsWith('[') ? `${head}${k}` : `${head}.${k}`))
+      return nextEntries.map(([k, v]) => [k.startsWith('[') ? `${head}${k}` : `${head}.${k}`, v])
     })
 
-    return keys
+    return entries
   }
 
   #getNextModifier<D extends Dictionary>(nextRaw: D, keyOfNextRaw: string | number): ObjectModifier<D> {

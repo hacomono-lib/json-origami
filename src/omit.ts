@@ -49,13 +49,13 @@ export function omit(obj: Dictionary, keys: Array<string | RegExp>, opt?: OmitOp
   }
 
   const src = toModifier(obj, fixedOption)
-  const srcKeys = src.keys()
+  const srcEntries = src.entries()
 
-  const pickKeys = srcKeys.filter((srcKey) => keys.every((k) => !startsKeyWith(srcKey, k, fixedOption)))
+  const pickEntries = srcEntries.filter(([srcKey]) => keys.every((k) => !startsKeyWith(srcKey, k, fixedOption)))
   const dist = createEmptyModifier(fixedOption)
 
-  for (const key of pickKeys) {
-    dist.set(key, src.get(key))
+  for (const [key, value] of pickEntries) {
+    dist.set(key, value)
   }
   return dist.finalize()
 }

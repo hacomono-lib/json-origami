@@ -1,5 +1,12 @@
 import { createEmptyModifier, startsKeyWith, toModifier } from './lib'
-import { type Dictionary, type MoveMap, type Twist, type TwistOption, defaultCommonOption } from './type'
+import {
+  type Dictionary,
+  type DictionaryLeaf,
+  type MoveMap,
+  type Twist,
+  type TwistOption,
+  defaultCommonOption,
+} from './type'
 
 /**
  *
@@ -21,22 +28,23 @@ export function twist<D extends Dictionary, M extends MoveMap<D>>(
   const src = toModifier(obj, fixedOption)
   const dist = createEmptyModifier({ ...fixedOption, pruneNilInArray: option?.pruneArray })
 
-  const srcKeys = src.keys()
-  const copyKeys: string[] = []
+  const srcEntries = src.entries()
+  const copyEntries: [string, DictionaryLeaf][] = []
 
-  for (const srcKey of srcKeys) {
-    const needCopy = fromKeys.every((fromKey) => !startsKeyWith(srcKey, fromKey, fixedOption))
-    if (needCopy) {
-      copyKeys.push(srcKey)
+  for (const [srcKey, srcValue] of srcEntries) {
+    const foundFromKey = fromKeys.find((fromKey) => startsKeyWith(srcKey, fromKey, fixedOption))
+    if (foundFromKey) {
+      const tail = srcKey.slice(foundFromKey.length)
+      const fixedTail = tail.startsWith('.') ? tail.slice(1) : tail
+      const toKey = `${moveMap[foundFromKey]}${fixedTail !== '' ? '.' : ''}${fixedTail}`
+      copyEntries.push([toKey, srcValue])
+    } else {
+      copyEntries.push([srcKey, srcValue])
     }
   }
 
-  for (const [from, to] of Object.entries(moveMap)) {
-    dist.set(to, src.get(from))
-  }
-
-  for (const key of copyKeys) {
-    dist.set(key, src.get(key))
+  for (const [copyKey, copyValue] of copyEntries) {
+    dist.set(copyKey, copyValue)
   }
 
   return dist.finalize()

@@ -39,8 +39,8 @@ export function fold<D extends Dictionary>(obj: D, option?: FoldOption): Folded<
 
   const result = {} as Folded<D>
 
-  for (const key of modifier.keys()) {
-    result[fixKey(fixedOption, key)] = modifier.get(key)
+  for (const [key, value] of modifier.entries()) {
+    result[fixKey(fixedOption, key)] = value
   }
 
   return result
