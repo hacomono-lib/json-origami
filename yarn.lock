@@ -1111,11 +1111,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vitest/ui@npm:^1.2.1":
-  version: 1.2.1
-  resolution: "@vitest/ui@npm:1.2.1"
+"@vitest/ui@npm:^1.2.2":
+  version: 1.2.2
+  resolution: "@vitest/ui@npm:1.2.2"
   dependencies:
-    "@vitest/utils": "npm:1.2.1"
+    "@vitest/utils": "npm:1.2.2"
     fast-glob: "npm:^3.3.2"
     fflate: "npm:^0.8.1"
     flatted: "npm:^3.2.9"
@@ -1124,7 +1124,7 @@ __metadata:
     sirv: "npm:^2.0.4"
   peerDependencies:
     vitest: ^1.0.0
-  checksum: 1e94d5378e8d46dc941760ace882805e47adc17f3fe09db8a5f2a083194823af08970d138c9301fd6720e1c9d15aaa6846c8a171550c53320a7dc73093151f82
+  checksum: 5570ff8afc7731e672608709e8d107127b71080d3b4ee20369a24bd03c18365642aec4a31c5eea01adf473d1f016bbdf4b0b9dfa70d4d0fc1e552439f004efd4
   languageName: node
   linkType: hard
 
@@ -1137,6 +1137,18 @@ __metadata:
     loupe: "npm:^2.3.7"
     pretty-format: "npm:^29.7.0"
   checksum: 9416c5b685f7e05bdff82a0b7b829d8c08bb6ab536d3cd5831ba7049f79c384ba5c6f16bfbf2952ffea7836b077ab17b579f5022acab25bb5a89173d206f18d0
+  languageName: node
+  linkType: hard
+
+"@vitest/utils@npm:1.2.2":
+  version: 1.2.2
+  resolution: "@vitest/utils@npm:1.2.2"
+  dependencies:
+    diff-sequences: "npm:^29.6.3"
+    estree-walker: "npm:^3.0.3"
+    loupe: "npm:^2.3.7"
+    pretty-format: "npm:^29.7.0"
+  checksum: f9a62bc8cbe05475b99e1f8bd96e0ee48cf819ca2e532ba18f071bf0371f044dffa006c33a69b1b276097e6b50f91342a776c830cfac19456b24a9bdad29abe5
   languageName: node
   linkType: hard
 
@@ -3169,7 +3181,7 @@ __metadata:
     "@biomejs/biome": "npm:^1.5.3"
     "@changesets/changelog-github": "npm:^0.5.0"
     "@changesets/cli": "npm:^2.27.1"
-    "@vitest/ui": "npm:^1.2.1"
+    "@vitest/ui": "npm:^1.2.2"
     defu: "npm:^6.1.4"
     tsup: "npm:^8.0.1"
     type-fest: "npm:^4.9.0"
