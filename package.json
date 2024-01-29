@@ -1,11 +1,10 @@
 {
   "name": "json-origami",
   "version": "0.4.1",
-  "description": "Transform nested objects into a flattened key-value structure and vice-versa.",
+  "description": "Transform and reshape your JSON objects with the artistry of origami.",
   "keywords": [
     "key-value",
-    "kv",
-    "convert",
+    "transform",
     "object",
     "json",
     "typescrip"
@@ -39,7 +38,9 @@
   "scripts": {
     "dev": "vitest --ui",
     "bench": "vitest bench",
+    "doc": "astro dev --root ./docs --open",
     "build": "tsup",
+    "doc-build": "astro check --root ./docs && astro build --root ./docs",
     "test": "run-p test:*",
     "test:spec": "vitest --run --silent",
     "test:type": "tsc --noEmit -p tsconfig.json",
@@ -47,11 +48,15 @@
     "lint": "biome check --apply ./src ./test"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.4.1",
+    "@astrojs/starlight": "^0.17.0",
     "@biomejs/biome": "^1.5.3",
     "@changesets/changelog-github": "^0.5.0",
     "@changesets/cli": "^2.27.1",
     "@vitest/ui": "^1.2.2",
+    "astro": "^4.2.6",
     "defu": "^6.1.4",
+    "sharp": "^0.33.2",
     "tsup": "^8.0.1",
     "type-fest": "^4.9.0",
     "typescript": "^5.3.3",
