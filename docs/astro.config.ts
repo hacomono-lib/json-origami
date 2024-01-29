@@ -3,6 +3,8 @@ import { defineConfig } from 'astro/config'
 
 // biome-ignore lint/style/noDefaultExport: <explanation>
 export default defineConfig({
+  site: 'https://hacomono-lib.github.io',
+  base: '/json-origami',
   integrations: [
     starlight({
       title: 'json-origami',
