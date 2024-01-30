@@ -1,6 +1,7 @@
 import type { JsonObject } from 'type-fest'
 import { bench, describe } from 'vitest'
-import { fold, omit } from '../src'
+import { fold } from '~/fold'
+import { omit } from '~/omit'
 import {
   BENCHMARK_TARGET_LIGHT_OBJECT_VALUES,
   BENCHMARK_TARGET_OBJECT_VALUES,
@@ -46,7 +47,8 @@ function runBench({ percentOfOmitKeys, objectValues }: TestCaseOption) {
 
   bench(`omit (complex object including ${objectValues} values, omit ${percentOfOmitKeys * 100}% of keys)`, () => {
     const currentIndex = index++ % iterations
-    const { object, keys } = testCases[currentIndex]
+    // biome-ignore lint/style/noNonNullAssertion: <explanation>
+    const { object, keys } = testCases[currentIndex]!
     omit(object, keys)
   })
 }
@@ -57,7 +59,7 @@ describe('omit with light object', () => {
   runBench({ objectValues: BENCHMARK_TARGET_LIGHT_OBJECT_VALUES, percentOfOmitKeys: 0.9 })
 })
 
-describe.skip('omit with heavy object', () => {
+describe('omit with heavy object', () => {
   runBench({ objectValues: BENCHMARK_TARGET_OBJECT_VALUES, percentOfOmitKeys: 0.1 })
   runBench({ objectValues: BENCHMARK_TARGET_OBJECT_VALUES, percentOfOmitKeys: 0.5 })
   runBench({ objectValues: BENCHMARK_TARGET_OBJECT_VALUES, percentOfOmitKeys: 0.9 })

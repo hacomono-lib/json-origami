@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest'
-import { unfold } from '../src'
+import { unfold } from '~/unfold'
 
 it('should handle nested object', () => {
   const kv = {
@@ -199,8 +199,7 @@ it('should handle include empty object or empty array', () => {
   })
 })
 
-// FIXME: should not throw error
-it.skip('should handle include array key and object key in the same hierarchy.', () => {
+it('should handle include array key and object key in the same hierarchy.', () => {
   const kv1 = {
     'a.x': 1,
     'a[0]': 2,
@@ -220,8 +219,7 @@ it.skip('should handle include array key and object key in the same hierarchy.',
   })
 })
 
-// FIXME: should not throw error
-it.skip('should handle include array key and object key in root', () => {
+it('should handle include array key and object key in root', () => {
   const kv1 = {
     'a.b': 1,
     '[0]': 2,
@@ -234,12 +232,12 @@ it.skip('should handle include array key and object key in root', () => {
   expect(unfold(kv2)).toEqual({ 0: 1, a: { b: 2 } })
 })
 
-// FIXME: should throw error
-it.skip('should throw error when empty key exists', () => {
+it('should throw error when empty key exists', () => {
   const kv = {
     '': 1,
-    a: 2,
+    a: {
+      '': 2,
+    },
   }
-
-  expect(() => unfold(kv)).toThrow()
+  expect(unfold(kv)).toEqual({ '': 1, a: { '': 2 } })
 })

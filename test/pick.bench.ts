@@ -1,6 +1,7 @@
 import type { JsonObject } from 'type-fest'
 import { bench, describe } from 'vitest'
-import { fold, pick } from '../src'
+import { fold } from '~/fold'
+import { pick } from '~/pick'
 import {
   BENCHMARK_TARGET_LIGHT_OBJECT_VALUES,
   BENCHMARK_TARGET_OBJECT_VALUES,
@@ -46,7 +47,8 @@ function runBench({ percentOfPickKeys, objectValues }: TestCaseOption) {
 
   bench(`pick (complex object including ${objectValues} values, pick ${percentOfPickKeys * 100}% of keys)`, () => {
     const currentIndex = index++ % iterations
-    const { object, keys } = testCases[currentIndex]
+    // biome-ignore lint/style/noNonNullAssertion: <explanation>
+    const { object, keys } = testCases[currentIndex]!
     pick(object, keys)
   })
 }
@@ -57,7 +59,7 @@ describe('pick with light object', () => {
   runBench({ objectValues: BENCHMARK_TARGET_LIGHT_OBJECT_VALUES, percentOfPickKeys: 0.9 })
 })
 
-describe.skip('pick with heavy object', () => {
+describe('pick with heavy object', () => {
   runBench({ objectValues: BENCHMARK_TARGET_OBJECT_VALUES, percentOfPickKeys: 0.1 })
   runBench({ objectValues: BENCHMARK_TARGET_OBJECT_VALUES, percentOfPickKeys: 0.5 })
   runBench({ objectValues: BENCHMARK_TARGET_OBJECT_VALUES, percentOfPickKeys: 0.9 })

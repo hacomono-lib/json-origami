@@ -1,5 +1,5 @@
 import { bench, describe } from 'vitest'
-import { fold } from '../src'
+import { fold } from '~/fold'
 import { BENCHMARK_TARGET_LIGHT_OBJECT_VALUES, BENCHMARK_TARGET_OBJECT_VALUES, createRandomObject } from './utils'
 
 const iterations = 10
@@ -17,7 +17,8 @@ function runBench({ objectValues }: TestCaseOption) {
 
   bench(`fold (complex object including ${objectValues} values)`, () => {
     const object = objects[index++ % iterations]
-    fold(object)
+    // biome-ignore lint/style/noNonNullAssertion: <explanation>
+    fold(object!)
   })
 }
 
