@@ -17,6 +17,7 @@
     "importHelpers": true,
     "inlineSources": false,
     "isolatedModules": true,
+    "resolvePackageJsonExports": false,
 
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
