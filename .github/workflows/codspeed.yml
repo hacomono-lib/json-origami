@@ -17,12 +17,12 @@ on:
       - "package.json"
       - "vitest.config.ts"
       - "yarn.lock"
-      
 
 jobs:
   init__node:
     if: |
-      !contains(github.event.pull_request.labels.*.name, 'renovate')
+      !contains(github.event.pull_request.labels.*.name, 'renovate') &&
+      !startsWith(github.event.pull_request.title, 'Version Packages')
     name: "Initialize: node"
     runs-on: ubuntu-latest
     steps:
