@@ -1,6 +1,6 @@
 ---
-name: Lint Code Base
-run-name: "Lint code base (eslint) on \"${{ github.event.pull_request.title }}\" by ${{ github.actor }}"
+name: Lint Code Base (Biome)
+run-name: "Lint code base (Biome) on \"${{ github.event.pull_request.title }}\" by ${{ github.actor }}"
 
 permissions:
   contents: read
@@ -12,12 +12,9 @@ on:
     types: [opened, synchronize]
 
 jobs:
-  eslint:
-    name: "Lint: ESLint"
+  biome:
     if: |
-      (contains(github.event.pull_request.labels.*.name, 'renovate') &&
-        contains(github.event.pull_request.labels.*.name, 'renovate:lint')) ||
-      contains(github.event.pull_request.labels.*.name, 'renovate') == false
+      !contains(github.event.pull_request.labels.*.name, 'renovate')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

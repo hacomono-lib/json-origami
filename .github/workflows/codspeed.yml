@@ -1,4 +1,9 @@
+---
 name: Codspeed Benchmarks
+run-name: |-
+  github.event_name == 'pull_request' &&
+  "Test on ${{ github.event.pull_request.title }} by ${{ github.actor }}" ||
+  "Test on main"
 
 permissions:
   contents: read
@@ -12,14 +17,18 @@ on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
     paths:
-      - ".github/workflows/benchmarks.yml"
+      - ".github/workflows/codspeed.yml"
+      - ".gitignore"
       - "src"
+      - "test"
       - "package.json"
       - "vitest.config.ts"
       - "yarn.lock"
 
 jobs:
   init__node:
+    if: |
+      !contains(github.event.pull_request.labels.*.name, 'renovate') && github.event.pull_request.title != 'Version Packages'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
