@@ -1,12 +1,13 @@
-import { createEmptyModifier, startsKeyWith, toModifier } from './lib'
+import { fold } from './fold'
 import {
+  type CommonOption,
   type Dictionary,
-  type DictionaryLeaf,
   type MoveMap,
   type Twist,
   type TwistOption,
   defaultCommonOption,
 } from './type'
+import { unfold } from './unfold'
 
 /**
  *
@@ -18,34 +19,41 @@ export function twist<D extends Dictionary, M extends MoveMap<D>>(
   moveMap: M,
   option?: TwistOption,
 ): Twist<D, M> {
-  const fixedOption = {
-    ...defaultCommonOption,
-    ...option,
+  const folded = fold(obj, option)
+
+  const twisted = Object.fromEntries(
+    Object.entries(folded).map(([key, value]) => {
+      const found = Object.keys(moveMap).find((k) => includesKey(key, k, option))
+
+      if (found) {
+        const newKey = key.replace(found, moveMap[found]!)
+        return [newKey, value]
+      }
+
+      return [key, value]
+    }),
+  )
+
+  return unfold(twisted, option)
+}
+
+function includesKey(
+  origin: string,
+  match: string | RegExp,
+  { arrayIndex }: CommonOption = defaultCommonOption,
+): boolean {
+  if (match instanceof RegExp) return match.test(origin)
+
+  const split = (key: string): string[] => {
+    const fixedKey = arrayIndex === 'bracket' ? key.replace(/\[(\w+)\]/g, '.$1') : key
+    return fixedKey.split('.')
   }
 
-  const fromKeys = Object.keys(moveMap)
+  const originKeys = split(origin)
+  const keys = split(match)
 
-  const src = toModifier(obj, fixedOption)
-  const dist = createEmptyModifier({ ...fixedOption, pruneNilInArray: option?.pruneArray })
+  if (keys.length > originKeys.length) return false
 
-  const srcEntries = src.entries()
-  const copyEntries: [string, DictionaryLeaf][] = []
-
-  for (const [srcKey, srcValue] of srcEntries) {
-    const foundFromKey = fromKeys.find((fromKey) => startsKeyWith(srcKey, fromKey, fixedOption))
-    if (foundFromKey) {
-      const tail = srcKey.slice(foundFromKey.length)
-      const fixedTail = tail.startsWith('.') ? tail.slice(1) : tail
-      const toKey = `${moveMap[foundFromKey]}${fixedTail !== '' ? '.' : ''}${fixedTail}`
-      copyEntries.push([toKey, srcValue])
-    } else {
-      copyEntries.push([srcKey, srcValue])
-    }
-  }
-
-  for (const [copyKey, copyValue] of copyEntries) {
-    dist.set(copyKey, copyValue)
-  }
-
-  return dist.finalize()
+  const targets = originKeys.slice(0, keys.length)
+  return targets.join('.') === keys.join('.')
 }
