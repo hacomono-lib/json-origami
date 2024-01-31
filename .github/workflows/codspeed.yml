@@ -1,6 +1,9 @@
 ---
 name: Codspeed Benchmarks
-run-name: ${{ github.event_name == 'pull_request' && ('Test on "' + github.event.pull_request.title + '" by ' + github.actor) || 'Test on main' }}
+run-name: |-
+  github.event_name == 'pull_request' &&
+  "Test on ${{ github.event.pull_request.title }} by ${{ github.actor }}" ||
+  "Test on main"
 
 permissions:
   contents: read
