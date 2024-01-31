@@ -14,7 +14,7 @@ on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
     paths:
-      - ".github/workflows/benchmarks.yml"
+      - ".github/workflows/codspeed.yml"
       - ".gitignore"
       - "src"
       - "package.json"
