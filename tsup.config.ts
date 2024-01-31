@@ -1,6 +1,7 @@
 import { defineConfig } from 'tsup'
 import config from './package.json'
 
+// biome-ignore lint/style/noDefaultExport: <explanation>
 export default defineConfig({
   name: config.name,
   target: ['es2015'],
@@ -12,5 +13,5 @@ export default defineConfig({
   clean: true,
   esbuildOptions(options, _context) {
     options.drop = [...(options.drop ?? []), 'console']
-  }
+  },
 })
