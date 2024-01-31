@@ -47,7 +47,9 @@ const arrayKeyMap = {
 } satisfies Record<ArrayIndex, (prefix: string, index: number) => string>
 
 function flatEntries(key: string, value: object, opt: FixedFoldOption): Array<[string, DictionaryLeaf]> {
-  if (value === undefined || value === null) return []
+  if (value === undefined || value === null) {
+    return []
+  }
 
   const appendKey = (k: string | number) =>
     typeof k === 'number' ? arrayKeyMap[opt.arrayIndex](key, k) : key === '' ? k : `${key}.${k}`

@@ -26,16 +26,17 @@ import type { ArrayIndex, FixedUnfoldOption, Folded, UnfoldOption, Unfolded } fr
  * ```
  */
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-export function unfold<KV extends Folded<any>>(kv: KV, option?: UnfoldOption): Unfolded<KV> {
+export function unfold<Kv extends Folded<any>>(kv: Kv, option?: UnfoldOption): Unfolded<Kv> {
   const fixedOpion = {
     ...defaultUnfoldOption,
     ...option,
   } as FixedUnfoldOption
   validateKeys(kv)
 
-  return unfoldInternal(Object.entries(kv), fixedOpion) as Unfolded<KV>
+  return unfoldInternal(Object.entries(kv), fixedOpion) as Unfolded<Kv>
 }
 
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 function validateKeys(kv: Folded<any>) {
   for (const key in kv) {
     if (key.startsWith('.') || key.endsWith('.')) {
@@ -74,14 +75,16 @@ function omitHeadKey(key: string, opt: FixedUnfoldOption): string {
   return key.replace(headKey === undefined ? '' : new RegExp(`^${headKey}\\.?`), '')
 }
 
-function unfoldInternal(entries: Array<[string, unknown]>, opt: FixedUnfoldOption): unknown {
+function unfoldInternal(entries: [string, unknown][], opt: FixedUnfoldOption): unknown {
   if (entries.length <= 0) {
     return {}
   }
 
+  // biome-ignore lint/style/noNonNullAssertion: <explanation>
   const firstKey = extractHeadKey(entries[0]![0], opt)
 
   if (firstKey === '') {
+    // biome-ignore lint/style/noNonNullAssertion: <explanation>
     return entries[entries.length - 1]![1]
   }
 
@@ -121,6 +124,7 @@ function unfoldInternal(entries: Array<[string, unknown]>, opt: FixedUnfoldOptio
     )
 
     return {
+      // biome-ignore lint/performance/noAccumulatingSpread: <explanation>
       ...acc,
       [key]: unfolded,
     }
