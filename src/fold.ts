@@ -46,7 +46,7 @@ const arrayKeyMap = {
   bracket: (prefix: string, index: number) => `${prefix}[${index}]`,
 } satisfies Record<ArrayIndex, (prefix: string, index: number) => string>
 
-function flatEntries(key: string, value: object, opt: FixedFoldOption): Array<[string, DictionaryLeaf]> {
+function flatEntries(key: string, value: object, opt: FixedFoldOption): [string, DictionaryLeaf][] {
   if (value === undefined || value === null) {
     return []
   }
