@@ -1,5 +1,21 @@
 # json-origami
 
+## 0.5.0
+
+### Minor Changes
+
+- [#109](https://github.com/hacomono-lib/json-origami/pull/109) [`655d4f7`](https://github.com/hacomono-lib/json-origami/commit/655d4f79683c5c9d2c4d8472f755384a7644753d) Thanks [@mew-ton](https://github.com/mew-ton)! - fix: performance improvement (#106)
+
+### Patch Changes
+
+- [#107](https://github.com/hacomono-lib/json-origami/pull/107) [`0054bcb`](https://github.com/hacomono-lib/json-origami/commit/0054bcb8f1cd80252cb09d7b13a4dc92a38bd216) Thanks [@mew-ton](https://github.com/mew-ton)! - unfold 関数にて、値が空配列・空オブジェクトのときに値が結果に反映されない問題の修正
+
+- [#125](https://github.com/hacomono-lib/json-origami/pull/125) [`27733a4`](https://github.com/hacomono-lib/json-origami/commit/27733a4ece3ba998f07e0fa256fd088ed04bc671) Thanks [@mew-ton](https://github.com/mew-ton)! - misc: codspeed がうまく連携できてなかたｔ
+
+- [#122](https://github.com/hacomono-lib/json-origami/pull/122) [`4a742c7`](https://github.com/hacomono-lib/json-origami/commit/4a742c7b9bc054bc0bb333c10c0b77cb1dbc905f) Thanks [@renovate](https://github.com/apps/renovate)! - fix: update dependency type-fest to ^4.10.1
+
+- [#115](https://github.com/hacomono-lib/json-origami/pull/115) [`691dd55`](https://github.com/hacomono-lib/json-origami/commit/691dd55f097fa275b4d42bd67e7806702cdc8b23) Thanks [@mew-ton](https://github.com/mew-ton)! - misc: replace eslint -> biome, pre-commit -> lefthook
+
 ## 0.4.1
 
 ### Patch Changes
