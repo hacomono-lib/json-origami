@@ -12,8 +12,7 @@ on:
     types: [opened, synchronize]
 
 jobs:
-  eslint:
-    name: "Lint: ESLint"
+  biome:
     if: |
       !contains(github.event.pull_request.labels.*.name, 'renovate')
     runs-on: ubuntu-latest
