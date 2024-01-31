@@ -13,8 +13,8 @@ on:
     paths:
       - ".github/workflows/test.yml"
       - ".gitignore"
-      - "src"
-      - "test"
+      - "src/**"
+      - "test/**"
       - "package.json"
       - "tsconfig.json"
       - "tsup.config.ts"

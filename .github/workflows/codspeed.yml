@@ -19,8 +19,8 @@ on:
     paths:
       - ".github/workflows/codspeed.yml"
       - ".gitignore"
-      - "src"
-      - "test"
+      - "src/**"
+      - "test/**"
       - "package.json"
       - "vitest.config.ts"
       - "yarn.lock"
