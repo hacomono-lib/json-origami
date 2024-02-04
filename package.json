@@ -48,7 +48,7 @@
     "lint": "biome check --apply ./src ./test"
   },
   "dependencies": {
-    "type-fest": "^4.10.1"
+    "type-fest": "^4.10.2"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.5.3",
