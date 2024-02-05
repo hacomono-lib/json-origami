@@ -72,7 +72,7 @@ jobs:
     needs:
       - init__node
     steps:
-      - uses: xxxxxxxxxxxxxxxx@xx
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/init-node
 
       - run: yarn test:doc
