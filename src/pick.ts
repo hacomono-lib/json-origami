@@ -1,7 +1,5 @@
-import { fold } from './fold'
-import type { DeepKeyOf, Dictionary, Folded, Omit, PickOption } from './type'
-import { unfold } from './unfold'
-import { includesKey } from './utils'
+import { createEmptyModifier, toModifier } from './lib'
+import { type DeepKeyOf, type Dictionary, type PickOption, defaultCommonOption } from './type'
 
 /**
  * Returns an object with the specified keys picked from the object.
@@ -38,18 +36,42 @@ export function pick<D extends Dictionary, K extends DeepKeyOf<D>>(
   opt?: PickOption,
 ): Omit<D, K>
 
-export function pick<D extends Dictionary, K extends DeepKeyOf<D>>(
-  obj: D,
-  keys: Array<K | RegExp>,
-  opt?: PickOption,
-): Omit<D, K> {
-  const folded = fold(obj)
+export function pick(obj: Dictionary, keys: Array<string | RegExp>, opt?: PickOption): Dictionary {
+  const fixedOption = {
+    ...defaultCommonOption,
+    ...opt,
+  }
 
-  const targetKeys = new Set(Object.keys(folded).filter((k) => keys.some((key) => includesKey(k, key, opt))))
+  const src = toModifier(obj, fixedOption)
 
-  const fixedKeyMap = Object.fromEntries(
-    Object.entries(folded).filter(([k]) => targetKeys.has(k)),
-  ) as Folded<Dictionary>
+  const regexpKeyss = keys.filter((key): key is RegExp => key instanceof RegExp)
 
-  return unfold(fixedKeyMap, opt) as Dictionary
+  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: <explanation>
+  const fixedKeys: string[] = (() => {
+    if (regexpKeyss.length <= 0) {
+      return keys as string[]
+    }
+
+    const stringKeys = keys.filter((key): key is string => typeof key === 'string')
+    const keyset = new Set<string>(stringKeys)
+    const srcKeys = src.keys()
+
+    for (const key of regexpKeyss) {
+      if (key instanceof RegExp) {
+        for (const k of srcKeys) {
+          if (key.test(k)) {
+            keyset.add(k)
+          }
+        }
+      }
+    }
+    return [...keyset]
+  })()
+
+  const dist = createEmptyModifier(fixedOption)
+  for (const key of fixedKeys) {
+    dist.set(key, src.get(key))
+  }
+
+  return dist.finalize()
 }

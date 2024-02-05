@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest'
-import { fold } from '../src'
+import { fold } from '~/fold'
 
 it('should handle empty', () => {
   const target = {}

@@ -3,7 +3,7 @@ export function dice(probability: number): boolean {
 }
 
 export function randomChoice<T extends string>(arr: T[]): T {
-  return arr[Math.floor(Math.random() * arr.length)]
+  return arr[Math.floor(Math.random() * arr.length)] as T
 }
 
 export function randomChoices<T extends string>(arr: T[], count: number): T[] {

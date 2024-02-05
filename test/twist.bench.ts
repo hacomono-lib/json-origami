@@ -1,5 +1,6 @@
 import { bench, describe } from 'vitest'
-import { fold, twist } from '../src'
+import { fold } from '~/fold'
+import { twist } from '~/twist'
 import {
   BENCHMARK_TARGET_LIGHT_OBJECT_VALUES,
   BENCHMARK_TARGET_OBJECT_VALUES,
@@ -31,10 +32,13 @@ function createTestCase({ percentOfTwistKeys, objectValues }: TestCaseOption): T
   const object = createRandomObject({ leafs: objectValues })
   const allKeys = Object.keys(fold(object))
   const keys = randomChoices(allKeys, Math.min(objectValues, allKeys.length) * percentOfTwistKeys)
-  const twistMap = keys.reduce((acc, key) => {
-    acc[key] = randomKeyName()
-    return acc
-  }, {})
+  const twistMap = keys.reduce(
+    (acc, key) => {
+      acc[key] = randomKeyName()
+      return acc
+    },
+    {} as Record<string, string>,
+  )
   return { object, twistMap }
 }
 
@@ -50,7 +54,8 @@ function runBench({ percentOfTwistKeys, objectValues }: TestCaseOption) {
 
   bench(`twist (complex object including ${objectValues} values, twist ${percentOfTwistKeys * 100}% of keys)`, () => {
     const currentIndex = index++ % iterations
-    const { object, twistMap } = testCases[currentIndex]
+    // biome-ignore lint/style/noNonNullAssertion: <explanation>
+    const { object, twistMap } = testCases[currentIndex]!
     twist(object, twistMap)
   })
 }
@@ -61,7 +66,7 @@ describe('twist with light object', () => {
   runBench({ objectValues: BENCHMARK_TARGET_LIGHT_OBJECT_VALUES, percentOfTwistKeys: 0.9 })
 })
 
-describe.skip('twist with heavy object', () => {
+describe('twist with heavy object', () => {
   runBench({ objectValues: BENCHMARK_TARGET_OBJECT_VALUES, percentOfTwistKeys: 0.1 })
   runBench({ objectValues: BENCHMARK_TARGET_OBJECT_VALUES, percentOfTwistKeys: 0.5 })
   runBench({ objectValues: BENCHMARK_TARGET_OBJECT_VALUES, percentOfTwistKeys: 0.9 })

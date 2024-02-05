@@ -1,7 +1,12 @@
-import { fold } from './fold'
-import type { Dictionary, MoveMap, Twist, TwistOption } from './type'
-import { unfold } from './unfold'
-import { includesKey } from './utils'
+import { createEmptyModifier, startsKeyWith, toModifier } from './lib'
+import {
+  type Dictionary,
+  type DictionaryLeaf,
+  type MoveMap,
+  type Twist,
+  type TwistOption,
+  defaultCommonOption,
+} from './type'
 
 /**
  *
@@ -13,21 +18,34 @@ export function twist<D extends Dictionary, M extends MoveMap<D>>(
   moveMap: M,
   option?: TwistOption,
 ): Twist<D, M> {
-  const folded = fold(obj, option)
+  const fixedOption = {
+    ...defaultCommonOption,
+    ...option,
+  }
 
-  const twisted = Object.fromEntries(
-    Object.entries(folded).map(([key, value]) => {
-      const found = Object.keys(moveMap).find((k) => includesKey(key, k, option))
+  const fromKeys = Object.keys(moveMap)
 
-      if (found) {
-        // biome-ignore lint/style/noNonNullAssertion: <explanation>
-        const newKey = key.replace(found, moveMap[found]!)
-        return [newKey, value]
-      }
+  const src = toModifier(obj, fixedOption)
+  const dist = createEmptyModifier({ ...fixedOption, pruneNilInArray: option?.pruneArray })
 
-      return [key, value]
-    }),
-  )
+  const srcEntries = src.entries()
+  const copyEntries: [string, DictionaryLeaf][] = []
 
-  return unfold(twisted, option)
+  for (const [srcKey, srcValue] of srcEntries) {
+    const foundFromKey = fromKeys.find((fromKey) => startsKeyWith(srcKey, fromKey, fixedOption))
+    if (foundFromKey) {
+      const tail = srcKey.slice(foundFromKey.length)
+      const fixedTail = tail.startsWith('.') ? tail.slice(1) : tail
+      const toKey = `${moveMap[foundFromKey]}${fixedTail !== '' ? '.' : ''}${fixedTail}`
+      copyEntries.push([toKey, srcValue])
+    } else {
+      copyEntries.push([srcKey, srcValue])
+    }
+  }
+
+  for (const [copyKey, copyValue] of copyEntries) {
+    dist.set(copyKey, copyValue)
+  }
+
+  return dist.finalize()
 }
