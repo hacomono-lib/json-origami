@@ -41,7 +41,7 @@
     "doc": "astro dev --root ./docs --open",
     "build": "tsup",
     "doc-build": "astro check --root ./docs && astro build --root ./docs",
-    "test": "run-p test:*",
+    "test": "yarn test:spec && yarn test:type",
     "test:spec": "yarn vitest --run --silent",
     "test:type": "tsc --noEmit -p tsconfig.json",
     "vitest": "node --expose-gc node_modules/.bin/vitest",
@@ -65,8 +65,7 @@
     "sharp": "^0.33.2",
     "tsup": "^8.0.1",
     "typescript": "^5.3.3",
-    "vitest": "^1.2.2",
-    "yarn-run-all": "latest"
+    "vitest": "^1.2.2"
   },
   "peerDependencies": {
     "typescript": ">= 4.0.0"
