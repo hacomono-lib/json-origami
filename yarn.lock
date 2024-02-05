@@ -148,9 +148,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@astrojs/starlight@npm:^0.17.0":
-  version: 0.17.0
-  resolution: "@astrojs/starlight@npm:0.17.0"
+"@astrojs/starlight@npm:^0.17.2":
+  version: 0.17.2
+  resolution: "@astrojs/starlight@npm:0.17.2"
   dependencies:
     "@astrojs/mdx": "npm:^2.0.4"
     "@astrojs/sitemap": "npm:^3.0.4"
@@ -171,7 +171,7 @@ __metadata:
     vfile: "npm:^6.0.1"
   peerDependencies:
     astro: ^4.0.0
-  checksum: 10/daa7a5f3232d46ba3dd760dfb24a79ffc9e47b7ca6f4b5a938d5b0c11b32eedd4a6fad6a14caf7bb8136314913c1a6269d69edff99406acbfcb82952fb42a943
+  checksum: 10/c695ddcbc357417095edc19c70271b82c43e9e3a24a15bd2f5c026a4e462f16e0b4d345ab6c591251885a04294ce4f85b94af92cbf0e099610d344147cfd28ff
   languageName: node
   linkType: hard
 
@@ -5409,7 +5409,7 @@ __metadata:
   resolution: "json-origami@workspace:."
   dependencies:
     "@astrojs/check": "npm:^0.4.1"
-    "@astrojs/starlight": "npm:^0.17.0"
+    "@astrojs/starlight": "npm:^0.17.2"
     "@biomejs/biome": "npm:^1.5.3"
     "@changesets/changelog-github": "npm:^0.5.0"
     "@changesets/cli": "npm:^2.27.1"
