@@ -41,9 +41,10 @@
     "doc": "astro dev --root ./docs --open",
     "build": "tsup",
     "doc-build": "astro check --root ./docs && astro build --root ./docs",
-    "test": "yarn test:spec && yarn test:type",
+    "test": "yarn test:spec && yarn test:type && yarn test:doc",
     "test:spec": "yarn vitest --run --silent",
     "test:type": "tsc --noEmit -p tsconfig.json",
+    "test:doc": "astro check --root ./docs",
     "vitest": "node --expose-gc node_modules/.bin/vitest",
     "format": "biome format --write ./src ./test",
     "lint": "biome check --apply ./src ./test"

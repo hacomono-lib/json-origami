@@ -66,3 +66,14 @@ jobs:
 
       - run: yarn test:type
 
+  astro-check:
+    name: "Test: astro-check"
+    runs-on: ubuntu-latest
+    needs:
+      - init__node
+    steps:
+      - uses: xxxxxxxxxxxxxxxx@xx
+      - uses: ./.github/actions/init-node
+
+      - run: yarn test:doc
+
