@@ -1,11 +1,10 @@
 {
   "name": "json-origami",
   "version": "0.5.0",
-  "description": "Transform nested objects into a flattened key-value structure and vice-versa.",
+  "description": "Transform and reshape your JSON objects with the artistry of origami.",
   "keywords": [
     "key-value",
-    "kv",
-    "convert",
+    "transform",
     "object",
     "json",
     "typescrip"
@@ -39,10 +38,13 @@
   "scripts": {
     "dev": "yarn vitest --ui",
     "bench": "vitest bench",
+    "doc": "astro dev --root ./docs --open",
     "build": "tsup",
-    "test": "run-p test:*",
+    "doc-build": "astro check --root ./docs && astro build --root ./docs",
+    "test": "yarn test:spec && yarn test:type && yarn test:doc",
     "test:spec": "yarn vitest --run --silent",
     "test:type": "tsc --noEmit -p tsconfig.json",
+    "test:doc": "astro check --root ./docs",
     "vitest": "node --expose-gc node_modules/.bin/vitest",
     "format": "biome format --write ./src ./test",
     "lint": "biome check --apply ./src ./test"
@@ -51,17 +53,20 @@
     "type-fest": "^4.10.2"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.4.1",
+    "@astrojs/starlight": "^0.17.0",
     "@biomejs/biome": "^1.5.3",
     "@changesets/changelog-github": "^0.5.0",
     "@changesets/cli": "^2.27.1",
     "@codspeed/vitest-plugin": "^3.1.0",
     "@types/node": "^20.11.16",
     "@vitest/ui": "^1.2.2",
+    "astro": "^4.2.6",
     "defu": "^6.1.4",
+    "sharp": "^0.33.2",
     "tsup": "^8.0.1",
     "typescript": "^5.3.3",
-    "vitest": "^1.2.2",
-    "yarn-run-all": "latest"
+    "vitest": "^1.2.2"
   },
   "peerDependencies": {
     "typescript": ">= 4.0.0"
