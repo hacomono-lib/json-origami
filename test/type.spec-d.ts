@@ -7,7 +7,7 @@ describe('DeepKeyOf', () => {
       a: {
         b: {
           c: number
-        },
+        }
         d: string
       }
     }
@@ -18,10 +18,7 @@ describe('DeepKeyOf', () => {
   it('should returns nested array keys', () => {
     type D = {
       a: {
-        b: [
-          number,
-          { c: string }
-        ]
+        b: [number, { c: string }]
       }
     }
 
@@ -31,10 +28,7 @@ describe('DeepKeyOf', () => {
   it('should returns nested array keys (dot)', () => {
     type D = {
       a: {
-        b: [
-          number,
-          { c: string }
-        ]
+        b: [number, { c: string }]
       }
     }
 

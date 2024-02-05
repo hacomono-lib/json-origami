@@ -1,7 +1,6 @@
-import { fold } from './fold'
-import { unfold } from './unfold'
-import { includesKey } from './utils'
-import type { Dictionary, DeepKeyOf, OmitOption, Omit, Folded } from './type'
+import { createEmptyModifier, toModifier } from './lib'
+import { startsKeyWith } from './lib'
+import { type DeepKeyOf, type Dictionary, type Omit, type OmitOption, defaultCommonOption } from './type'
 
 /**
  * Returns an object with the specified keys removed from the object.
@@ -29,11 +28,7 @@ import type { Dictionary, DeepKeyOf, OmitOption, Omit, Folded } from './type'
  * @param keys
  * @param opt
  */
-export function omit<D extends Dictionary, K extends DeepKeyOf<D>>(
-  obj: D,
-  keys: K[],
-  opt?: OmitOption
-): Omit<D, K>
+export function omit<D extends Dictionary, K extends DeepKeyOf<D>>(obj: D, keys: K[], opt?: OmitOption): Omit<D, K>
 
 /**
  *
@@ -44,23 +39,23 @@ export function omit<D extends Dictionary, K extends DeepKeyOf<D>>(
 export function omit<D extends Dictionary, K extends DeepKeyOf<D>>(
   obj: D,
   keys: Array<K | RegExp>,
-  opt?: OmitOption
+  opt?: OmitOption,
 ): Dictionary
 
-export function omit<D extends Dictionary, K extends DeepKeyOf<D>>(
-  obj: D,
-  keys: Array<K | RegExp>,
-  opt?: OmitOption
-): Dictionary {
-  const folded = fold(obj)
+export function omit(obj: Dictionary, keys: Array<string | RegExp>, opt?: OmitOption): Dictionary {
+  const fixedOption = {
+    ...defaultCommonOption,
+    ...opt,
+  }
 
-  const targetKeys = new Set(
-    Object.keys(folded).filter((k) => !keys.some((key) => includesKey(k, key, opt)))
-  )
+  const src = toModifier(obj, fixedOption)
+  const srcEntries = src.entries()
 
-  const fixedKeyMap = Object.fromEntries(
-    Object.entries(folded).filter(([k]) => targetKeys.has(k))
-  ) as Folded<Dictionary>
+  const pickEntries = srcEntries.filter(([srcKey]) => keys.every((k) => !startsKeyWith(srcKey, k, fixedOption)))
+  const dist = createEmptyModifier(fixedOption)
 
-  return unfold(fixedKeyMap, opt) as Dictionary
+  for (const [key, value] of pickEntries) {
+    dist.set(key, value)
+  }
+  return dist.finalize()
 }

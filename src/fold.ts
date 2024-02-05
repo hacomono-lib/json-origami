@@ -1,12 +1,5 @@
-import {
-  defaultCommonOption,
-  type Dictionary,
-  type FoldOption,
-  type Folded,
-  type Primitive,
-  type FixedFoldOption,
-  type ArrayIndex
-} from './type'
+import { toModifier } from './lib'
+import { type Dictionary, type FixedFoldOption, type FoldOption, type Folded, defaultCommonOption } from './type'
 
 /**
  * Fold an object into a one-level object.
@@ -33,32 +26,29 @@ import {
  * ```
  */
 export function fold<D extends Dictionary>(obj: D, option?: FoldOption): Folded<D> {
-  return Object.fromEntries(
-    flatEntries(option?.keyPrefix ?? '', obj, {
-      ...defaultCommonOption,
-      ...option
-    } as FixedFoldOption)
-  ) as Folded<D>
+  if (Object.keys(obj).length <= 0) {
+    return {}
+  }
+
+  const fixedOption = {
+    ...defaultCommonOption,
+    ...option,
+  } as FixedFoldOption
+
+  const modifier = toModifier(obj, fixedOption)
+
+  const result = {} as Folded<D>
+
+  for (const [key, value] of modifier.entries()) {
+    result[fixKey(fixedOption, key)] = value
+  }
+
+  return result
 }
 
-const arrayKeyMap = {
-  dot: (prefix: string, index: number) => (prefix === '' ? `${index}` : `${prefix}.${index}`),
-  bracket: (prefix: string, index: number) => `${prefix}[${index}]`
-} satisfies Record<ArrayIndex, (prefix: string, index: number) => string>
-
-function flatEntries(key: string, value: object, opt: FixedFoldOption): Array<[string, Primitive]> {
-  if (value === undefined || value === null) return []
-
-  const appendKey = (k: string | number) =>
-    typeof k === 'number' ? arrayKeyMap[opt.arrayIndex](key, k) : key === '' ? k : `${key}.${k}`
-
-  if (Array.isArray(value)) {
-    return value.flatMap((v, i) => flatEntries(appendKey(i), v, opt))
+function fixKey(option: FixedFoldOption, key: string) {
+  if (option.keyPrefix) {
+    return key.startsWith('[') ? `${option.keyPrefix}${key}` : `${option.keyPrefix}.${key}`
   }
-
-  if (typeof value === 'object') {
-    return Object.entries(value as object).flatMap(([k, v]) => flatEntries(appendKey(k), v, opt))
-  }
-
-  return [[key, value as Primitive]]
+  return key
 }

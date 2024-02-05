@@ -1,0 +1,30 @@
+---
+name: Lint Code Base (Biome)
+run-name: "Lint code base (Biome) on \"${{ github.event.pull_request.title }}\" by ${{ github.actor }}"
+
+permissions:
+  contents: read
+  packages: read
+  pull-requests: write
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  biome:
+    if: |
+      !contains(github.event.pull_request.labels.*.name, 'renovate')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/actions/init-node
+
+      - name: Setup Biome
+        uses: biomejs/setup-biome@v2
+        with:
+          version: latest
+
+      - name: Run Biome
+        run: biome ci .

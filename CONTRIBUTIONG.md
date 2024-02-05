@@ -7,7 +7,11 @@ We appreciate your interest in contributing to our project! To ensure a smooth c
 1. Make sure you have the appropriate permissions to contribute to the repository.
 1. Clone the repository to your local machine using `git clone https://github.com/hacomono-lib/type-assurer.git.`
 1. Install the project dependencies by running yarn install.
-1. (optional) Install [pre-commit}(https://pre-commit.com)
+1. Install the following and enable pre-commit hook
+
+- [actionlint](https://github.com/rhysd/actionlint/tree/main)
+- [lefthook](https://github.com/evilmartians/lefthook/wiki/Comparison-with-other-solutions)
+  - Please run `lefthook install`
 
 ## Development Workflow
 

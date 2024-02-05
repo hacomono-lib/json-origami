@@ -1,6 +1,6 @@
 {
   "name": "json-origami",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "Transform nested objects into a flattened key-value structure and vice-versa.",
   "keywords": [
     "key-value",
@@ -11,12 +11,12 @@
     "typescrip"
   ],
   "repository": {
-    "url": "https://github.com/hacomono-lib/json-origami",
+    "url": "git+https://github.com/hacomono-lib/json-origami.git",
     "type": "git"
   },
   "author": "mew-ton <mxl_usmarc@slmail.mewton.jp>",
   "license": "MIT",
-  "packageManager": "yarn@4.0.2",
+  "packageManager": "yarn@4.1.0",
   "type": "module",
   "files": [
     "dist",
@@ -37,27 +37,30 @@
     "access": "public"
   },
   "scripts": {
-    "dev": "vitest --ui",
+    "dev": "yarn vitest --ui",
+    "bench": "vitest bench",
     "build": "tsup",
     "test": "run-p test:*",
-    "test:spec": "vitest --run --silent",
+    "test:spec": "yarn vitest --run --silent",
     "test:type": "tsc --noEmit -p tsconfig.json",
-    "lint": "eslint --ext .ts .",
-    "format": "prettier --write . --ignore-path=.eslintignore"
+    "vitest": "node --expose-gc node_modules/.bin/vitest",
+    "format": "biome format --write ./src ./test",
+    "lint": "biome check --apply ./src ./test"
+  },
+  "dependencies": {
+    "type-fest": "^4.10.2"
   },
   "devDependencies": {
+    "@biomejs/biome": "^1.5.3",
     "@changesets/changelog-github": "^0.5.0",
     "@changesets/cli": "^2.27.1",
-    "@typescript-eslint/eslint-plugin": "^6.13.1",
-    "@typescript-eslint/parser": "^6.13.1",
-    "@vitest/ui": "^0.34.6",
-    "eslint": "^8.55.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-import": "^2.29.0",
-    "prettier": "^3.1.0",
+    "@codspeed/vitest-plugin": "^3.1.0",
+    "@types/node": "^20.11.16",
+    "@vitest/ui": "^1.2.2",
+    "defu": "^6.1.4",
     "tsup": "^8.0.1",
-    "typescript": "^5.3.2",
-    "vitest": "^0.34.6",
+    "typescript": "^5.3.3",
+    "vitest": "^1.2.2",
     "yarn-run-all": "latest"
   },
   "peerDependencies": {
@@ -69,7 +72,7 @@
     }
   },
   "volta": {
-    "node": "20.10.0",
-    "yarn": "4.0.2"
+    "node": "20.11.0",
+    "yarn": "4.1.0"
   }
 }

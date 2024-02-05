@@ -17,6 +17,7 @@
     "importHelpers": true,
     "inlineSources": false,
     "isolatedModules": true,
+    "resolvePackageJsonExports": false,
 
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
@@ -33,7 +34,9 @@
     "strictBindCallApply": true,
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
-    "useDefineForClassFields": true
+    "useDefineForClassFields": true,
+
+    "paths": {
+      "~/*": ["./src/*"]}
   },
-  "include": ["src/**/*"],
 }

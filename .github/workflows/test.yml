@@ -13,7 +13,8 @@ on:
     paths:
       - ".github/workflows/test.yml"
       - ".gitignore"
-      - "src"
+      - "src/**"
+      - "test/**"
       - "package.json"
       - "tsconfig.json"
       - "tsup.config.ts"
@@ -23,9 +24,8 @@ on:
 jobs:
   init__node:
     if: |
-      (contains(github.event.pull_request.labels.*.name, 'renovate') &&
-        !contains(github.event.pull_request.labels.*.name, 'renovate:lint')) ||
-      !contains(github.event.pull_request.labels.*.name, 'renovate')
+      !contains(github.event.pull_request.labels.*.name, 'renovate') ||
+        github.event.pull_request.title != 'Version Packages'
     name: "Initialize: node"
     runs-on: ubuntu-latest
     steps:

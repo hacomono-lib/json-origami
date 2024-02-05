@@ -1,24 +1,24 @@
 /**
  *
  */
-export type Primitive = string | number | boolean | null | undefined
+// biome-ignore lint/complexity/noBannedTypes: <explanation>
+export type DictionaryLeaf = string | number | boolean | {} | [] | Function | null | undefined | symbol | bigint
 
-type MaybeReadonly<T> = T | (T extends Array<infer U> ? readonly U[] : Readonly<T>)
+type DictionaryValue = DictionaryLeaf | Dictionary
+
+type DictionaryObject = { [Key in string]: DictionaryValue } & { [Key in string]?: DictionaryValue | undefined }
+
+type DictionaryArray = DictionaryValue[] | readonly DictionaryValue[]
 
 /**
  *
  */
-export type Dictionary =
-  | MaybeReadonly<Record<string, unknown>>
-  | MaybeReadonly<Array<Primitive | Record<string, unknown>>>
+export type Dictionary = DictionaryObject | DictionaryArray
 
-export type DeepKeyOf<D extends Dictionary, A extends ArrayIndex = 'bracket'> = FixArrayIndex<
-  DeepKeyOfInternal<D>,
-  A
->
+export type DeepKeyOf<D extends Dictionary, A extends ArrayIndex = 'bracket'> = FixArrayIndex<DeepKeyOfInternal<D>, A>
 
 type DeepKeyOfInternal<D extends Dictionary> = {
-  [K in keyof D]: D[K] extends Primitive | Dictionary
+  [K in keyof D]: D[K] extends DictionaryLeaf | Dictionary
     ? `${Exclude<K, symbol>}${D[K] extends Dictionary ? `.${DeepKeyOfInternal<D[K]>}` : ''}`
     : never
 }[keyof D]
@@ -28,8 +28,7 @@ type A = Exclude<keyof [1, 2, 3], symbol>
 /**
  *
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export type Folded<_D extends Dictionary> = Record<string, Primitive>
+export type Folded<_D extends Dictionary> = Record<string, DictionaryLeaf>
 
 /**
  *
@@ -39,25 +38,23 @@ export type MoveMap<D extends Dictionary> = Record<DeepKeyOf<D>, string>
 /**
  *
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Unfolded<KV extends Folded<any>> = KV extends Folded<infer D> ? D : Dictionary
+
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+export type Unfolded<Kv extends Folded<any>> = Kv extends Folded<infer D> ? D : Dictionary
 
 /**
  *
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export type Twist<D extends Dictionary, _M extends MoveMap<D>> = Dictionary
 
 /**
  *
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export type Omit<D extends Dictionary, _K extends DeepKeyOf<D>> = Dictionary
 
 /**
  *
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export type Pick<D extends Dictionary, _K extends DeepKeyOf<D>> = Dictionary
 
 /**
@@ -69,9 +66,7 @@ type FixBracket<T extends string> = T extends `${infer L}[${infer R}]` ? `${L}.$
 
 type FixDot<T extends string> = T extends `${infer L}.${infer R}` ? `${L}[${R}]` : T
 
-type FixArrayIndex<T extends string, A extends ArrayIndex> = A extends 'dot'
-  ? FixDot<T>
-  : FixBracket<T>
+type FixArrayIndex<T extends string, A extends ArrayIndex> = A extends 'dot' ? FixDot<T> : FixBracket<T>
 
 export interface CommonOption {
   /**
@@ -96,7 +91,7 @@ export interface FoldOption extends CommonOption {
 }
 
 export const defaultCommonOption = {
-  arrayIndex: 'bracket' as ArrayIndex
+  arrayIndex: 'bracket' as ArrayIndex,
 } satisfies FoldOption
 
 export type FixedFoldOption = Readonly<FoldOption & typeof defaultCommonOption>
@@ -129,7 +124,7 @@ export interface UnfoldOption extends CommonOption {
 
 export const defaultUnfoldOption = {
   ...defaultCommonOption,
-  pruneArray: true
+  pruneArray: true,
 } satisfies UnfoldOption
 
 export type FixedUnfoldOption = Readonly<UnfoldOption & typeof defaultUnfoldOption>
@@ -154,3 +149,10 @@ export type FixedOmitOption = Readonly<OmitOption & typeof defaultUnfoldOption>
 export interface PickOption extends UnfoldOption {}
 
 export type FixedPickOption = Readonly<PickOption & typeof defaultUnfoldOption>
+
+/**
+ *
+ */
+export interface KeysOption extends CommonOption {}
+
+export type FixedKeysOption = Readonly<KeysOption & typeof defaultCommonOption>
