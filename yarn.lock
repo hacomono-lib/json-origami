@@ -104,6 +104,28 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@astrojs/markdown-remark@npm:4.2.1":
+  version: 4.2.1
+  resolution: "@astrojs/markdown-remark@npm:4.2.1"
+  dependencies:
+    "@astrojs/prism": "npm:^3.0.0"
+    github-slugger: "npm:^2.0.0"
+    import-meta-resolve: "npm:^4.0.0"
+    mdast-util-definitions: "npm:^6.0.0"
+    rehype-raw: "npm:^7.0.0"
+    rehype-stringify: "npm:^10.0.0"
+    remark-gfm: "npm:^4.0.0"
+    remark-parse: "npm:^11.0.0"
+    remark-rehype: "npm:^11.0.0"
+    remark-smartypants: "npm:^2.0.0"
+    shikiji: "npm:^0.9.18"
+    unified: "npm:^11.0.4"
+    unist-util-visit: "npm:^5.0.0"
+    vfile: "npm:^6.0.1"
+  checksum: 10/529b74a6b6c46e993f3258a53aa854b09a131ada885eb3fb2da6cd5fa5c5c7f7e887f3f34d5bc4bf2d08a3f48dff3e3af56d72c6da5f8488f634e1736796c88f
+  languageName: node
+  linkType: hard
+
 "@astrojs/mdx@npm:^2.0.4":
   version: 2.1.0
   resolution: "@astrojs/mdx@npm:2.1.0"
@@ -2436,13 +2458,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"astro@npm:^4.2.6":
-  version: 4.2.6
-  resolution: "astro@npm:4.2.6"
+"astro@npm:^4.2.8":
+  version: 4.3.2
+  resolution: "astro@npm:4.3.2"
   dependencies:
     "@astrojs/compiler": "npm:^2.5.0"
     "@astrojs/internal-helpers": "npm:0.2.1"
-    "@astrojs/markdown-remark": "npm:4.2.0"
+    "@astrojs/markdown-remark": "npm:4.2.1"
     "@astrojs/telemetry": "npm:3.0.4"
     "@babel/core": "npm:^7.23.3"
     "@babel/generator": "npm:^7.23.3"
@@ -2510,7 +2532,7 @@ __metadata:
       optional: true
   bin:
     astro: astro.js
-  checksum: 10/d40439a0abb6c967024a5a98ecd013c8cd40a2da8c612705e8cf95e71dcfa239eb75e26c0c529c999f364c552e90701a00a2fe7f2e398df9052b4e8a375024aa
+  checksum: 10/b192ae9455bc6f4d07406621f92233472b40d74198a4128799e9561c837106c99ddca41de868239ef466fd0cee5a0ad71222e7438ac15d143942c7e5760784a7
   languageName: node
   linkType: hard
 
@@ -5416,7 +5438,7 @@ __metadata:
     "@codspeed/vitest-plugin": "npm:^3.1.0"
     "@types/node": "npm:^20.11.16"
     "@vitest/ui": "npm:^1.2.2"
-    astro: "npm:^4.2.6"
+    astro: "npm:^4.2.8"
     defu: "npm:^6.1.4"
     sharp: "npm:^0.33.2"
     tsup: "npm:^8.0.1"
