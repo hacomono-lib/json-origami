@@ -22,6 +22,7 @@ jobs:
         uses: withastro/action@v1
         with:
           path: ./docs
+          package-manager: yarn
           node-version: 20
 
   deploy:
