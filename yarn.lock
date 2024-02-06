@@ -5154,7 +5154,7 @@ __metadata:
     defu: "npm:^6.1.4"
     sharp: "npm:^0.33.2"
     tsup: "npm:^8.0.1"
-    type-fest: "npm:^3.13.0"
+    type-fest: "npm:^2.19.0"
     typescript: "npm:^5.3.3"
     vitest: "npm:^1.2.2"
   peerDependencies:
@@ -8784,17 +8784,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"type-fest@npm:^2.13.0":
+"type-fest@npm:^2.13.0, type-fest@npm:^2.19.0":
   version: 2.19.0
   resolution: "type-fest@npm:2.19.0"
   checksum: 10/7bf9e8fdf34f92c8bb364c0af14ca875fac7e0183f2985498b77be129dc1b3b1ad0a6b3281580f19e48c6105c037fb966ad9934520c69c6434d17fd0af4eed78
-  languageName: node
-  linkType: hard
-
-"type-fest@npm:^3.13.0":
-  version: 3.13.1
-  resolution: "type-fest@npm:3.13.1"
-  checksum: 10/9a8a2359ada34c9b3affcaf3a8f73ee14c52779e89950db337ce66fb74c3399776c697c99f2532e9b16e10e61cfdba3b1c19daffb93b338b742f0acd0117ce12
   languageName: node
   linkType: hard
 
