@@ -1,5 +1,11 @@
 # json-origami
 
+## 0.5.2
+
+### Patch Changes
+
+- [#149](https://github.com/hacomono-lib/json-origami/pull/149) [`afde67c`](https://github.com/hacomono-lib/json-origami/commit/afde67c4f68a14298c502c7d702af62097f38451) Thanks [@mew-ton](https://github.com/mew-ton)! - fix: remove dependencies
+
 ## 0.5.1
 
 ### Patch Changes
