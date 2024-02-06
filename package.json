@@ -50,7 +50,7 @@
     "lint": "biome check --apply ./src ./test"
   },
   "dependencies": {
-    "type-fest": "^4.10.2"
+    "type-fest": "^3.13.0"
   },
   "devDependencies": {
     "@astrojs/check": "^0.4.1",
