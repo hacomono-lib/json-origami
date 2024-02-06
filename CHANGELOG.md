@@ -1,5 +1,11 @@
 # json-origami
 
+## 0.5.1
+
+### Patch Changes
+
+- [#146](https://github.com/hacomono-lib/json-origami/pull/146) [`2ab599b`](https://github.com/hacomono-lib/json-origami/commit/2ab599b8640acd469b18b3b4300690f5b0641378) Thanks [@mew-ton](https://github.com/mew-ton)! - fix: downgrade type-fest
+
 ## 0.5.0
 
 ### Minor Changes
