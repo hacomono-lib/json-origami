@@ -1,4 +1,4 @@
-import type { JsonArray, JsonObject, JsonValue, Writable } from 'type-fest'
+import type { Dictionary } from '~/type'
 import { createRandomWord, dice, randomChoice } from './random'
 
 const DEFAULT_LEAFS = 1000
@@ -7,7 +7,7 @@ interface RandomObjectOption {
   leafs: number
 }
 
-export function createRandomObject({ leafs }: RandomObjectOption): JsonObject {
+export function createRandomObject({ leafs }: RandomObjectOption): Dictionary {
   let leafCount = 0
 
   if (leafs % 1 !== 0) {
@@ -31,8 +31,8 @@ export function createRandomObject({ leafs }: RandomObjectOption): JsonObject {
     return leafCount % 2 === 0
   }
 
-  function createObject({ root }: { root?: boolean } = {}): JsonObject {
-    const obj: JsonObject = {}
+  function createObject({ root }: { root?: boolean } = {}): Dictionary {
+    const obj: Dictionary = {}
 
     while ((root || dice(0.6)) && leafCount < maxLeafs) {
       const key = createRandomWord()
@@ -52,8 +52,8 @@ export function createRandomObject({ leafs }: RandomObjectOption): JsonObject {
     return obj
   }
 
-  function createArray(): JsonArray {
-    const arr: Writable<JsonArray> = []
+  function createArray(): Dictionary {
+    const arr: Dictionary = []
 
     while (dice(0.3) && leafCount < maxLeafs) {
       const value = createValue()
@@ -67,7 +67,7 @@ export function createRandomObject({ leafs }: RandomObjectOption): JsonObject {
     return arr
   }
 
-  function createValue(): JsonValue {
+  function createValue(): Dictionary {
     type ValueType = 'number' | 'string' | 'boolean' | 'object' | 'array'
 
     const map = {
@@ -76,7 +76,7 @@ export function createRandomObject({ leafs }: RandomObjectOption): JsonObject {
       boolean: createBooleanLeaf,
       object: createObject,
       array: createArray,
-    } satisfies Record<ValueType, () => JsonValue>
+    } satisfies Record<ValueType, () => Dictionary>
 
     return map[
       randomChoice([

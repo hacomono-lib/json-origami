@@ -1,4 +1,3 @@
-import type { Get } from 'type-fest'
 import type { Dictionary, DictionaryLeaf } from '~/type'
 import { type KeyOption, splitHead, splitTails } from './string'
 
@@ -34,7 +33,6 @@ interface ObjectModifier<T extends Dictionary = Dictionary> {
    * modifier.get('a.b.c') // 'd'
    * ```
    */
-  get<K extends string>(key: K): Get<T, K>
   get(key: string): unknown
 
   /**
@@ -64,7 +62,6 @@ interface ObjectModifier<T extends Dictionary = Dictionary> {
    * modifier.set('a.b.c', 'e')
    * ```
    */
-  set<K extends string>(key: K, value: Get<T, K>): boolean
   set(key: string, value: unknown): boolean
 
   /**
