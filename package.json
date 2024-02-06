@@ -1,6 +1,6 @@
 {
   "name": "json-origami",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "Transform and reshape your JSON objects with the artistry of origami.",
   "keywords": [
     "key-value",
