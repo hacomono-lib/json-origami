@@ -1,7 +1,7 @@
-import type { JsonObject } from 'type-fest'
 import { bench, describe } from 'vitest'
 import { fold } from '~/fold'
 import { pick } from '~/pick'
+import type { Dictionary } from '~/type'
 import {
   BENCHMARK_TARGET_LIGHT_OBJECT_VALUES,
   BENCHMARK_TARGET_OBJECT_VALUES,
@@ -24,7 +24,7 @@ interface TestCaseOption {
 }
 
 interface TestCase {
-  object: JsonObject
+  object: Dictionary
   keys: string[]
 }
 
