@@ -32,10 +32,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@astrojs/compiler@npm:^2.4.0, @astrojs/compiler@npm:^2.5.0":
+"@astrojs/compiler@npm:^2.4.0":
   version: 2.5.1
   resolution: "@astrojs/compiler@npm:2.5.1"
   checksum: 10/f502a0e63b88256b13db8536997da44c2b3abd334ece01cdee77238310c4436689531116eaefbd8c9b3e4fa773a2c5c848086c6a4eab66638ecb55dc88e7af3c
+  languageName: node
+  linkType: hard
+
+"@astrojs/compiler@npm:^2.5.3":
+  version: 2.5.3
+  resolution: "@astrojs/compiler@npm:2.5.3"
+  checksum: 10/23455b9c0dfa5b57ee43d3189a6a6f098c7f5bdae61a3557723ce8e01776c0e8b860f6c87cb87e8122dffcad514332f10707a6af67b2801cee790dfda4341759
   languageName: node
   linkType: hard
 
@@ -2250,11 +2257,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"astro@npm:^4.3.2":
-  version: 4.3.2
-  resolution: "astro@npm:4.3.2"
+"astro@npm:^4.3.5":
+  version: 4.3.5
+  resolution: "astro@npm:4.3.5"
   dependencies:
-    "@astrojs/compiler": "npm:^2.5.0"
+    "@astrojs/compiler": "npm:^2.5.3"
     "@astrojs/internal-helpers": "npm:0.2.1"
     "@astrojs/markdown-remark": "npm:4.2.1"
     "@astrojs/telemetry": "npm:3.0.4"
@@ -2324,7 +2331,7 @@ __metadata:
       optional: true
   bin:
     astro: astro.js
-  checksum: 10/b192ae9455bc6f4d07406621f92233472b40d74198a4128799e9561c837106c99ddca41de868239ef466fd0cee5a0ad71222e7438ac15d143942c7e5760784a7
+  checksum: 10/1159d42ab53db54649c144ac72a65ac31ac5f3d57183f5476c6bf88eb4074ae180c7a66790e15c87a73bcf9ffd48d0ca05c8bdf53d4aab5366a11ece7b17031f
   languageName: node
   linkType: hard
 
@@ -5150,7 +5157,7 @@ __metadata:
     "@codspeed/vitest-plugin": "npm:^3.1.0"
     "@types/node": "npm:^20.11.16"
     "@vitest/ui": "npm:^1.2.2"
-    astro: "npm:^4.3.2"
+    astro: "npm:^4.3.5"
     defu: "npm:^6.1.4"
     sharp: "npm:^0.33.2"
     tsup: "npm:^8.0.1"
