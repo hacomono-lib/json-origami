@@ -58,7 +58,7 @@
     "@codspeed/vitest-plugin": "^3.1.0",
     "@types/node": "^20.11.17",
     "@vitest/ui": "^1.2.2",
-    "astro": "^4.3.5",
+    "astro": "^4.3.7",
     "defu": "^6.1.4",
     "sharp": "^0.33.2",
     "tsup": "^8.0.2",
