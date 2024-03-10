@@ -2251,9 +2251,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"astro@npm:^4.4.10":
-  version: 4.4.10
-  resolution: "astro@npm:4.4.10"
+"astro@npm:^4.4.15":
+  version: 4.4.15
+  resolution: "astro@npm:4.4.15"
   dependencies:
     "@astrojs/compiler": "npm:^2.5.3"
     "@astrojs/internal-helpers": "npm:0.2.1"
@@ -2325,7 +2325,7 @@ __metadata:
       optional: true
   bin:
     astro: astro.js
-  checksum: 10/fff6099f9c336eb985371743e8d7a2a1c881f1422df4ae555cc97e6025d78a67b9d7841316cdfdb4a9e8e88bd97adc3811c6c5738aec4208d1c6e9c1ea0db7ef
+  checksum: 10/e5deb1be1d6fc5194dfb9114c6d2d120006d2f9fedbde77559044cfb71291ae6407e23c1f1aab58c87789f49cc1fb1b01f107202e9e38ff6f17a4a69b5115559
   languageName: node
   linkType: hard
 
@@ -5133,7 +5133,7 @@ __metadata:
     "@codspeed/vitest-plugin": "npm:^3.1.0"
     "@types/node": "npm:^20.11.25"
     "@vitest/ui": "npm:^1.2.2"
-    astro: "npm:^4.4.10"
+    astro: "npm:^4.4.15"
     defu: "npm:^6.1.4"
     sharp: "npm:^0.33.2"
     tsup: "npm:^8.0.2"
