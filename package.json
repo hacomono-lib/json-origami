@@ -50,7 +50,7 @@
     "lint": "biome check --apply ./src ./test"
   },
   "devDependencies": {
-    "@astrojs/check": "^0.4.1",
+    "@astrojs/check": "^0.5.10",
     "@astrojs/starlight": "^0.17.4",
     "@biomejs/biome": "^1.5.3",
     "@changesets/changelog-github": "^0.5.0",
