@@ -1746,12 +1746,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^20.12.9":
-  version: 20.12.9
-  resolution: "@types/node@npm:20.12.9"
+"@types/node@npm:^20.12.11":
+  version: 20.12.11
+  resolution: "@types/node@npm:20.12.11"
   dependencies:
     undici-types: "npm:~5.26.4"
-  checksum: 10/289445d9cfe49ad21fe55d25ccad44d786a616a96118916332a7d5d338632329fc8a281d486afd0929934641fa55b82ca23171a120b37d6f540d400df6d2ca68
+  checksum: 10/c6afe7c2c4504a4f488814d7b306ebad16bf42cbb43bf9db9fe1aed8c5fb99235593c3be5088979a64526b106cf022256688e2f002811be8273d87dc2e0d484f
   languageName: node
   linkType: hard
 
@@ -5138,7 +5138,7 @@ __metadata:
     "@changesets/changelog-github": "npm:^0.5.0"
     "@changesets/cli": "npm:^2.27.1"
     "@codspeed/vitest-plugin": "npm:^3.1.0"
-    "@types/node": "npm:^20.12.9"
+    "@types/node": "npm:^20.12.11"
     "@vitest/ui": "npm:^1.2.2"
     astro: "npm:^4.4.15"
     defu: "npm:^6.1.4"
