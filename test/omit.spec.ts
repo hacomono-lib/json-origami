@@ -14,7 +14,7 @@ it('should omit specified keys from the object', () => {
     },
   }
   const result = omit(obj, ['a', 'b.c', 'b.e.f'])
-  expect(result).toEqual({
+  expect(result).toStrictEqual({
     b: {
       d: [3, 4],
       e: {
@@ -37,7 +37,7 @@ it('should handle arrays correctly (bracket mode)', () => {
     },
   }
   const result = omit(obj, ['b.d[1]'])
-  expect(result).toEqual({
+  expect(result).toStrictEqual({
     a: 1,
     b: {
       c: 2,
@@ -63,7 +63,7 @@ it('should handle arrays correctly (dot mode)', () => {
     },
   }
   const result = omit(obj, ['b.d.1'], { arrayIndex: 'dot' })
-  expect(result).toEqual({
+  expect(result).toStrictEqual({
     a: 1,
     b: {
       c: 2,
@@ -83,7 +83,7 @@ it('should handle keys that are prefixes of other keys', () => {
     abc: 3,
   }
   const result = omit(obj, ['a', 'ab'])
-  expect(result).toEqual({
+  expect(result).toStrictEqual({
     abc: 3,
   })
 })
@@ -101,7 +101,7 @@ it('should handle keys that are prefixes of nested other keys', () => {
     },
   }
   const result = omit(obj, ['a.b', 'ab'])
-  expect(result).toEqual({
+  expect(result).toStrictEqual({
     abc: { b: 3 },
   })
 })
@@ -113,7 +113,7 @@ it('should handle keys that are suffixes of other keys', () => {
     cba: 3,
   }
   const result = omit(obj, ['a', 'ba'])
-  expect(result).toEqual({
+  expect(result).toStrictEqual({
     cba: 3,
   })
 })
@@ -146,11 +146,28 @@ it('should handle RegExp keys', () => {
     },
   }
   const result = omit(obj, [/^a\.b/, /\.e$/])
-  expect(result).toEqual({
+  expect(result).toStrictEqual({
     ab: {
       c: {
         de: 4,
       },
+    },
+  })
+})
+
+// 存在しないキーを omit した場合、結果にそのキーが含まれないことを確認する
+it('should not include keys that do not exist in the object', () => {
+  const obj = {
+    a: 1,
+    b: {
+      c: 2,
+    },
+  }
+  const result = omit(obj, ['a.b', 'b.d', 'e'])
+  expect(result).toStrictEqual({
+    a: 1,
+    b: {
+      c: 2,
     },
   })
 })

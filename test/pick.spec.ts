@@ -14,7 +14,7 @@ it('should pick specified keys from the object', () => {
     },
   }
   const result = pick(obj, ['a', 'b.c', 'b.d', 'b.e.f'])
-  expect(result).toEqual({
+  expect(result).toStrictEqual({
     a: 1,
     b: {
       c: 2,
@@ -39,7 +39,7 @@ it('should handle arrays correctly (bracket mode)', () => {
     },
   }
   const result = pick(obj, ['b.d[0]'])
-  expect(result).toEqual({
+  expect(result).toStrictEqual({
     b: {
       d: [3],
     },
@@ -59,7 +59,7 @@ it('should handle arrays correctly (dot mode)', () => {
     },
   }
   const result = pick(obj, ['b.d[0]'])
-  expect(result).toEqual({
+  expect(result).toStrictEqual({
     b: {
       d: [3],
     },
@@ -73,7 +73,7 @@ it('should handle keys that are prefixes of other keys', () => {
     abc: 3,
   }
   const result = pick(obj, ['a', 'ab'])
-  expect(result).toEqual({
+  expect(result).toStrictEqual({
     a: 1,
     ab: 2,
   })
@@ -92,7 +92,7 @@ it('should handle keys that are prefixes of nested other keys', () => {
     },
   }
   const result = pick(obj, ['a', 'ab.b'])
-  expect(result).toEqual({
+  expect(result).toStrictEqual({
     a: { b: 1 },
     ab: { b: 2 },
   })
@@ -105,7 +105,7 @@ it('should handle keys that are suffixes of other keys', () => {
     cba: 3,
   }
   const result = pick(obj, ['a', 'ba'])
-  expect(result).toEqual({
+  expect(result).toStrictEqual({
     a: 1,
     ba: 2,
   })
@@ -139,7 +139,7 @@ it('should handle RegExp keys', () => {
     },
   }
   const result = pick(obj, [/^a\.b/, /\.e$/])
-  expect(result).toEqual({
+  expect(result).toStrictEqual({
     a: {
       b: {
         cde: 1,
@@ -160,6 +160,22 @@ it('should handle RegExp keys', () => {
       d: {
         e: 6,
       },
+    },
+  })
+})
+
+it('should not include keys that do not exist in the object', () => {
+  const obj = {
+    a: 1,
+    b: {
+      c: 2,
+    },
+  }
+  const result = pick(obj, ['a', 'b.c', 'b.d', 'd'])
+  expect(result).toStrictEqual({
+    a: 1,
+    b: {
+      c: 2,
     },
   })
 })

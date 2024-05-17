@@ -13,6 +13,12 @@ interface OrigamiOption extends KeyOption {
    * @default false
    */
   immutable?: boolean
+
+  /**
+   * Treat keys with "undefined" values as nonexistent
+   * @default true
+   */
+  treatUndefinedAsNonexistent?: boolean
 }
 
 interface ObjectModifier<T extends Dictionary = Dictionary> {
@@ -102,6 +108,12 @@ interface ObjectModifier<T extends Dictionary = Dictionary> {
    *
    */
   entries(): [string, DictionaryLeaf][]
+
+  /**
+   *
+   * @param key
+   */
+  has(key: string): boolean
 
   get raw(): T
 }
@@ -210,6 +222,36 @@ class ObjectModifierImpl<T extends Dictionary> implements ObjectModifier<T> {
     const nextModifier = this.#getNextModifier(nextRaw, head)
 
     return rest ? nextModifier.get(rest) : nextModifier.raw
+  }
+
+  has(key: string): boolean {
+    if (key === '') {
+      return true
+    }
+
+    const shorthand = this.#findShorthand(key)
+    if (shorthand) {
+      return shorthand.modifier.has(shorthand.lastKey)
+    }
+
+    const { head, rest } = splitHead(key, this.#opt)
+
+    const nextRaw = this.#raw[head as keyof T]
+
+    const fixedHas = (key: string | number, target: Dictionary) => {
+      if (this.#opt.treatUndefinedAsNonexistent ?? true) {
+        return key in target
+      }
+      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+      return key in target && (target as any)[key] !== undefined
+    }
+
+    if (!(isDictionary(nextRaw) && rest)) {
+      return rest ? false : fixedHas(head, this.#raw)
+    }
+
+    const nextModifier = this.#getNextModifier(nextRaw, head)
+    return rest ? nextModifier.has(rest) : false
   }
 
   finalize(): T {
