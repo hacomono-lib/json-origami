@@ -45,11 +45,14 @@ function runBench({ percentOfCheckKeys, objectValues }: TestCaseOption) {
 
   let index = 0
 
-  bench(`omit (complex object including ${objectValues} values, omit ${percentOfCheckKeys * 100}% of keys)`, () => {
+  bench(`has (complex object including ${objectValues} values, check ${percentOfCheckKeys * 100}% of keys)`, () => {
     const currentIndex = index++ % iterations
     // biome-ignore lint/style/noNonNullAssertion: <explanation>
     const { object, keys } = testCases[currentIndex]!
-    has(object, keys)
+
+    for (const key of keys) {
+      has(object, key)
+    }
   })
 }
 
