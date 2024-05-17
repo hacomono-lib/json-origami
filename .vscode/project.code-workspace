@@ -5,13 +5,8 @@
     }
   ],
   "extensions": {
-    "recommendations": [
-      "vitest.explorer",
-      "biomejs.biome"
-    ],
-    "unwantedRecommendations": [
-      "zixuanchen.vitest-explorer"
-    ]
+    "recommendations": ["vitest.explorer", "biomejs.biome"],
+    "unwantedRecommendations": ["zixuanchen.vitest-explorer"]
   },
   "settings": {
     "typescript.tsdk": "node_modules/typescript/lib",
