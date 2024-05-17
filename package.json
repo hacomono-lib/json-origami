@@ -1,8 +1,14 @@
 {
   "name": "json-origami",
-  "version": "0.5.2",
+  "version": "0.6.0",
   "description": "Transform and reshape your JSON objects with the artistry of origami.",
-  "keywords": ["key-value", "transform", "object", "json", "typescript"],
+  "keywords": [
+    "key-value",
+    "transform",
+    "object",
+    "json",
+    "typescript"
+  ],
   "repository": {
     "url": "git+https://github.com/hacomono-lib/json-origami.git",
     "type": "git"
@@ -11,7 +17,10 @@
   "license": "MIT",
   "packageManager": "yarn@4.2.2",
   "type": "module",
-  "files": ["dist", "src"],
+  "files": [
+    "dist",
+    "src"
+  ],
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
