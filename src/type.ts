@@ -142,3 +142,18 @@ export type FixedPickOption = Readonly<PickOption & typeof defaultUnfoldOption>
 export interface KeysOption extends CommonOption {}
 
 export type FixedKeysOption = Readonly<KeysOption & typeof defaultCommonOption>
+
+export interface HasOption extends CommonOption {
+  /**
+   * Trait keys with "undefined" value as nonexistent.
+   * @default true
+   */
+  treatUndefinedAsNonexistent?: boolean
+}
+
+export const defaultHasOption = {
+  ...defaultCommonOption,
+  treatUndefinedAsNonexistent: true,
+} satisfies HasOption
+
+export type FixedHasOption = Readonly<HasOption & typeof defaultHasOption>
