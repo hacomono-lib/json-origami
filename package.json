@@ -2,13 +2,7 @@
   "name": "json-origami",
   "version": "0.5.2",
   "description": "Transform and reshape your JSON objects with the artistry of origami.",
-  "keywords": [
-    "key-value",
-    "transform",
-    "object",
-    "json",
-    "typescrip"
-  ],
+  "keywords": ["key-value", "transform", "object", "json", "typescript"],
   "repository": {
     "url": "git+https://github.com/hacomono-lib/json-origami.git",
     "type": "git"
@@ -17,10 +11,7 @@
   "license": "MIT",
   "packageManager": "yarn@4.2.2",
   "type": "module",
-  "files": [
-    "dist",
-    "src"
-  ],
+  "files": ["dist", "src"],
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -46,8 +37,8 @@
     "test:type": "tsc --noEmit -p tsconfig.json",
     "test:doc": "astro check --root ./docs",
     "vitest": "node --expose-gc node_modules/.bin/vitest",
-    "format": "biome format --write ./src ./test",
-    "lint": "biome check --apply ./src ./test"
+    "format": "biome format --write .",
+    "lint": "biome check --apply ."
   },
   "devDependencies": {
     "@astrojs/check": "^0.4.1",
