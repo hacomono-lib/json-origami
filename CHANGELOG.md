@@ -1,5 +1,11 @@
 # json-origami
 
+## 0.6.0
+
+### Minor Changes
+
+- [#189](https://github.com/hacomono-lib/json-origami/pull/189) [`534fb16`](https://github.com/hacomono-lib/json-origami/commit/534fb16a927e2c24a1825e35a71954851aa72c92) Thanks [@mew-ton](https://github.com/mew-ton)! - fix: #190 存在しないキーを pick すると undefined を値とするキーが結果に含まれるのをやめる
+
 ## 0.5.2
 
 ### Patch Changes
