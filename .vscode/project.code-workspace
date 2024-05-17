@@ -6,8 +6,11 @@
   ],
   "extensions": {
     "recommendations": [
-      "zixuanchen.vitest-explorer",
+      "vitest.explorer",
       "biomejs.biome"
+    ],
+    "unwantedRecommendations": [
+      "zixuanchen.vitest-explorer"
     ]
   },
   "settings": {
