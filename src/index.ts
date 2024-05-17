@@ -1,5 +1,4 @@
 export type { Folded, Unfolded } from './type'
-// biome-ignore lint/performance/noBarrelFile: <explanation>
 export { fold } from './fold'
 export { has } from './has'
 export { unfold } from './unfold'
