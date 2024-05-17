@@ -44,11 +44,11 @@ export function pick(obj: Dictionary, keys: Array<string | RegExp>, opt?: PickOp
 
   const src = toModifier(obj, fixedOption)
 
-  const regexpKeyss = keys.filter((key): key is RegExp => key instanceof RegExp)
+  const regexpKeys = keys.filter((key): key is RegExp => key instanceof RegExp)
 
   // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: <explanation>
   const fixedKeys: string[] = (() => {
-    if (regexpKeyss.length <= 0) {
+    if (regexpKeys.length <= 0) {
       return keys as string[]
     }
 
@@ -56,7 +56,7 @@ export function pick(obj: Dictionary, keys: Array<string | RegExp>, opt?: PickOp
     const keyset = new Set<string>(stringKeys)
     const srcKeys = src.keys()
 
-    for (const key of regexpKeyss) {
+    for (const key of regexpKeys) {
       if (key instanceof RegExp) {
         for (const k of srcKeys) {
           if (key.test(k)) {
@@ -70,7 +70,9 @@ export function pick(obj: Dictionary, keys: Array<string | RegExp>, opt?: PickOp
 
   const dist = createEmptyModifier(fixedOption)
   for (const key of fixedKeys) {
-    dist.set(key, src.get(key))
+    if (src.has(key)) {
+      dist.set(key, src.get(key))
+    }
   }
 
   return dist.finalize()
