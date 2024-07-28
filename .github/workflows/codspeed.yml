@@ -43,7 +43,7 @@ jobs:
       - uses: ./.github/actions/init-node
 
       - name: Run benchmarks
-        uses: CodSpeedHQ/action@v2
+        uses: CodSpeedHQ/action@v3
         with:
           run: yarn bench
           token: ${{ secrets.CODSPEED_TOKEN }}
