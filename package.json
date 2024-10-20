@@ -9,7 +9,7 @@
   },
   "author": "mew-ton <mxl_usmarc@slmail.mewton.jp>",
   "license": "MIT",
-  "packageManager": "yarn@4.2.2",
+  "packageManager": "yarn@4.5.1",
   "type": "module",
   "files": ["dist", "src"],
   "main": "./dist/index.cjs",
@@ -66,6 +66,6 @@
   },
   "volta": {
     "node": "20.13.1",
-    "yarn": "4.2.2"
+    "yarn": "4.5.1"
   }
 }
