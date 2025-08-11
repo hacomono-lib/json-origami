@@ -16,7 +16,7 @@ jobs:
   init__node:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: ./.github/actions/init-node
 
   build-doc:
@@ -25,7 +25,7 @@ jobs:
     needs:
       - init__node
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: ./.github/actions/init-node
 
       - run: yarn doc-build

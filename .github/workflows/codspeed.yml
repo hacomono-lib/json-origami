@@ -31,7 +31,7 @@ jobs:
       !contains(github.event.pull_request.labels.*.name, 'renovate') && github.event.pull_request.title != 'Version Packages'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: ./.github/actions/init-node
 
   benchmarks:
@@ -39,7 +39,7 @@ jobs:
     needs:
       - init__node
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: ./.github/actions/init-node
 
       - name: Run benchmarks
