@@ -2372,11 +2372,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vitest/ui@npm:^1.6.0":
-  version: 1.6.0
-  resolution: "@vitest/ui@npm:1.6.0"
+"@vitest/ui@npm:^1.6.1":
+  version: 1.6.1
+  resolution: "@vitest/ui@npm:1.6.1"
   dependencies:
-    "@vitest/utils": "npm:1.6.0"
+    "@vitest/utils": "npm:1.6.1"
     fast-glob: "npm:^3.3.2"
     fflate: "npm:^0.8.1"
     flatted: "npm:^3.2.9"
@@ -2384,8 +2384,8 @@ __metadata:
     picocolors: "npm:^1.0.0"
     sirv: "npm:^2.0.4"
   peerDependencies:
-    vitest: 1.6.0
-  checksum: 10/4927285e1aaf1aec449055ad86be424ea8db513e8904c425226203fe14480850061213afd638929e17f9817d18c1e935215f50c0a4f7d885c15b6aefc80ca358
+    vitest: 1.6.1
+  checksum: 10/3470206f4349dab3282f4586716c7f96a4df5e777a7ae0d17a4c54e4814c46d8cc7706710ba0d2609e3a11c68f48fb01c8d56caf6c9cd8efc97dd66ca4b411d0
   languageName: node
   linkType: hard
 
@@ -2398,6 +2398,18 @@ __metadata:
     loupe: "npm:^2.3.7"
     pretty-format: "npm:^29.7.0"
   checksum: 10/5c5d7295ac13fcea1da039232bcc7c3fc6f070070fe12ba2ad152456af6e216e48a3ae169016cfcd5055706a00dc567b8f62e4a9b1914f069f52b8f0a3c25e60
+  languageName: node
+  linkType: hard
+
+"@vitest/utils@npm:1.6.1":
+  version: 1.6.1
+  resolution: "@vitest/utils@npm:1.6.1"
+  dependencies:
+    diff-sequences: "npm:^29.6.3"
+    estree-walker: "npm:^3.0.3"
+    loupe: "npm:^2.3.7"
+    pretty-format: "npm:^29.7.0"
+  checksum: 10/2aa8718c5e0705f28a8e94ac00055a48789b1badda79d3578d21241557195816508677ecd5f41fe355edb204e6f817124f059c4806102e040cc8890d8691ae9a
   languageName: node
   linkType: hard
 
@@ -5699,7 +5711,7 @@ __metadata:
     "@changesets/cli": "npm:^2.27.1"
     "@codspeed/vitest-plugin": "npm:^3.1.0"
     "@types/node": "npm:^20.12.12"
-    "@vitest/ui": "npm:^1.6.0"
+    "@vitest/ui": "npm:^1.6.1"
     astro: "npm:^4.8.5"
     defu: "npm:^6.1.4"
     sharp: "npm:^0.33.4"
