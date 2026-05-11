@@ -2277,12 +2277,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^20.12.12":
-  version: 20.12.12
-  resolution: "@types/node@npm:20.12.12"
+"@types/node@npm:^20.19.40":
+  version: 20.19.40
+  resolution: "@types/node@npm:20.19.40"
   dependencies:
-    undici-types: "npm:~5.26.4"
-  checksum: 10/e3945da0a3017bdc1f88f15bdfb823f526b2a717bd58d4640082d6eb0bd2794b5c99bfb914b9e9324ec116dce36066990353ed1c777e8a7b0641f772575793c4
+    undici-types: "npm:~6.21.0"
+  checksum: 10/ca7df7695ae9824c1934a642bf2841e661a4c97a37a6305d3a5cc0367d309f225b6420b464c7824ed98e9ff652e50541540d760c6d416e2b9cda668e82d284ae
   languageName: node
   linkType: hard
 
@@ -5698,7 +5698,7 @@ __metadata:
     "@changesets/changelog-github": "npm:^0.5.0"
     "@changesets/cli": "npm:^2.27.1"
     "@codspeed/vitest-plugin": "npm:^3.1.0"
-    "@types/node": "npm:^20.12.12"
+    "@types/node": "npm:^20.19.40"
     "@vitest/ui": "npm:^1.6.0"
     astro: "npm:^4.8.5"
     defu: "npm:^6.1.4"
@@ -9243,6 +9243,13 @@ __metadata:
   version: 5.26.5
   resolution: "undici-types@npm:5.26.5"
   checksum: 10/0097779d94bc0fd26f0418b3a05472410408877279141ded2bd449167be1aed7ea5b76f756562cb3586a07f251b90799bab22d9019ceba49c037c76445f7cddd
+  languageName: node
+  linkType: hard
+
+"undici-types@npm:~6.21.0":
+  version: 6.21.0
+  resolution: "undici-types@npm:6.21.0"
+  checksum: 10/ec8f41aa4359d50f9b59fa61fe3efce3477cc681908c8f84354d8567bb3701fafdddf36ef6bff307024d3feb42c837cf6f670314ba37fc8145e219560e473d14
   languageName: node
   linkType: hard
 
