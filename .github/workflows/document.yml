@@ -15,8 +15,13 @@ permissions:
 jobs:
   init__node:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     steps:
       - uses: actions/checkout@v4
+      - uses: ./.github/actions/takumi-guard-setup
       - uses: ./.github/actions/init-node
 
   build-doc:
@@ -24,8 +29,13 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - init__node
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     steps:
       - uses: actions/checkout@v4
+      - uses: ./.github/actions/takumi-guard-setup
       - uses: ./.github/actions/init-node
 
       - run: yarn doc-build

@@ -30,16 +30,28 @@ jobs:
     if: |
       !contains(github.event.pull_request.labels.*.name, 'renovate') && github.event.pull_request.title != 'Version Packages'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+      pull-requests: write
+      id-token: write
     steps:
       - uses: actions/checkout@v4
+      - uses: ./.github/actions/takumi-guard-setup
       - uses: ./.github/actions/init-node
 
   benchmarks:
     runs-on: ubuntu-latest
     needs:
       - init__node
+    permissions:
+      contents: read
+      packages: read
+      pull-requests: write
+      id-token: write
     steps:
       - uses: actions/checkout@v4
+      - uses: ./.github/actions/takumi-guard-setup
       - uses: ./.github/actions/init-node
 
       - name: Run benchmarks
